@@ -26,7 +26,16 @@ std::string TaskDoFile::DoExec(lua_State* pL)
 {
 	int execResult = luaL_dofile(pL, mFilePath.c_str());
 
-	if (execResult != 0) return "";
+	if (execResult != 0)
+	{
+		std::string luaError = "No Error Message!";
+		if (lua_type(pL, -1) == LUA_TSTRING) 
+		{
+			luaError = lua_tostring(pL, -1);
+		}
+
+		SetError("Error in file " + mFilePath + ": " + luaError);
+	}
 	
 	if (lua_type(pL, -1) != LUA_TSTRING) return "";
 
