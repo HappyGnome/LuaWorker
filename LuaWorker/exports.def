@@ -1,0 +1,3 @@
+LIBRARY LuaWorker
+EXPORTS
+  luaopen_LuaWorker
