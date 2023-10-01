@@ -1,4 +1,4 @@
-/*****************************************************************************\
+--[[*****************************************************************************
 * 
 *  Copyright 2023 HappyGnome
 *  
@@ -14,7 +14,7 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 * 
-\*****************************************************************************/
+]]--*****************************************************************************
 
 package.cpath = package.cpath..";"..BinDir.."\\?.dll;"
 
@@ -25,15 +25,30 @@ require('LuaWorker')
 foo = function()
 	local w = LuaWorker.Create()
 	w:Start()
-	local status, task = w:DoString("os.execute('timeout 5') return '123'")
-	print(status .. " " .. LuaWorker.WorkerStatus.Processing)
+	local status, task = w:DoString(
+		[[
+			local i = 0
+
+			print("In worker thread")
+
+			while i < 10000000 do
+				i = (i + 10000002)%10000001 -- +1 slowly
+			end
+
+			print("End of worker thread")
+
+			return 'Done'
+		]])
 
 	local i = 0
-	while task:Status() ~= LuaWorker.TaskStatus.Complete and i < 10 do 
-		print(i)
-		os.execute('timeout 1')
-		i=i+1
+
+	while i < 5000000 do
+		i = (i + 10000002)%10000001 -- +1 slowly
 	end
+
+	print("Still in calling thread")
+
+	print(task:Await())
 end
 
 foo();
