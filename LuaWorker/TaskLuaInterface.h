@@ -47,7 +47,7 @@ namespace LuaWorker
 	{
 	private:
 
-		static AutoKeyMap<int, Task> mTasks;
+		static AutoKeyMap<int, Task> sTasks;
 
 		//-------------------------------
 		// Static Lua helper methods

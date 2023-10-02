@@ -185,6 +185,7 @@
     <ClInclude Include="LogSection.h" />
     <ClInclude Include="LogStack.h" />
     <ClInclude Include="LogItem.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="TaskDoFile.h" />
     <ClInclude Include="TaskDoString.h" />
@@ -207,6 +208,9 @@
   <ItemGroup>
     <None Include="..\README.md" />
     <None Include="exports.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LuaWorker.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -26,11 +26,11 @@ using namespace LuaWorker;
 // Static private objects
 //-------------------------------
 
-AutoKeyMap<int, Worker> WorkerLuaInterface::mWorkers(0);
+AutoKeyMap<int, Worker> WorkerLuaInterface::sWorkers(0);
 
-int WorkerLuaInterface::mNextWorkerId = 0;
+int WorkerLuaInterface::sNextWorkerId = 0;
 
-std::shared_ptr<LogStack> WorkerLuaInterface::mLog = std::shared_ptr<LogStack>(new LogStack());
+std::shared_ptr<LogStack> WorkerLuaInterface::sLog = std::shared_ptr<LogStack>(new LogStack());
 
 //-------------------------------
 // Static Lua helper methods
@@ -50,7 +50,7 @@ std::shared_ptr<Worker> WorkerLuaInterface::l_PopWorker(lua_State* pL, int& outK
 	{
 		outKey = key;
 
-		return mWorkers.at(key);
+		return sWorkers.at(key);
 	}
 	catch (std::out_of_range)
 	{
@@ -65,12 +65,12 @@ std::shared_ptr<Worker> WorkerLuaInterface::l_PopWorker(lua_State* pL, int& outK
 
 int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 {
-	LogSection log(mLog, "Worker " + std::to_string(mNextWorkerId++));
+	LogSection log(sLog, "Worker " + std::to_string(sNextWorkerId++));
 
 	std::shared_ptr<Worker> newWorker(new Worker(std::move(log)));
 	newWorker->Start();
 
-	int key = mWorkers.push(newWorker);
+	int key = sWorkers.push(newWorker);
 
 	lua_createtable(pL, 0, 5);
 	lua_newuserdata(pL, 1);
@@ -102,7 +102,7 @@ int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 int WorkerLuaInterface::l_Worker_PopLogLine(lua_State* pL) 
 {
 	std::string msg;
-	if (mLog->PopLine(msg))
+	if (sLog->PopLine(msg))
 	{
 		lua_pushstring(pL, msg.c_str());
 		return 1;
@@ -119,30 +119,30 @@ int WorkerLuaInterface::l_Worker_PopLogLine(lua_State* pL)
 int WorkerLuaInterface::l_Worker_Delete(lua_State* pL) 
 {
 	int key;
-	std::shared_ptr<Worker> p = l_PopWorker(pL, key);
+	std::shared_ptr<Worker> pWorker = l_PopWorker(pL, key);
 
-	if (p != nullptr)
+	if (pWorker != nullptr)
 	{
-		p->Stop();
-		mWorkers.pop(key);
+		pWorker->Stop();
+		sWorkers.pop(key);
 	}
 	return 0;
 }
 
 int WorkerLuaInterface::l_Worker_DoString(lua_State* pL)
 {
-	std::shared_ptr<Worker> p = l_PopWorker(pL);
+	std::shared_ptr<Worker> pWorker = l_PopWorker(pL);
 
-	if (p != nullptr)
+	if (pWorker != nullptr)
 	{
 		if (lua_isstring(pL, -1))
 		{
 			std::string str = lua_tostring(pL, -1);
 
 			std::shared_ptr<Task> newItem(new TaskDoString(str));
-			p->AddTask(newItem);
+			pWorker->AddTask(newItem);
 
-			return TaskLuaInterface::l_PushTask(pL, newItem) + l_PushStatus(pL, p);
+			return TaskLuaInterface::l_PushTask(pL, newItem) + l_PushStatus(pL, pWorker);
 		}
 	}
 
@@ -151,18 +151,18 @@ int WorkerLuaInterface::l_Worker_DoString(lua_State* pL)
 
 int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 {
-	std::shared_ptr<Worker> p = l_PopWorker(pL);
+	std::shared_ptr<Worker> pWorker = l_PopWorker(pL);
 
-	if (p != nullptr)
+	if (pWorker != nullptr)
 	{
 		if (lua_isstring(pL, -1))
 		{
 			std::string str = lua_tostring(pL, -1);
 
 			std::shared_ptr<Task> newItem(new TaskDoFile(str));
-			p->AddTask(newItem);
+			pWorker->AddTask(newItem);
 			
-			return TaskLuaInterface::l_PushTask(pL, newItem) + l_PushStatus(pL, p);
+			return TaskLuaInterface::l_PushTask(pL, newItem) + l_PushStatus(pL, pWorker);
 		}
 	}
 
@@ -171,16 +171,16 @@ int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 
 int WorkerLuaInterface::l_Worker_Status(lua_State* pL)
 {
-	std::shared_ptr<Worker> p = l_PopWorker(pL);
+	std::shared_ptr<Worker> pWorker = l_PopWorker(pL);
 
-	return l_PushStatus(pL, p);
+	return l_PushStatus(pL, pWorker);
 }
 
-int WorkerLuaInterface::l_PushStatus(lua_State* pL, std::shared_ptr<Worker> p)
+int WorkerLuaInterface::l_PushStatus(lua_State* pL, std::shared_ptr<Worker> pWorker)
 {
-	if (p == nullptr) return 0;
+	if (pWorker == nullptr) return 0;
 
-	WorkerStatus status = p -> GetStatus();
+	WorkerStatus status = pWorker-> GetStatus();
 
 	int statusInt;
 
@@ -200,18 +200,18 @@ int WorkerLuaInterface::l_PushStatus(lua_State* pL, std::shared_ptr<Worker> p)
 
 int WorkerLuaInterface::l_Worker_Start(lua_State* pL) 
 {
-	std::shared_ptr<Worker> p = l_PopWorker(pL);
+	std::shared_ptr<Worker> pWorker = l_PopWorker(pL);
 
-	if (p != nullptr) p->Start();
+	if (pWorker != nullptr) pWorker->Start();
 
-	return l_PushStatus(pL, p);
+	return l_PushStatus(pL, pWorker);
 }
 
 int WorkerLuaInterface::l_Worker_Stop(lua_State* pL)
 {
-	std::shared_ptr<Worker> p = l_PopWorker(pL);
+	std::shared_ptr<Worker> pWorker = l_PopWorker(pL);
 
-	if (p != nullptr) p->Stop();
+	if (pWorker != nullptr) pWorker->Stop();
 
-	return l_PushStatus(pL, p);
+	return l_PushStatus(pL, pWorker);
 }

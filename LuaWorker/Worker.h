@@ -75,6 +75,18 @@ namespace LuaWorker
 		/// Method executed by the worker thread
 		/// </summary>
 		void ThreadMain();
+	
+		/// <summary>
+		/// Setup lua environment for main thread
+		/// </summary>
+		/// <returns>Lua state created, or nullptr</returns>
+		lua_State* ThreadMainInitLua();
+
+		/// <summary>
+		/// Execute main worker loop
+		/// </summary>
+		/// <param name="pL">Lua state in which to execute tasks</param>
+		void ThreadMainLoop(lua_State* pL);
 
 		/// <summary>
 		/// Cancel worker thread execution
@@ -85,6 +97,15 @@ namespace LuaWorker
 		/// Set all pending tasks to a Cancelled state
 		/// </summary>
 		void CancelAllTasks();
+
+		//---------------------
+		// Worker Lua 
+		// C methods
+		//---------------------
+		static Worker* l_PopThis(lua_State* pL);
+		static int l_Log (lua_State* pL, LogLevel level);
+		static int l_LogError (lua_State* pL);
+		static int l_LogInfo (lua_State* pL);
 
 	public:
 

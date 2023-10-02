@@ -21,5 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="run_worker.lua" />
+    <None Include="file_to_run.lua" />
   </ItemGroup>
 </Project>

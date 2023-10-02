@@ -20,7 +20,7 @@
 
 using namespace LuaWorker;
 
-AutoKeyMap<int, Task> TaskLuaInterface::mTasks(0);
+AutoKeyMap<int, Task> TaskLuaInterface::sTasks(0);
 
 //-------------------------------
 // Static Lua helper methods
@@ -40,7 +40,7 @@ std::shared_ptr<Task> TaskLuaInterface::l_PopTask(lua_State* pL, int &outKey)
 	{
 		outKey = key;
 
-		return mTasks.at(key);
+		return sTasks.at(key);
 	}
 	catch (std::out_of_range) 
 	{
@@ -54,7 +54,7 @@ std::shared_ptr<Task> TaskLuaInterface::l_PopTask(lua_State* pL, int &outKey)
 
 int TaskLuaInterface::l_PushTask(lua_State* pL, std::shared_ptr<Task> pTask)
 {
-	int key = mTasks.push(pTask);
+	int key = sTasks.push(pTask);
 
 	lua_createtable(pL, 0, 5);
 		lua_newuserdata(pL, 1);
@@ -86,11 +86,11 @@ int TaskLuaInterface::l_PushTask(lua_State* pL, std::shared_ptr<Task> pTask)
 int TaskLuaInterface::l_Task_Delete(lua_State* pL)
 {
 	int key;
-	std::shared_ptr<Task> p = l_PopTask(pL, key);
+	std::shared_ptr<Task> pTask = l_PopTask(pL, key);
 
-	if (p != nullptr)
+	if (pTask != nullptr)
 	{
-		mTasks.pop(key);
+		sTasks.pop(key);
 	}
 
 	return 0;
@@ -98,15 +98,15 @@ int TaskLuaInterface::l_Task_Delete(lua_State* pL)
 
 int TaskLuaInterface::l_Task_Await(lua_State* pL)
 {
-	std::shared_ptr<Task> p = l_PopTask(pL);
+	std::shared_ptr<Task> pTask = l_PopTask(pL);
 
-	if (p != nullptr)
+	if (pTask != nullptr)
 	{
-		p->WaitForResult();
+		pTask->WaitForResult();
 
-		if (p->GetStatus() == TaskStatus::Complete)
+		if (pTask->GetStatus() == TaskStatus::Complete)
 		{
-			lua_pushstring(pL, p->GetResult().c_str());
+			lua_pushstring(pL, pTask->GetResult().c_str());
 			return 1;
 		}
 
@@ -117,11 +117,11 @@ int TaskLuaInterface::l_Task_Await(lua_State* pL)
 
 int TaskLuaInterface::l_Task_Status(lua_State* pL)
 {
-	std::shared_ptr<Task> p = l_PopTask(pL);
+	std::shared_ptr<Task> pTask = l_PopTask(pL);
 
-	if (p != nullptr)
+	if (pTask != nullptr)
 	{
-		TaskStatus status = p->GetStatus();
+		TaskStatus status = pTask->GetStatus();
 
 		int statusInt;
 

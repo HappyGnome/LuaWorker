@@ -28,14 +28,62 @@ void Worker::ThreadMain()
 {
 	mLog.Push(LogLevel::Info, "Thread starting.");
 
-	mCurrentStatus = WorkerStatus::Processing;
-	lua_State* pL = lua_open();
-	luaL_openlibs(pL);
+	lua_State* pL = ThreadMainInitLua();
 
-	std::shared_ptr<Task> currentTask;
+	mLog.Push(LogLevel::Info, "Lua opened on worker.");
+
+	ThreadMainLoop(pL);
+
+	mLog.Push(LogLevel::Info, "Thread stopping.");
+
+	Cancel(); // Ensure tasks cancelled and status updated
+
+	if (pL != nullptr) lua_close(pL);
+}
+
+//------
+lua_State* Worker::ThreadMainInitLua()
+{
+	try
+	{
+		mCurrentStatus = WorkerStatus::Processing;
+		lua_State* pL = lua_open();
+		luaL_openlibs(pL);
+
+			lua_createtable(pL, 0, 2);
+				lua_pushlightuserdata(pL, this);
+				lua_pushcclosure(pL, Worker::l_LogError, 1);
+			lua_setfield(pL, -2, "LogError");
+				lua_pushlightuserdata(pL, this);
+				lua_pushcclosure(pL, Worker::l_LogInfo, 1);
+			lua_setfield(pL, -2, "LogInfo");
+
+		lua_setglobal(pL, "LuaWorker");
+
+		return pL;
+	}
+	catch (const std::exception& ex)
+	{
+		mLog.Push(ex);
+		mCurrentStatus = WorkerStatus::Error;
+	}
+
+	return nullptr;
+}
+
+//------
+void Worker::ThreadMainLoop(lua_State* pL)
+{
+	if (pL == nullptr)
+	{
+		mLog.Push(LogLevel::Error, "Lua not initialized.");
+		return;
+	}
 
 	try
 	{
+		std::shared_ptr<Task> currentTask;
+
 		while (!mCancel)
 		{
 			while (!mCancel)
@@ -53,11 +101,14 @@ void Worker::ThreadMain()
 			}
 
 			if (mCancel) break;
-			else if (currentTask == nullptr || currentTask -> GetStatus() != TaskStatus::NotStarted) continue;
+			else if (currentTask == nullptr || currentTask->GetStatus() != TaskStatus::NotStarted) continue;
 
-			try 
+			try
 			{
 				currentTask->Exec(pL);
+
+				if (currentTask->GetStatus() == TaskStatus::Error) mLog.Push(LogLevel::Error, currentTask->GetError());
+
 				currentTask = nullptr;
 			}
 			catch (const std::exception& ex)
@@ -72,12 +123,6 @@ void Worker::ThreadMain()
 		mLog.Push(ex);
 		mCurrentStatus = WorkerStatus::Error;
 	}
-
-	mLog.Push(LogLevel::Info, "Thread stopping.");
-
-	Cancel(); // Ensure tasks cancelled and status updated
-
-	lua_close(pL);
 }
 
 //------
@@ -104,6 +149,41 @@ void Worker::CancelAllTasks()
 	mTaskQueue.clear();
 }
 
+//---------------------
+// Worker Lua 
+// C methods
+//---------------------
+
+Worker* Worker::l_PopThis(lua_State* pL)
+{
+	if (!lua_islightuserdata(pL, lua_upvalueindex(1))) return nullptr;
+	return (Worker*)lua_topointer(pL, lua_upvalueindex(1));
+}
+
+int Worker::l_Log(lua_State* pL, LogLevel level)
+{
+	Worker* pWorker = l_PopThis(pL);
+
+	if (pWorker != nullptr)
+	{
+		if (!lua_isstring(pL, -1)) return 0;
+		pWorker->mLog.Push(level, lua_tostring(pL, -1));
+	}
+	return 0;
+}
+
+int Worker::l_LogError(lua_State* pL)
+{
+	return l_Log(pL, LogLevel::Error);
+}
+
+//------
+int Worker::l_LogInfo(lua_State* pL)
+{
+	return l_Log(pL, LogLevel::Info);
+}
+
+
 //-------------------------------
 // Public methods
 //-------------------------------
@@ -113,9 +193,18 @@ Worker::Worker(LogSection && log) : mCancel(false), mCurrentStatus(WorkerStatus:
 //------
 Worker::~Worker()
 {
-	if (mThread.joinable())
+	try
 	{
-		mLog.Push(LogLevel::Warn,"Thread not joined at destruction!");
+		if (mThread.joinable())
+		{
+			mLog.Push(LogLevel::Warn, "Stop not called on thread. Attempting shutdown...");
+			Stop();
+			//Perhaps add a timeout here, or where the thread calls Exec.
+		}
+	}
+	catch (const std::exception& ex)
+	{
+		//Suppress exceptions from destructor
 	}
 }
 

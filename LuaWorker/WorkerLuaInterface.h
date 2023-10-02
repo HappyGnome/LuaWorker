@@ -45,9 +45,9 @@ namespace LuaWorker
 	{
 	private:
 
-		static std::shared_ptr<LogStack> mLog;
-		static AutoKeyMap<int, Worker> mWorkers;
-		static int mNextWorkerId;
+		static std::shared_ptr<LogStack> sLog;
+		static AutoKeyMap<int, Worker> sWorkers;
+		static int sNextWorkerId;
 
 		//-------------------------------
 		// Static Lua helper methods
@@ -76,7 +76,7 @@ namespace LuaWorker
 		/// <param name="pL">Lua state</param>
 		/// <param name="p">Worker whose state to push</param>
 		/// <returns>Number of items pushed to the stack</returns>
-		static int l_PushStatus(lua_State* pL, std::shared_ptr<Worker> p);
+		static int l_PushStatus(lua_State* pL, std::shared_ptr<Worker> pWorker);
 
 	public:
 

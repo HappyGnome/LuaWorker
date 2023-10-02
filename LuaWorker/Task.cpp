@@ -94,7 +94,7 @@ void Task::Exec(lua_State* pL)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
-		mStatus = TaskStatus::Complete;
+		if (mStatus != TaskStatus::Error) mStatus = TaskStatus::Complete;
 	}
 
 	mResultStatusCv.notify_all();
