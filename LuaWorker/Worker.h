@@ -29,13 +29,14 @@
 
 #include "Task.h"
 #include "LogSection.h"
+#include "InnerLuaState.h"
 
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
 }
-using namespace std::chrono_literals;
+//using namespace std::chrono_literals;
 
 namespace LuaWorker
 {
@@ -67,6 +68,8 @@ namespace LuaWorker
 
 		LogSection mLog;
 
+		InnerLuaState mInnerLua;
+
 		//---------------------
 		// Private Methods
 		//---------------------
@@ -79,14 +82,19 @@ namespace LuaWorker
 		/// <summary>
 		/// Setup lua environment for main thread
 		/// </summary>
-		/// <returns>Lua state created, or nullptr</returns>
-		lua_State* ThreadMainInitLua();
+		/// <returns>True on success</returns>
+		bool ThreadMainInitLua();
+
+		/// <summary>
+		/// Close Lua for main thread
+		/// </summary>
+		/// <returns>True on success</returns>
+		bool ThreadMainCloseLua();
 
 		/// <summary>
 		/// Execute main worker loop
 		/// </summary>
-		/// <param name="pL">Lua state in which to execute tasks</param>
-		void ThreadMainLoop(lua_State* pL);
+		void ThreadMainLoop();
 
 		/// <summary>
 		/// Cancel worker thread execution
@@ -97,15 +105,6 @@ namespace LuaWorker
 		/// Set all pending tasks to a Cancelled state
 		/// </summary>
 		void CancelAllTasks();
-
-		//---------------------
-		// Worker Lua 
-		// C methods
-		//---------------------
-		static Worker* l_PopThis(lua_State* pL);
-		static int l_Log (lua_State* pL, LogLevel level);
-		static int l_LogError (lua_State* pL);
-		static int l_LogInfo (lua_State* pL);
 
 	public:
 

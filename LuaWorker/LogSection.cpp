@@ -24,6 +24,16 @@ using namespace LuaWorker;
 
 LogSection::LogSection(std::shared_ptr<LogStack> stack, std::string section) : mLog(stack), mSection(section) {}
 
+LogSection::LogSection(const LogSection& other) : mLog(other.mLog), mSection (other.mSection) {}
+
+LogSection& LogSection::operator= (const LogSection& other)
+{
+	mLog = other.mLog;
+	mSection = other.mSection;
+
+	return *this;
+}
+
 void LogSection::Push(const LogLevel& level, const std::string& message)
 {
 	if (mLog != nullptr)

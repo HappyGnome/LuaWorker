@@ -28,57 +28,56 @@ void Worker::ThreadMain()
 {
 	mLog.Push(LogLevel::Info, "Thread starting.");
 
-	lua_State* pL = ThreadMainInitLua();
+	if (ThreadMainInitLua()) mLog.Push(LogLevel::Info, "Lua opened on worker.");
 
-	mLog.Push(LogLevel::Info, "Lua opened on worker.");
-
-	ThreadMainLoop(pL);
+	ThreadMainLoop();
 
 	mLog.Push(LogLevel::Info, "Thread stopping.");
 
 	Cancel(); // Ensure tasks cancelled and status updated
 
-	if (pL != nullptr) lua_close(pL);
+	ThreadMainCloseLua();
 }
 
 //------
-lua_State* Worker::ThreadMainInitLua()
+bool Worker::ThreadMainInitLua()
 {
 	try
 	{
 		mCurrentStatus = WorkerStatus::Processing;
-		lua_State* pL = lua_open();
-		luaL_openlibs(pL);
+		
+		mInnerLua.Open();
 
-			lua_createtable(pL, 0, 2);
-				lua_pushlightuserdata(pL, this);
-				lua_pushcclosure(pL, Worker::l_LogError, 1);
-			lua_setfield(pL, -2, "LogError");
-				lua_pushlightuserdata(pL, this);
-				lua_pushcclosure(pL, Worker::l_LogInfo, 1);
-			lua_setfield(pL, -2, "LogInfo");
-
-		lua_setglobal(pL, "LuaWorker");
-
-		return pL;
+		return true;
 	}
 	catch (const std::exception& ex)
 	{
 		mLog.Push(ex);
 		mCurrentStatus = WorkerStatus::Error;
 	}
-
-	return nullptr;
+	return false;
 }
 
 //------
-void Worker::ThreadMainLoop(lua_State* pL)
+bool Worker::ThreadMainCloseLua()
 {
-	if (pL == nullptr)
+	try
 	{
-		mLog.Push(LogLevel::Error, "Lua not initialized.");
-		return;
+		mInnerLua.Close();
+
+		return true;
 	}
+	catch (const std::exception& ex)
+	{
+		mLog.Push(ex);
+		mCurrentStatus = WorkerStatus::Error;
+	}
+	return false;
+}
+
+//------
+void Worker::ThreadMainLoop()
+{
 
 	try
 	{
@@ -105,7 +104,13 @@ void Worker::ThreadMainLoop(lua_State* pL)
 
 			try
 			{
-				currentTask->Exec(pL);
+				if (!mInnerLua.IsOpen())
+				{
+					mLog.Push(LogLevel::Error, "Lua not initialized.");
+					break;
+				}
+
+				mInnerLua.ExecTask(currentTask);
 
 				if (currentTask->GetStatus() == TaskStatus::Error) mLog.Push(LogLevel::Error, currentTask->GetError());
 
@@ -134,6 +139,8 @@ void Worker::Cancel()
 	CancelAllTasks();
 
 	mTaskCancelCv.notify_all();
+
+	mInnerLua.Cancel();
 }
 
 //------
@@ -149,46 +156,15 @@ void Worker::CancelAllTasks()
 	mTaskQueue.clear();
 }
 
-//---------------------
-// Worker Lua 
-// C methods
-//---------------------
-
-Worker* Worker::l_PopThis(lua_State* pL)
-{
-	if (!lua_islightuserdata(pL, lua_upvalueindex(1))) return nullptr;
-	return (Worker*)lua_topointer(pL, lua_upvalueindex(1));
-}
-
-int Worker::l_Log(lua_State* pL, LogLevel level)
-{
-	Worker* pWorker = l_PopThis(pL);
-
-	if (pWorker != nullptr)
-	{
-		if (!lua_isstring(pL, -1)) return 0;
-		pWorker->mLog.Push(level, lua_tostring(pL, -1));
-	}
-	return 0;
-}
-
-int Worker::l_LogError(lua_State* pL)
-{
-	return l_Log(pL, LogLevel::Error);
-}
-
-//------
-int Worker::l_LogInfo(lua_State* pL)
-{
-	return l_Log(pL, LogLevel::Info);
-}
-
 
 //-------------------------------
 // Public methods
 //-------------------------------
 
-Worker::Worker(LogSection && log) : mCancel(false), mCurrentStatus(WorkerStatus::NotStarted), mLog(log){}
+Worker::Worker(LogSection && log) : mCancel(false), 
+									mCurrentStatus(WorkerStatus::NotStarted), 
+									mLog(log), 
+									mInnerLua(LogSection(log)){}
 
 //------
 Worker::~Worker()

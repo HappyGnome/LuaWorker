@@ -47,6 +47,24 @@ namespace LuaWorker
 		explicit LogSection(std::shared_ptr<LogStack> stack, std::string section);
 
 		/// <summary>
+		/// Copy Constructor
+		/// </summary>
+		/// <param name="other"></param>
+		LogSection(const LogSection& other);
+
+		/// <summary>
+		/// Default destructor
+		/// </summary>
+		~LogSection() = default;
+
+		/// <summary>
+		/// Copy assignment
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
+		LogSection& operator= (const LogSection& other);
+
+		/// <summary>
 		/// Push log message to queue
 		/// </summary>
 		/// <param name="level">Message type/level</param>
