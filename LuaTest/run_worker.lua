@@ -48,13 +48,13 @@ foo = function()
 
 	print("Still in calling thread")
 
-	task:Await(10000)
+	print(task:Await(10000))
 
 	local status, task = w:DoFile([[file_to_run.lua]])
 
-	task:Await(1000)
+	--print(task:Await(10000))
 
-	w:Stop()
+	--w:Stop()
 end
 
 foo();

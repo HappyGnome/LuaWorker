@@ -25,24 +25,37 @@ extern "C" {
 #include "lauxlib.h"
 #include "lualib.h"
 }
-using namespace std::chrono_literals;
-int main()
+
+void SimulateCallingLua()
 {
 	lua_State* pL = lua_open();
 	luaL_openlibs(pL);
 
 	std::filesystem::path path = std::filesystem::current_path().parent_path();
-	path+="\\LuaTest\\run_worker.lua";
+	path += "\\LuaTest\\run_worker.lua";
 
 	std::filesystem::path binpath = std::filesystem::current_path().parent_path().parent_path().parent_path();
 
 	lua_pushfstring(pL, binpath.string().c_str());
 	lua_setglobal(pL, "BinDir");
 
-	if (luaL_dofile(pL,  path.string().c_str()) == 0) {
+	if (luaL_dofile(pL, path.string().c_str()) == 0) {
 		std::cout << "Lua file run" << std::endl;
 	}
 	else { std::cout << lua_tostring(pL, -1) << std::endl; }
 	lua_close(pL);
+
+}
+using namespace std::chrono_literals;
+int main()
+{
+	SimulateCallingLua();
+	// Lua gc should fire at some point
+
+	std::cout << "Press any key to stop waiting.\n";
+	char a;
+	std::cin >> a;
+
 	return 0;
 }
+
