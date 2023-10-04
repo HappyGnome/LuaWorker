@@ -43,7 +43,7 @@ void SimulateCallingLua()
 		std::cout << "Lua file run" << std::endl;
 	}
 	else { std::cout << lua_tostring(pL, -1) << std::endl; }
-	lua_close(pL);
+	//lua_close(pL); // Test this being omitted
 
 }
 using namespace std::chrono_literals;
