@@ -21,13 +21,15 @@
 #ifndef _TASK_LUA_INTERFACE_H_
 #define _TASK_LUA_INTERFACE_H_
 
-#include <iostream>
-#include <filesystem>
-#include <thread>
-#include <mutex>
-#include <string>
-#include <vector>
-#include <map>
+//#include <iostream>
+//#include <filesystem>
+//#include <thread>
+//#include <mutex>
+//#include <string>
+//#include <vector>
+//#include <map>
+#include<memory>
+
 #include "AutoKeyMap.h"
 #include "Task.h"
 
@@ -36,7 +38,7 @@ extern "C" {
 #include "lauxlib.h"
 #include "lualib.h"
 }
-using namespace std::chrono_literals;
+//using namespace std::chrono_literals;
 
 namespace LuaWorker
 {

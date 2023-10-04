@@ -182,11 +182,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AutoKeyMap.h" />
+    <ClInclude Include="Cancelable.h" />
     <ClInclude Include="InnerLuaState.h" />
     <ClInclude Include="LogSection.h" />
     <ClInclude Include="LogStack.h" />
     <ClInclude Include="LogItem.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="LuaCancellationException.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="TaskDoFile.h" />
     <ClInclude Include="TaskDoString.h" />
@@ -200,6 +201,7 @@
     <ClCompile Include="LogItem.cpp" />
     <ClCompile Include="LogSection.cpp" />
     <ClCompile Include="LogStack.cpp" />
+    <ClCompile Include="LuaCancellationException.cpp" />
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="TaskFile.cpp" />
     <ClCompile Include="TaskLuaInterface.cpp" />
@@ -208,11 +210,7 @@
     <ClCompile Include="WorkerLuaInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\README.md" />
     <None Include="exports.def" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="LuaWorker.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

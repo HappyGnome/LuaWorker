@@ -28,25 +28,32 @@ void Worker::ThreadMain()
 {
 	mLog.Push(LogLevel::Info, "Thread starting.");
 
-	if (ThreadMainInitLua()) mLog.Push(LogLevel::Info, "Lua opened on worker.");
+	InnerLuaState lua = InnerLuaState(LogSection(mLog));
 
-	ThreadMainLoop();
+	if (ThreadMainInitLua(lua)) mLog.Push(LogLevel::Info, "Lua opened on worker.");
+
+	ThreadMainLoop(lua);
 
 	mLog.Push(LogLevel::Info, "Thread stopping.");
 
 	Cancel(); // Ensure tasks cancelled and status updated
 
-	ThreadMainCloseLua();
+	ThreadMainCloseLua(lua);
 }
 
 //------
-bool Worker::ThreadMainInitLua()
+bool Worker::ThreadMainInitLua(InnerLuaState& lua)
 {
 	try
 	{
 		mCurrentStatus = WorkerStatus::Processing;
+
+		{
+			std::unique_lock<std::mutex> lock(mLuaCancelMtx);
+			mLuaCancel = &lua;
+		}
 		
-		mInnerLua.Open();
+		lua.Open();
 
 		return true;
 	}
@@ -59,11 +66,16 @@ bool Worker::ThreadMainInitLua()
 }
 
 //------
-bool Worker::ThreadMainCloseLua()
+bool Worker::ThreadMainCloseLua(InnerLuaState& lua)
 {
 	try
 	{
-		mInnerLua.Close();
+		lua.Close();
+
+		{
+			std::unique_lock<std::mutex> lock(mLuaCancelMtx);
+			mLuaCancel = nullptr;
+		}
 
 		return true;
 	}
@@ -76,7 +88,7 @@ bool Worker::ThreadMainCloseLua()
 }
 
 //------
-void Worker::ThreadMainLoop()
+void Worker::ThreadMainLoop(InnerLuaState& lua)
 {
 
 	try
@@ -104,13 +116,13 @@ void Worker::ThreadMainLoop()
 
 			try
 			{
-				if (!mInnerLua.IsOpen())
+				if (!lua.IsOpen())
 				{
 					mLog.Push(LogLevel::Error, "Lua not initialized.");
 					break;
 				}
 
-				mInnerLua.ExecTask(currentTask);
+				lua.ExecTask(currentTask);
 
 				if (currentTask->GetStatus() == TaskStatus::Error) mLog.Push(LogLevel::Error, currentTask->GetError());
 
@@ -140,7 +152,10 @@ void Worker::Cancel()
 
 	mTaskCancelCv.notify_all();
 
-	mInnerLua.Cancel();
+	{
+		std::unique_lock<std::mutex> lock(mLuaCancelMtx);
+		if (mLuaCancel != nullptr) mLuaCancel->Cancel();
+	}
 }
 
 //------
@@ -164,7 +179,7 @@ void Worker::CancelAllTasks()
 Worker::Worker(LogSection && log) : mCancel(false), 
 									mCurrentStatus(WorkerStatus::NotStarted), 
 									mLog(log), 
-									mInnerLua(LogSection(log)){}
+									mLuaCancel(nullptr){}
 
 //------
 Worker::~Worker()

@@ -21,7 +21,15 @@
 #ifndef _TASKDOSTRING_H_
 #define _TASKDOSTRING_H_
 
+#include<string>
+
 #include "Task.h"
+
+extern "C" {
+#include "lua.h"
+	//#include "lauxlib.h"
+	//#include "lualib.h"
+}
 
 namespace LuaWorker
 {

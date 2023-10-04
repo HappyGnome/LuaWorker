@@ -18,8 +18,17 @@
 
 #include "InnerLuaState.h"
 #include "Worker.h"
+#include "LuaCancellationException.h"
+
+extern "C" {
+	#include "lua.h"
+	#include "lauxlib.h"
+	#include "lualib.h"
+}
 
 using namespace LuaWorker;
+
+const char* InnerLuaState::cLuaStateHandleKey = "_LUAWORKER_STATE";
 
 //---------------------
 // InnerLuaState
@@ -60,7 +69,18 @@ int InnerLuaState::l_LogInfo(lua_State* pL)
 //------
 void InnerLuaState::l_Hook(lua_State* pL, lua_Debug* pDebug)
 {
-	InnerLuaState* pState = l_PopThis(pL);
+	int stackDelta = -lua_gettop(pL);
+	lua_getglobal(pL, cLuaStateHandleKey);
+	stackDelta += lua_gettop(pL);
+
+	if (!lua_islightuserdata(pL, -1) || stackDelta == 0)
+	{
+		lua_pop(pL, stackDelta);
+		return;
+	}
+
+	InnerLuaState* pState = (InnerLuaState*)lua_topointer(pL, -1);
+	lua_pop(pL, 1);
 
 	if (pState != nullptr)
 	{
@@ -97,9 +117,7 @@ void InnerLuaState::Open()
 {
 	std::unique_lock<std::mutex> lock(mLuaMtx);
 
-	mCancel = false;
-
-	if (mLua == nullptr) 
+	if (mLua == nullptr && !mCancel) 
 	{
 		mLua = lua_open();
 
@@ -114,7 +132,10 @@ void InnerLuaState::Open()
 			lua_setfield(mLua, -2, "LogInfo");
 		lua_setglobal(mLua, "LuaWorker");
 
-		lua_sethook(mLua, InnerLuaState::l_Hook, LUA_HOOKCALL | LUA_HOOKCOUNT, 10000);
+			lua_pushlightuserdata(mLua, this);
+		lua_setglobal(mLua, cLuaStateHandleKey);
+
+		lua_sethook(mLua, InnerLuaState::l_Hook, LUA_MASKCALL | LUA_MASKCOUNT, (int)1e7);
 
 		mOpen = true;
 	}

@@ -22,26 +22,30 @@
 #define _INNER_LUA_STATE_H_
 
 #include <mutex> 
-#include <map> 
+//#include <map> 
 
 #include "LogSection.h"
 #include "Task.h"
+#include "Cancelable.h"
 
 extern "C" {
 #include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+//#include "lauxlib.h"
+//#include "lualib.h"
 }
 
 
 namespace LuaWorker
 {
-	class LuaCancellationException : public std::exception {};
 
-	class InnerLuaState 
+	/// <summary>
+	/// Manages lua state in worker thread
+	/// </summary>
+	class InnerLuaState : public Cancelable
 	{
 	private:
 
+		const static char* cLuaStateHandleKey;
 
 		std::atomic<bool> mCancel;
 		std::atomic<bool> mOpen;

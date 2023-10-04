@@ -21,18 +21,20 @@
 #ifndef _TASK_H_
 #define _TASK_H_
 
-#include <iostream>
-#include <filesystem>
-#include <thread>
+//#include <iostream>
+//#include <filesystem>
+//#include <thread>
 #include <mutex>
 #include <string>
 
+#include "Cancelable.h"
+
 extern "C" {
 #include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+//#include "lauxlib.h"
+//#include "lualib.h"
 }
-using namespace std::chrono_literals;
+//using namespace std::chrono_literals;
 
 namespace LuaWorker
 {
@@ -47,7 +49,7 @@ namespace LuaWorker
 	/// <summary>
 	/// Base class for tasks for LuaWorker to execute
 	/// </summary>
-	class Task
+	class Task : public Cancelable
 	{
 	private:
 
@@ -111,7 +113,7 @@ namespace LuaWorker
 		/// <summary>
 		/// Block until task has executed (or reaches a final state) 
 		/// </summary>
-		void WaitForResult();
+		void WaitForResult(long waitForMillis);
 
 		/// <summary>
 		/// Get execution status of this Task

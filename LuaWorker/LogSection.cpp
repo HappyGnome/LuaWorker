@@ -16,8 +16,6 @@
 *
 \*****************************************************************************/
 
-#include <memory>
-
 #include "LogSection.h"
 
 using namespace LuaWorker;

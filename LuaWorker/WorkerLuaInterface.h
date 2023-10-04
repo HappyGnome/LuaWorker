@@ -21,20 +21,23 @@
 #ifndef _WORKER_LUA_INTERFACE_H_
 #define _WORKER_LUA_INTERFACE_H_
 
-#include <iostream>
-#include <filesystem>
-#include <thread>
+//#include <iostream>
+//#include <filesystem>
+//#include <thread>
 
+#include <memory>
+
+#include "AutoKeyMap.h"
 #include "LogStack.h"
 #include "Worker.h"
 #include "TaskLuaInterface.h"
 
 extern "C" {
 #include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+//#include "lauxlib.h"
+//#include "lualib.h"
 }
-using namespace std::chrono_literals;
+//using namespace std::chrono_literals;
 
 namespace LuaWorker
 {

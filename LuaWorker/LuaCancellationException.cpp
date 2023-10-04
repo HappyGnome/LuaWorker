@@ -16,38 +16,13 @@
 *
 \*****************************************************************************/
 
-#include "LogItem.h"
+#include"LuaCancellationException.h"
 
 using namespace LuaWorker;
 
 //---------------------
-// Public methods
+// LuaCancellationException
 //---------------------
 
-
-LogItem::LogItem(LogLevel level, std::string message, std::string section) : mLevel(level), mMessage(message), mSection(section) 
-{
-	mTime = std::time(nullptr);
-}
-
-std::string LogItem::ToString()
-{
-	std::string sep = " | ";
-
-	char timestampStr[std::size("yyyy-MM-dd hh:mm:ssZ")];
-	tm tmBuf;	
-	gmtime_s(&tmBuf, &mTime);
-
-	std::strftime(timestampStr, std::size(timestampStr), "%F %TZ",  &tmBuf);
-
-	std::string levelStr;
-
-	switch (mLevel)
-	{
-	case LogLevel::Error: levelStr = "Err "; break;
-	case LogLevel::Warn: levelStr = "Warn"; break;
-	default: levelStr = "Info"; break;
-	}
-
-	return std::string(timestampStr) + sep + mSection + sep + levelStr + sep + mMessage;
-}
+LuaCancellationException::LuaCancellationException()
+	: exception("Lua Worker Cancelled") {}

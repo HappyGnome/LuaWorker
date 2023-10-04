@@ -21,21 +21,22 @@
 #ifndef _AUTO_KEY_MAP_H_
 #define _AUTO_KEY_MAP_H_
 
-#include <iostream>
-#include <filesystem>
-#include <thread>
-#include <mutex>
-#include <string>
+//#include <iostream>
+//#include <filesystem>
+//#include <thread>
+//#include <mutex>
+//#include <string>
 #include <vector>
 #include <map>
-#include "Task.h"
+
+//#include "Task.h"
 
 extern "C" {
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+//#include "lua.h"
+//#include "lauxlib.h"
+//#include "lualib.h"
 }
-using namespace std::chrono_literals;
+//using namespace std::chrono_literals;
 
 namespace LuaWorker
 {

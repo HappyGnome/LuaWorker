@@ -21,7 +21,16 @@
 #ifndef _TASKDOFILE_H_
 #define _TASKDOFILE_H_
 
+#include<string>
+
 #include "Task.h"
+
+extern "C" {
+#include "lua.h"
+	//#include "lauxlib.h"
+	//#include "lualib.h"
+}
+
 namespace LuaWorker
 {
 	/// <summary>
@@ -40,7 +49,7 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		/// <returns> Result of the task</returns>
-		std::string  DoExec(lua_State* pL) override;
+		std::string DoExec(lua_State* pL) override;
 
 	public:
 

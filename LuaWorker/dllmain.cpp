@@ -17,13 +17,14 @@
 \*****************************************************************************/
 
 // dllmain.cpp : Defines the entry point for the DLL application.
+
 #include "WorkerLuaInterface.h"
 #include "TaskLuaInterface.h"
 
 extern "C" {
     #include "lua.h"
-    #include "lauxlib.h"
-    #include "lualib.h"
+    //#include "lauxlib.h"
+    //#include "lualib.h"
 }
 
 using namespace LuaWorker;

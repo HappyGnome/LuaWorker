@@ -16,36 +16,18 @@
 *
 \*****************************************************************************/
 
-#include "TaskDoFile.h"
+#pragma once
 
-extern "C" {
-	#include "lua.h"
-	#include "lauxlib.h"
-	//#include "lualib.h"
-}
+#ifndef _CANCELABLE_H_
+#define _CANCELABLE_H_
 
-using namespace LuaWorker;
-
-TaskDoFile::TaskDoFile(std::string FilePath) : mFilePath(FilePath) {}
-
-std::string TaskDoFile::DoExec(lua_State* pL) 
+/// <summary>
+/// Interface for objects that can have execution cancelled
+/// </summary>
+class Cancelable 
 {
-	int execResult = luaL_dofile(pL, mFilePath.c_str());
+public:
+	virtual void Cancel() = 0;
+};
 
-	if (execResult != 0)
-	{
-		std::string luaError = "No Error Message!";
-		if (lua_type(pL, -1) == LUA_TSTRING) 
-		{
-			luaError = lua_tostring(pL, -1);
-		}
-
-		SetError("Error in file " + mFilePath + ": " + luaError);
-	}
-	
-	if (lua_type(pL, -1) != LUA_TSTRING) return "";
-
-	return lua_tostring(pL, -1);
-}
-
-
+#endif

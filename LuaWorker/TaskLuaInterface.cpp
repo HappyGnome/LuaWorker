@@ -102,7 +102,15 @@ int TaskLuaInterface::l_Task_Await(lua_State* pL)
 
 	if (pTask != nullptr)
 	{
-		pTask->WaitForResult();
+		if (!lua_isnumber(pL, -1))
+		{
+			luaL_error(pL,"Wait millis required!");
+			return 0;
+		}
+		
+		long waitMillis = (long)lua_tointeger(pL, -1);
+
+		pTask->WaitForResult(waitMillis);
 
 		if (pTask->GetStatus() == TaskStatus::Complete)
 		{

@@ -21,20 +21,21 @@
 #ifndef _WORKER_H_
 #define _WORKER_H_
 
-#include <iostream>
-#include <filesystem>
+//#include <iostream>
+//#include <filesystem>
 #include <thread>
-#include <deque> 
+//#include <deque> 
 #include <mutex> 
 
 #include "Task.h"
 #include "LogSection.h"
 #include "InnerLuaState.h"
+#include "Cancelable.h"
 
 extern "C" {
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+//#include "lua.h"
+//#include "lauxlib.h"
+//#include "lualib.h"
 }
 //using namespace std::chrono_literals;
 
@@ -51,7 +52,7 @@ namespace LuaWorker
 	/// <summary>
 	/// Class to manage a worker thread executing Tasks in a lua instance
 	/// </summary>
-	class Worker
+	class Worker : public Cancelable
 	{
 	private:
 
@@ -68,7 +69,8 @@ namespace LuaWorker
 
 		LogSection mLog;
 
-		InnerLuaState mInnerLua;
+		Cancelable* mLuaCancel;
+		std::mutex mLuaCancelMtx;
 
 		//---------------------
 		// Private Methods
@@ -83,18 +85,18 @@ namespace LuaWorker
 		/// Setup lua environment for main thread
 		/// </summary>
 		/// <returns>True on success</returns>
-		bool ThreadMainInitLua();
+		bool ThreadMainInitLua(InnerLuaState& lua);
 
 		/// <summary>
 		/// Close Lua for main thread
 		/// </summary>
 		/// <returns>True on success</returns>
-		bool ThreadMainCloseLua();
+		bool ThreadMainCloseLua(InnerLuaState& lua);
 
 		/// <summary>
 		/// Execute main worker loop
 		/// </summary>
-		void ThreadMainLoop();
+		void ThreadMainLoop(InnerLuaState& lua);
 
 		/// <summary>
 		/// Cancel worker thread execution

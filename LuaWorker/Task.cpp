@@ -18,6 +18,8 @@
 
 #include "Task.h"
 
+using namespace std::chrono_literals;
+
 using namespace LuaWorker;
 
 //-------------------------------
@@ -49,19 +51,19 @@ std::string Task::GetResult()
 }
 
 //------
-void Task::WaitForResult()
+void Task::WaitForResult(long waitForMillis)
 {
+	if (waitForMillis <= 0) waitForMillis = 1;
 
-	while (true)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
 
 		if (mStatus == TaskStatus::Cancelled
 			|| mStatus == TaskStatus::Complete
-			|| mStatus == TaskStatus::Error) break;
+			|| mStatus == TaskStatus::Error) return;
 
-		mResultStatusCv.wait(lock);
+		mResultStatusCv.wait_for(lock, waitForMillis * 1ms);
 
 	}
 }

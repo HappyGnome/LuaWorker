@@ -16,36 +16,20 @@
 *
 \*****************************************************************************/
 
-#include "TaskDoFile.h"
+#pragma once
 
-extern "C" {
-	#include "lua.h"
-	#include "lauxlib.h"
-	//#include "lualib.h"
-}
+#ifndef _LUA_CANCELLATION_EXCEPTION_H_
+#define _LUA_CANCELLATION_EXCEPTION_H_
 
-using namespace LuaWorker;
+#include <exception>
 
-TaskDoFile::TaskDoFile(std::string FilePath) : mFilePath(FilePath) {}
-
-std::string TaskDoFile::DoExec(lua_State* pL) 
+namespace LuaWorker
 {
-	int execResult = luaL_dofile(pL, mFilePath.c_str());
-
-	if (execResult != 0)
+	class LuaCancellationException : public std::exception
 	{
-		std::string luaError = "No Error Message!";
-		if (lua_type(pL, -1) == LUA_TSTRING) 
-		{
-			luaError = lua_tostring(pL, -1);
-		}
-
-		SetError("Error in file " + mFilePath + ": " + luaError);
-	}
-	
-	if (lua_type(pL, -1) != LUA_TSTRING) return "";
-
-	return lua_tostring(pL, -1);
+	public:
+		LuaCancellationException();
+	};
 }
 
-
+#endif

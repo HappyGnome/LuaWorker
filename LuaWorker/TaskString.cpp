@@ -18,6 +18,12 @@
 
 #include "TaskDoString.h"
 
+extern "C" {
+	#include "lua.h"
+	#include "lauxlib.h"
+	//#include "lualib.h"
+}
+
 using namespace LuaWorker;
 
 TaskDoString::TaskDoString(std::string execString) : mExecString(execString) {}
