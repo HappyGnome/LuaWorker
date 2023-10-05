@@ -37,7 +37,7 @@ namespace LuaWorker
 
 		std::mutex mMessagesMutex;
 
-		int mCapacity;
+		std::size_t mCapacity;
 
 	public:
 
@@ -45,7 +45,7 @@ namespace LuaWorker
 		/// Constructor
 		/// </summary>
 		/// <param name="capacity">Max number of log lines to store</param>
-		explicit LogStack(int capacity = 100);
+		explicit LogStack(std::size_t capacity = 100);
 
 		/// <summary>
 		/// Try to get next log line, removing that line from the log stack.

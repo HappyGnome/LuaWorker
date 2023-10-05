@@ -24,11 +24,11 @@ using namespace LuaWorker;
 // Private methods
 //-------------------------------
 
-void Worker::ThreadMain() 
+void Worker::ThreadMain()
 {
 	mLog.Push(LogLevel::Info, "Thread starting.");
 
-	InnerLuaState lua = InnerLuaState(LogSection(mLog));
+	InnerLuaState lua(mLog);
 
 	if (ThreadMainInitLua(lua)) mLog.Push(LogLevel::Info, "Lua opened on worker.");
 

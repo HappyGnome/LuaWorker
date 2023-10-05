@@ -98,6 +98,7 @@ void InnerLuaState::l_Hook(lua_State* pL, lua_Debug* pDebug)
 //---------------------
 
 InnerLuaState::InnerLuaState(LogSection&& log) : mLog(log), mCancel(false), mLua(nullptr)  {}
+InnerLuaState::InnerLuaState(const LogSection& log) : mLog(log), mCancel(false), mLua(nullptr) {}
 
 //------
 InnerLuaState::~InnerLuaState()
@@ -106,7 +107,7 @@ InnerLuaState::~InnerLuaState()
 	{
 		Close();
 	}
-	catch (const std::exception& ex)
+	catch (const std::exception&)
 	{
 		//Suppress exceptions in destructor
 	}

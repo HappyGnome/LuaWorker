@@ -70,7 +70,13 @@ namespace LuaWorker
 		/// Constructor
 		/// </summary>
 		/// <param name="log">Logger to use</param>
-		InnerLuaState(LogSection&& log);
+		explicit InnerLuaState(LogSection&& log);
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="log">Logger to copy</param>
+		explicit InnerLuaState(const LogSection& log);
 
 		/// <summary>
 		/// Destructor

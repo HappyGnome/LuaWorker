@@ -363,4 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Third party binaries
-lua.dll
+!/Lua_5_1_5/**
+/Lua_5_1_5/**/*.exp
+/Lua_5_1_5/**/*.pdb

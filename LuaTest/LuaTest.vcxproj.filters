@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Deployment">
+      <UniqueIdentifier>{706ea52e-7db8-4f12-8699-8ea5925a449f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deployment\x64">
+      <UniqueIdentifier>{96231c3c-9b61-4056-8c99-398e49cf31fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deployment\Win32">
+      <UniqueIdentifier>{f8f37f9c-af06-4440-a320-72bc3432c41f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaTest.cpp">
@@ -22,5 +31,18 @@
   <ItemGroup>
     <None Include="run_worker.lua" />
     <None Include="file_to_run.lua" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\Lua_5_1_5\bin\x64\lua.dll">
+      <Filter>Deployment\x64</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Lua_5_1_5\bin\Win32\lua.dll">
+      <Filter>Deployment\Win32</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

@@ -20,7 +20,7 @@
 
 using namespace LuaWorker;
 
-LogStack::LogStack(int capacity) : mCapacity(std::max(0, capacity)) {}
+LogStack::LogStack(std::size_t capacity) : mCapacity(capacity) {}
 
 bool LogStack::PopLine(std::string& message) 
 {
