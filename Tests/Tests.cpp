@@ -16,40 +16,28 @@
 *
 \*****************************************************************************/
 
-#include "TaskDoString.h"
+#include "LuaTestState.h"
+#include "CppUnitTest.h"
+#include<thread>
 
-extern "C" {
-	#include "lua.h"
-	#include "lauxlib.h"
-	//#include "lualib.h"
-}
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-using namespace LuaWorker;
-
-TaskDoString::TaskDoString(std::string execString) : mExecString(execString) {}
-
-std::string TaskDoString::DoExec(lua_State* pL)
+namespace Tests
 {
-	int execResult = luaL_dostring(pL, mExecString.c_str());
-
-	if (execResult != 0)
+	TEST_CLASS(Tests)
 	{
-		std::string luaError = "No Error Message!";
-		if (lua_type(pL, -1) == LUA_TSTRING)
+	public:
+		
+		TEST_METHOD(TestMethod1)
 		{
-			luaError = lua_tostring(pL, -1);
+			LuaTestState lua;
+
+			lua.DoTestFile("Test1\\Test1.lua");
+
+			Assert::IsTrue(lua.DoTestString("return Step1()"));
+			Assert::IsTrue(lua.DoTestString("return Step2()"));
+			std::this_thread::sleep_for(1s);
+			Assert::IsTrue(lua.DoTestString("return Step3()"));
 		}
-
-		SetError("Error in lua string: " + luaError);
-	}
-
-	std::string ret = "";
-
-	if (lua_type(pL, -1) == LUA_TSTRING) ret = lua_tostring(pL, -1);
-
-	lua_settop(pL, 0);
-
-	return ret;
+	};
 }
-
-

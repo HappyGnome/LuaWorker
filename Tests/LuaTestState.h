@@ -16,40 +16,40 @@
 *
 \*****************************************************************************/
 
-#include "TaskDoString.h"
+#pragma once
+
+#ifndef _LUA_TEST_STATE_H_
+#define _LUA_TEST_STATE_H_
+
+#include<chrono>
 
 extern "C" {
-	#include "lua.h"
-	#include "lauxlib.h"
+#include "lua.h"
+	//#include "lauxlib.h"
 	//#include "lualib.h"
 }
 
-using namespace LuaWorker;
+using namespace std::chrono_literals;
 
-TaskDoString::TaskDoString(std::string execString) : mExecString(execString) {}
-
-std::string TaskDoString::DoExec(lua_State* pL)
+namespace Tests 
 {
-	int execResult = luaL_dostring(pL, mExecString.c_str());
-
-	if (execResult != 0)
+	class LuaTestState 
 	{
-		std::string luaError = "No Error Message!";
-		if (lua_type(pL, -1) == LUA_TSTRING)
-		{
-			luaError = lua_tostring(pL, -1);
-		}
+	private:
+		lua_State* mLua;
 
-		SetError("Error in lua string: " + luaError);
-	}
+		bool GetTestResult();
 
-	std::string ret = "";
+	public:
 
-	if (lua_type(pL, -1) == LUA_TSTRING) ret = lua_tostring(pL, -1);
+		LuaTestState();
+		~LuaTestState();
 
-	lua_settop(pL, 0);
-
-	return ret;
+		bool DoTestFile(const char* filepath);
+		bool DoTestFile(const char* filepath, std::chrono::duration<float> maxTime, std::chrono::duration<float> minTime = 0ms);
+		bool DoTestString(const char* luaString);
+		bool DoTestString(const char* luaString, std::chrono::duration<float> maxTime, std::chrono::duration<float> minTime = 0ms);
+	};
 }
 
-
+#endif

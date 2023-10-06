@@ -68,7 +68,7 @@ int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 	LogSection log(sLog, "Worker " + std::to_string(sNextWorkerId++));
 
 	std::shared_ptr<Worker> newWorker(new Worker(std::move(log)));
-	newWorker->Start();
+	//newWorker->Start();
 
 	int key = sWorkers.push(newWorker);
 

@@ -43,9 +43,13 @@ std::string TaskDoFile::DoExec(lua_State* pL)
 		SetError("Error in file " + mFilePath + ": " + luaError);
 	}
 	
-	if (lua_type(pL, -1) != LUA_TSTRING) return "";
+	std::string ret = "";
 
-	return lua_tostring(pL, -1);
+	if (lua_type(pL, -1) == LUA_TSTRING) ret = lua_tostring(pL, -1);
+
+	lua_settop(pL, 0);
+
+	return ret;
 }
 
 

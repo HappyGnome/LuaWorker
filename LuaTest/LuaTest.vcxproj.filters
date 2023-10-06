@@ -37,12 +37,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="..\Lua_5_1_5\bin\x64\lua.dll">
-      <Filter>Deployment\x64</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\Lua_5_1_5\bin\Win32\lua.dll">
-      <Filter>Deployment\Win32</Filter>
-    </CopyFileToFolders>
-  </ItemGroup>
 </Project>
