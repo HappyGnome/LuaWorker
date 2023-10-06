@@ -135,7 +135,7 @@ namespace LuaWorker
 		/// Add executable string task to the worker queue.
 		/// 
 		/// Lua syntax:
-		///		local status, task = worker:DoString("os.execute('timeout 5')")
+		///		local task = worker:DoString("os.execute('timeout 5')")
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
@@ -145,7 +145,7 @@ namespace LuaWorker
 		/// Add executable file task to the worker queue.
 		/// 
 		/// Lua syntax:
-		///		local status, task = worker:DoFile("myfile.lua")
+		///		local task = worker:DoFile("myfile.lua")
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>

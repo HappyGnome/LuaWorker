@@ -102,6 +102,10 @@ namespace LuaWorker
 		/// </summary>
 		Task();
 
+		/// <summary>
+		/// Execute this task on a given lua state
+		/// </summary>
+		/// <param name="pL">Lua state</param>
 		void Exec(lua_State* pL);
 
 		/// <summary>
@@ -113,7 +117,7 @@ namespace LuaWorker
 		/// <summary>
 		/// Block until task has executed (or reaches a final state) 
 		/// </summary>
-		void WaitForResult(long waitForMillis);
+		void WaitForResult(unsigned int waitForMillis);
 
 		/// <summary>
 		/// Get execution status of this Task

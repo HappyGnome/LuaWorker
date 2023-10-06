@@ -51,7 +51,7 @@ std::string Task::GetResult()
 }
 
 //------
-void Task::WaitForResult(long waitForMillis)
+void Task::WaitForResult(unsigned int waitForMillis)
 {
 	if (waitForMillis <= 0) waitForMillis = 1;
 

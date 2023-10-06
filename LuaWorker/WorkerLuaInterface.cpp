@@ -142,7 +142,7 @@ int WorkerLuaInterface::l_Worker_DoString(lua_State* pL)
 			std::shared_ptr<Task> newItem(new TaskDoString(str));
 			pWorker->AddTask(newItem);
 
-			return TaskLuaInterface::l_PushTask(pL, newItem) + l_PushStatus(pL, pWorker);
+			return TaskLuaInterface::l_PushTask(pL, newItem);
 		}
 	}
 
@@ -162,7 +162,7 @@ int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 			std::shared_ptr<Task> newItem(new TaskDoFile(str));
 			pWorker->AddTask(newItem);
 			
-			return TaskLuaInterface::l_PushTask(pL, newItem) + l_PushStatus(pL, pWorker);
+			return TaskLuaInterface::l_PushTask(pL, newItem);
 		}
 	}
 
