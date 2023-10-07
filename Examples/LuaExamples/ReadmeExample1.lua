@@ -29,13 +29,17 @@ worker:Start()
 -- Execute string in parallel lua thread
 local task = worker:DoString(
 		[[
+			print("Work started")
+
 			local i = 0
 
 			while i < 10000000 do
 				i = (i + 10000002)%10000001 -- i+1 (slowly)
 			end
 
-			return 'Worker task done'
+			print("Work done")
+
+			return 'Worker task returned'
 		]])									
 
 -- Do some other work in calling thread
@@ -58,6 +62,8 @@ else
 end
 
 worker:Stop()
+
+print("\nWorker logs: ")
 
 -- Readout any log entries
 while (true) do								

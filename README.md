@@ -17,13 +17,17 @@ worker:Start()
 -- Execute string in parallel lua thread
 local task = worker:DoString(
 		[[
+			print("Work started")
+
 			local i = 0
 
 			while i < 10000000 do
 				i = (i + 10000002)%10000001 -- i+1 (slowly)
 			end
 
-			return 'Worker task done'
+			print("Work done")
+
+			return 'Worker task returned'
 		]])									
 
 -- Do some other work in calling thread
@@ -47,6 +51,8 @@ end
 
 worker:Stop()
 
+print("\nWorker logs: ")
+
 -- Readout any log entries
 while (true) do								
 	local s = LuaWorker.PopLogLine()
@@ -58,11 +64,15 @@ end
 Console output:
 
 ```
+Work started
 Still in calling thread
-Worker task done
-2023-10-07 20:57:30Z | Worker 0 | Info | Thread start requested.
-2023-10-07 20:57:30Z | Worker 0 | Info | Thread starting.
-2023-10-07 20:57:30Z | Worker 0 | Info | Lua opened on worker.
-2023-10-07 20:57:30Z | Worker 0 | Info | Thread stop requested.
-2023-10-07 20:57:30Z | Worker 0 | Info | Thread stopping.
+Work done
+Worker task returned
+
+Worker logs:
+2023-10-07 21:09:21Z | Worker 0 | Info | Thread start requested.
+2023-10-07 21:09:21Z | Worker 0 | Info | Thread starting.
+2023-10-07 21:09:21Z | Worker 0 | Info | Lua opened on worker.
+2023-10-07 21:09:21Z | Worker 0 | Info | Thread stop requested.
+2023-10-07 21:09:21Z | Worker 0 | Info | Thread stopping.
 ```
