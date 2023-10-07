@@ -61,6 +61,7 @@ LuaTestState::LuaTestState()
 	luaL_openlibs(mLua);
 
 	std::filesystem::path here = std::filesystem::current_path();
+	here += "\\LuaTests\\";
 
 	lua_pushfstring(mLua, here.string().c_str());
 	lua_setglobal(mLua, "RootDir");
@@ -82,7 +83,7 @@ bool LuaTestState::DoTestFile(const char* filepath)
 	if (mLua == nullptr) return false;
 
 	std::filesystem::path path = std::filesystem::current_path();
-	path += "\\";
+	path += "\\LuaTests\\";
 	path += filepath;
 
 	int execResult = luaL_dofile(mLua, path.string().c_str());

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="LuaExamples">
+      <UniqueIdentifier>{fd111a8f-99be-423b-82bb-652e6cf30bf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deployment">
+      <UniqueIdentifier>{52e2faec-ceaf-4ab6-951f-e3f315171787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deployment\Win32">
+      <UniqueIdentifier>{a0a9d3a5-22cc-49ae-8613-8e042d4e9f59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deployment\x64">
+      <UniqueIdentifier>{6fd1d4cd-c706-4cd6-9b32-a1dc70a40147}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Examples.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\Lua_5_1_5\bin\Win32\lua.dll">
+      <Filter>Deployment\Win32</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Lua_5_1_5\bin\x64\lua.dll">
+      <Filter>Deployment\x64</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LuaExamples\ReadmeExample1.lua">
+      <Filter>LuaExamples</Filter>
+    </None>
+  </ItemGroup>
+</Project>
