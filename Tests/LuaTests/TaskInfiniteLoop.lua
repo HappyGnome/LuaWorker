@@ -16,24 +16,37 @@
 * 
 ]]--*****************************************************************************
 
+MyString = "Hello From File Task"
+
+w = LuaWorker.Create()
+w:Start()
+
 Step1 = function()
-	w = LuaWorker.Create()
-
-	RaiseFirstWorkerError()
-	return w:Status() == LuaWorker.WorkerStatus.NotStarted
-end 
-
-Step2 = function()
-	return w:Start() == LuaWorker.WorkerStatus.Starting
-end 
-
-Step3 = function()
 	return w:Status() == LuaWorker.WorkerStatus.Processing
 end 
 
-Step4 = function()
-	w:Stop()
+Step2 = function()
+	T = w:DoFile(RootDir .. "\\TestInfiniteLoop_FileTask.lua")
+
+	local res = T:Await(500)
 
 	RaiseFirstWorkerError()
-	return w:Status() == LuaWorker.WorkerStatus.Cancelled
+
+	return (T:Status() == LuaWorker.TaskStatus.Running)
 end 
+
+-- should return with error state (assert false)
+Step3 = function()
+	w:Stop()
+	RaiseFirstWorkerError()
+	return true
+end 
+
+Step4 = function()
+	return (w:Status() == LuaWorker.WorkerStatus.Cancelled) 
+end 
+
+Step5 = function()
+
+	return (T:Status() == LuaWorker.TaskStatus.Cancelled)
+end

@@ -16,22 +16,6 @@
 * 
 ]]--*****************************************************************************
 
-package.cpath = package.cpath..";"..RootDir.."\\?.dll;"
-
-require('LuaWorker')
-
------------------------------------------
-RaiseFirstWorkerError = function()
-	while (true) do
-		local s, l = LuaWorker.PopLogLine()
-		if s == nil then break end
-		if l == LuaWorker.LogLevel.Error then
-			error(s)
-		end
-	end
-end
-----------------------------------------
-
 MyString = "Hello From Task"
 
 w = LuaWorker.Create()
@@ -50,11 +34,7 @@ end
 
 Step3 = function()
 
-	while not T:Finalized() do
-		 T:Await(50)
-	end
-
-	local res = T:Await(50)
+	local res = T:Await(500)
 
 	RaiseFirstWorkerError()
 	if not ( (T:Status() == LuaWorker.TaskStatus.Complete) and (res == MyString)) then

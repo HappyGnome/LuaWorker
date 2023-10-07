@@ -16,22 +16,6 @@
 * 
 ]]--*****************************************************************************
 
-package.cpath = package.cpath..";"..RootDir.."\\?.dll;"
-
-require('LuaWorker')
-
------------------------------------------
-RaiseFirstWorkerError = function()
-	while (true) do
-		local s, l = LuaWorker.PopLogLine()
-		if s == nil then break end
-		if l == LuaWorker.LogLevel.Error then
-			error(s)
-		end
-	end
-end
-----------------------------------------
-
 w = LuaWorker.Create()
 w:Start()
 

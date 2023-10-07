@@ -91,12 +91,15 @@ void Task::WaitForResult(unsigned int waitForMillis)
 {
 	if (waitForMillis <= 0) waitForMillis = 1;
 
+	system_clock::time_point sleepTill = system_clock::now() + (waitForMillis * 1ms);
+
+	while (system_clock::now() < sleepTill)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
 		if (IsFinal(mStatus)) return;
 
-		mResultStatusCv.wait_for(lock, waitForMillis * 1ms);
+		mResultStatusCv.wait_for(lock, sleepTill - system_clock::now());
 
 	}
 }

@@ -16,22 +16,6 @@
 * 
 ]]--*****************************************************************************
 
-package.cpath = package.cpath..";"..RootDir.."\\?.dll;"
-
-require('LuaWorker')
-
------------------------------------------
-RaiseFirstWorkerError = function()
-	while (true) do
-		local s, l = LuaWorker.PopLogLine()
-		if s == nil then break end
-		if l == LuaWorker.LogLevel.Error then
-			error(s)
-		end
-	end
-end
-----------------------------------------
-
 MyString = "Hello From File Task"
 
 w = LuaWorker.Create()
@@ -44,11 +28,7 @@ end
 Step2 = function()
 	T = w:DoFile(RootDir .. "\\TestDoFile_FileTask.lua")
 
-	while not T:Finalized() do
-		 T:Await(50)
-	end
-
-	local res = T:Await(50)
+	local res = T:Await(500)
 
 	RaiseFirstWorkerError()
 
@@ -64,11 +44,7 @@ end
 
 Step4 = function()
 
-	while not T2:Finalized() do
-		 T2:Await(50)
-	end
-
-	local res = T2:Await(50)
+	local res = T2:Await(500)
 
 	RaiseFirstWorkerError()
 	return (T:Status() == LuaWorker.TaskStatus.Complete) and (T2:Status() == LuaWorker.TaskStatus.Complete) and (res == MyString)

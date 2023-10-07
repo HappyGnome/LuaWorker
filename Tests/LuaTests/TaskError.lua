@@ -16,22 +16,6 @@
 * 
 ]]--*****************************************************************************
 
-package.cpath = package.cpath..";"..RootDir.."\\?.dll;"
-
-require('LuaWorker')
-
------------------------------------------
-RaiseFirstWorkerError = function()
-	while (true) do
-		local s, l = LuaWorker.PopLogLine()
-		if s == nil then break end
-		if l == LuaWorker.LogLevel.Error then
-			error(s)
-		end
-	end
-end
-----------------------------------------
-
 w = LuaWorker.Create()
 w:Start()
 
@@ -48,9 +32,8 @@ Step2 = function()
 end 
 
 Step3 = function()
-	while not T:Finalized() do
-		 T:Await(50)
-	end
+	
+T:Await(500)
 
 	-- RaiseFirstWorkerError()
 	return T:Status() == LuaWorker.TaskStatus.Error
@@ -65,9 +48,8 @@ end
 
 -- Should take ~1s
 Step5 = function()
-	while not T2:Finalized() do
-		 T2:Await(50)
-	end
+
+	T2:Await(1100)
 
 	RaiseFirstWorkerError()
 	return w:Status() == LuaWorker.WorkerStatus.Processing

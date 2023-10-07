@@ -32,6 +32,7 @@ namespace Tests
 		{
 			LuaTestState lua;
 
+			lua.DoTestFile("Common.lua");
 			lua.DoTestFile("WorkerStatus.lua");
 
 			Assert::IsTrue(lua.DoTestString("return Step1()"), L"Step1");
@@ -45,6 +46,7 @@ namespace Tests
 		{
 			LuaTestState lua;
 
+			lua.DoTestFile("Common.lua");
 			lua.DoTestFile("TaskSleep.lua");
 
 			std::this_thread::sleep_for(0.5s);
@@ -60,6 +62,7 @@ namespace Tests
 		{
 			LuaTestState lua;
 
+			lua.DoTestFile("Common.lua");
 			lua.DoTestFile("TaskError.lua");
 
 			std::this_thread::sleep_for(0.5s);
@@ -74,6 +77,7 @@ namespace Tests
 		{
 			LuaTestState lua;
 
+			lua.DoTestFile("Common.lua");
 			lua.DoTestFile("TaskDoString.lua");
 
 			std::this_thread::sleep_for(0.5s);
@@ -86,6 +90,7 @@ namespace Tests
 		{
 			LuaTestState lua;
 
+			lua.DoTestFile("Common.lua");
 			lua.DoTestFile("TaskDoFile.lua");
 
 			std::this_thread::sleep_for(0.5s);
@@ -93,6 +98,21 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step2()", 500ms), L"Step2");
 			Assert::IsTrue(lua.DoTestString("return Step3()", 500ms), L"Step3");
 			Assert::IsTrue(lua.DoTestString("return Step4()", 500ms), L"Step4");
+		}
+
+		TEST_METHOD(TaskInfiniteLoop)
+		{
+			LuaTestState lua;
+
+			lua.DoTestFile("Common.lua");
+			lua.DoTestFile("TaskInfiniteLoop.lua");
+
+			std::this_thread::sleep_for(0.5s);
+			Assert::IsTrue(lua.DoTestString("return Step1()", 500ms), L"Step1");
+			Assert::IsTrue(lua.DoTestString("return Step2()", 1000ms), L"Step2");
+			Assert::IsFalse(lua.DoTestString("return Step3()", 500ms), L"Step3");
+			Assert::IsTrue(lua.DoTestString("return Step4()", 500ms), L"Step4");
+			Assert::IsTrue(lua.DoTestString("return Step4()", 500ms), L"Step5");
 		}
 	};
 }

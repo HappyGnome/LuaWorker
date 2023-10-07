@@ -16,24 +16,18 @@
 * 
 ]]--*****************************************************************************
 
-Step1 = function()
-	w = LuaWorker.Create()
+package.cpath = package.cpath..";"..RootDir.."\\?.dll;"
 
-	RaiseFirstWorkerError()
-	return w:Status() == LuaWorker.WorkerStatus.NotStarted
-end 
+require('LuaWorker')
 
-Step2 = function()
-	return w:Start() == LuaWorker.WorkerStatus.Starting
-end 
-
-Step3 = function()
-	return w:Status() == LuaWorker.WorkerStatus.Processing
-end 
-
-Step4 = function()
-	w:Stop()
-
-	RaiseFirstWorkerError()
-	return w:Status() == LuaWorker.WorkerStatus.Cancelled
-end 
+-----------------------------------------
+RaiseFirstWorkerError = function()
+	while (true) do
+		local s, l = LuaWorker.PopLogLine()
+		if s == nil then break end
+		if l == LuaWorker.LogLevel.Error then
+			error(s)
+		end
+	end
+end
+----------------------------------------

@@ -16,24 +16,8 @@
 * 
 ]]--*****************************************************************************
 
-Step1 = function()
-	w = LuaWorker.Create()
+i = 0
 
-	RaiseFirstWorkerError()
-	return w:Status() == LuaWorker.WorkerStatus.NotStarted
-end 
-
-Step2 = function()
-	return w:Start() == LuaWorker.WorkerStatus.Starting
-end 
-
-Step3 = function()
-	return w:Status() == LuaWorker.WorkerStatus.Processing
-end 
-
-Step4 = function()
-	w:Stop()
-
-	RaiseFirstWorkerError()
-	return w:Status() == LuaWorker.WorkerStatus.Cancelled
-end 
+while true do
+	i = (i + 10000000001) % 10000000000 -- i= i + 1, but harder
+end
