@@ -33,7 +33,7 @@ using namespace std::chrono_literals;
 
 namespace Tests 
 {
-	class LuaTestState 
+	class LuaTestState
 	{
 	private:
 		lua_State* mLua;

@@ -16,51 +16,40 @@
 * 
 ]]--*****************************************************************************
 
-package.cpath = package.cpath..";"..BinDir.."\\?.dll;"
+package.cpath = package.cpath..";"..RootDir.."\\?.dll;"
 
 require('LuaWorker')
 
---os.execute('sleep 10')
-
-foo = function()
-	local w = LuaWorker.Create()
-	w:Start()
-	local status, task = w:DoString(
-		[[
-			local i = 0
-
-			print("In worker thread")
-
-			while i < 10000000 do
-				i = (i + 10000002)%10000001 -- +1 slowly
-			end
-
-			print("End of worker thread")
-
-			return 'Done'
-		]])
-
-	local i = 0
-
-	while i < 5000000 do
-		i = (i + 10000002)%10000001 -- +1 slowly
+-----------------------------------------
+RaiseFirstWorkerError = function()
+	while (true) do
+		local s, l = LuaWorker.PopLogLine()
+		if s == nil then break end
+		if l == LuaWorker.LogLevel.Error then
+			error(s)
+		end
 	end
-
-	print("Still in calling thread")
-
-	print(task:Await(10000))
-
-	local status, task = w:DoFile([[file_to_run.lua]])
-
-	--print(task:Await(10000))
-
-	--w:Stop()
 end
+----------------------------------------
 
-foo();
+Step1 = function()
+	w = LuaWorker.Create()
 
-while (true) do
-	local s = LuaWorker.PopLogLine()
-	if s == nil then break end
-	print(s)		
-end
+	RaiseFirstWorkerError()
+	return w:Status() == LuaWorker.WorkerStatus.NotStarted
+end 
+
+Step2 = function()
+	return w:Start() == LuaWorker.WorkerStatus.Starting
+end 
+
+Step3 = function()
+	return w:Status() == LuaWorker.WorkerStatus.Processing
+end 
+
+Step4 = function()
+	w:Stop()
+
+	RaiseFirstWorkerError()
+	return w:Status() == LuaWorker.WorkerStatus.Cancelled
+end 

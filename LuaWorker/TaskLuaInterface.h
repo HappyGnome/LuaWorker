@@ -113,7 +113,16 @@ namespace LuaWorker
 		/// <returns>Number of items pushed to the stack</returns>
 		static int l_Task_Status(lua_State* pL);
 
-		
+		/// <summary>
+		/// Pop Task handle from the top of the lua stack
+		/// return true if tasks is in a final state
+		/// 
+		/// Lua syntax:
+		///		local final = task:Finalized()
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		/// <returns>Number of items pushed to the stack</returns>
+		static int l_Task_Finalized(lua_State* pL);
 	};
 };
 #endif

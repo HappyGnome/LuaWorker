@@ -18,7 +18,10 @@
 
 #include "Task.h"
 
+#include <chrono>
+
 using namespace std::chrono_literals;
+using std::chrono::system_clock;
 
 using namespace LuaWorker;
 
@@ -34,6 +37,39 @@ void Task::SetResult(const std::string& newResult)
 
 		mResult = newResult;
 	}
+}
+
+//-------------------------------
+// Protected methods
+//-------------------------------
+
+void Task::SleepFor(unsigned int waitForMillis)
+{
+	system_clock::time_point sleepTill = system_clock::now() + (waitForMillis * 1ms);
+
+	while (system_clock::now() < sleepTill)
+	{
+		std::unique_lock<std::mutex> lock(mResultStatusMtx);
+
+		if (mStatus == TaskStatus::Cancelled
+			|| mStatus == TaskStatus::Error) return;
+
+		mResultStatusCv.wait_for(lock, sleepTill - system_clock::now());
+
+	}
+
+}
+
+//-------------------------------
+// Public static methods
+//-------------------------------
+
+
+bool Task::IsFinal(TaskStatus status)
+{
+	return (status == TaskStatus::Cancelled
+		|| status == TaskStatus::Complete
+		|| status == TaskStatus::Error);
 }
 
 //-------------------------------
@@ -58,10 +94,7 @@ void Task::WaitForResult(unsigned int waitForMillis)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
-
-		if (mStatus == TaskStatus::Cancelled
-			|| mStatus == TaskStatus::Complete
-			|| mStatus == TaskStatus::Error) return;
+		if (IsFinal(mStatus)) return;
 
 		mResultStatusCv.wait_for(lock, waitForMillis * 1ms);
 
@@ -75,6 +108,7 @@ TaskStatus Task::GetStatus()
 
 	return mStatus;
 }
+
 
 //------
 Task::Task() : mStatus(TaskStatus::NotStarted) {}

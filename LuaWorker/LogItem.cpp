@@ -17,6 +17,7 @@
 \*****************************************************************************/
 
 #include "LogItem.h"
+#include "LogLevel.h"
 
 using namespace LuaWorker;
 
@@ -50,4 +51,9 @@ std::string LogItem::ToString()
 	}
 
 	return std::string(timestampStr) + sep + mSection + sep + levelStr + sep + mMessage;
+}
+
+LogLevel LogItem::GetLevel()
+{
+	return mLevel;
 }

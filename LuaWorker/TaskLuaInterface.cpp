@@ -70,6 +70,9 @@ int TaskLuaInterface::l_PushTask(lua_State* pL, std::shared_ptr<Task> pTask)
 		lua_pushinteger(pL, key);
 		lua_pushcclosure(pL, l_Task_Status, 1);
 	lua_setfield(pL, -2, "Status");
+		lua_pushinteger(pL, key);
+		lua_pushcclosure(pL, l_Task_Finalized, 1);
+	lua_setfield(pL, -2, "Finalized");
 
 	return 1;
 }
@@ -143,6 +146,22 @@ int TaskLuaInterface::l_Task_Status(lua_State* pL)
 		}
 
 		lua_pushinteger(pL, statusInt);
+
+		return 1;
+	}
+
+	return 0;
+}
+
+int TaskLuaInterface::l_Task_Finalized(lua_State* pL)
+{
+	std::shared_ptr<Task> pTask = l_PopTask(pL);
+
+	if (pTask != nullptr)
+	{
+		bool final = Task::IsFinal(pTask->GetStatus());
+
+		lua_pushboolean(pL, final);
 
 		return 1;
 	}

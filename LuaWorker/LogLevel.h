@@ -16,36 +16,19 @@
 *
 \*****************************************************************************/
 
-#include "LogStack.h"
+#pragma once
 
-using namespace LuaWorker;
+#ifndef _LOG_LEVEL_H_
+#define _LOG_LEVEL_H_
 
-LogStack::LogStack(std::size_t capacity) : mCapacity(capacity) {}
-
-bool LogStack::PopLine(std::string& message)
+namespace LuaWorker
 {
-	LogLevel l;
-
-	return PopLine(message, l);
+	enum class LogLevel
+	{
+		Error,
+		Warn,
+		Info
+	};
 }
 
-bool LogStack::PopLine(std::string& message, LogLevel& level)
-{
-	std::lock_guard<std::mutex> guard(mMessagesMutex);
-
-	if (mMessages.empty()) return false;
-
-	LogItem item = mMessages.back();
-	message = item.ToString();
-	level = item.GetLevel();
-	mMessages.pop_back();
-
-	return true;
-}
-
-void LogStack::Push(const LogItem& message)
-{
-	std::lock_guard<std::mutex> guard(mMessagesMutex);
-	if (mMessages.size() >= mCapacity) mMessages.pop_back();
-	mMessages.push_front(message);
-}
+#endif

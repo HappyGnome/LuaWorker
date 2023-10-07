@@ -91,7 +91,23 @@ namespace LuaWorker
 		/// <returns> Result of the task</returns>
 		virtual std::string DoExec(lua_State* pL) = 0;
 
+		/// <summary>
+		/// Block until specified time has elapsed (or task cancelled)
+		/// </summary>
+		/// <param name="waitForMillis">Min time to wait</param>
+		void SleepFor(unsigned int waitForMillis);
+
 	public:
+
+		//-------------------------------
+		// Public static methods
+		//-------------------------------
+
+		/// <summary>
+		/// Check if status is final
+		/// </summary>
+		/// <returns>True if status is final</returns>
+		static bool IsFinal(TaskStatus status);
 
 		//-------------------------------
 		// Public methods
@@ -117,6 +133,7 @@ namespace LuaWorker
 		/// <summary>
 		/// Block until task has executed (or reaches a final state) 
 		/// </summary>
+		/// <param name="waitForMillis">Max time to wait</param>
 		void WaitForResult(unsigned int waitForMillis);
 
 		/// <summary>
@@ -124,6 +141,7 @@ namespace LuaWorker
 		/// </summary>
 		/// <returns>Current status</returns>
 		TaskStatus GetStatus();
+
 
 		/// <summary>
 		/// Permanently cancel execution and any pending tasks

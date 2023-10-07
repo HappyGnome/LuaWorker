@@ -93,6 +93,11 @@ namespace LuaWorker
 			WorkerStatus_Cancelled = 3,
 			WorkerStatus_Error = 4;
 
+		static const int
+			LogLevel_Info = 0,
+			LogLevel_Warn = 1,
+			LogLevel_Error = 2;
+
 		//-------------------------------
 		// Static Lua-callable methods 
 		// (Library level)
@@ -112,7 +117,7 @@ namespace LuaWorker
 		/// Pop one log entry from library level logger
 		/// 
 		/// Lua syntax:
-		///		local logLine = LuaWorker.PopLogLine()
+		///		local logLine, level = LuaWorker.PopLogLine()
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
@@ -150,6 +155,16 @@ namespace LuaWorker
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
 		static int l_Worker_DoFile(lua_State* pL);
+
+		/// <summary>
+		/// Add thread sleep action to the worker queue.
+		/// 
+		/// Lua syntax:
+		///		local task = worker:DoSleep(1000) -- milliseconds
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		/// <returns>Number of items pushed to the stack</returns>
+		static int l_Worker_DoSleep(lua_State* pL);
 
 		/// <summary>
 		/// Start worker thread

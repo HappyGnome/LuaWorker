@@ -16,36 +16,22 @@
 *
 \*****************************************************************************/
 
-#include "LogStack.h"
+#include "TaskDoSleep.h"
+
+extern "C" {
+#include "lua.h"
+#include "lauxlib.h"
+	//#include "lualib.h"
+}
 
 using namespace LuaWorker;
 
-LogStack::LogStack(std::size_t capacity) : mCapacity(capacity) {}
+TaskDoSleep::TaskDoSleep(unsigned int sleepForMs) : mSleepForMs(sleepForMs) {}
 
-bool LogStack::PopLine(std::string& message)
+std::string TaskDoSleep::DoExec(lua_State* pL)
 {
-	LogLevel l;
+	
+	SleepFor(mSleepForMs);
 
-	return PopLine(message, l);
-}
-
-bool LogStack::PopLine(std::string& message, LogLevel& level)
-{
-	std::lock_guard<std::mutex> guard(mMessagesMutex);
-
-	if (mMessages.empty()) return false;
-
-	LogItem item = mMessages.back();
-	message = item.ToString();
-	level = item.GetLevel();
-	mMessages.pop_back();
-
-	return true;
-}
-
-void LogStack::Push(const LogItem& message)
-{
-	std::lock_guard<std::mutex> guard(mMessagesMutex);
-	if (mMessages.size() >= mCapacity) mMessages.pop_back();
-	mMessages.push_front(message);
+	return "";
 }

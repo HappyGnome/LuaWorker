@@ -67,6 +67,16 @@ extern "C"  int luaopen_LuaWorker(lua_State* pL) {
         lua_setfield(pL, -2, "Error");
     lua_setfield(pL, -2, "WorkerStatus");
 
+    //Log Level
+    lua_createtable(pL, 0, 4);
+        lua_pushnumber(pL, WorkerLuaInterface::LogLevel_Info);
+    lua_setfield(pL, -2, "Info");
+        lua_pushnumber(pL, WorkerLuaInterface::LogLevel_Warn);
+        lua_setfield(pL, -2, "Warn");
+    lua_pushnumber(pL, WorkerLuaInterface::LogLevel_Error);
+        lua_setfield(pL, -2, "Error");
+    lua_setfield(pL, -2, "LogLevel");
+
     return 1;
 }
 

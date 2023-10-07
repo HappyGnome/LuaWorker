@@ -15,53 +15,49 @@
 *  limitations under the License.
 *
 \*****************************************************************************/
- 
+
 #pragma once
 
-#ifndef _LOGITEM_H_
-#define _LOGITEM_H_
+#ifndef _TASK_SLEEP_H_
+#define _TASK_SLEEP_H_
 
-#include<string>
-#include<ctime>
+#include<chrono>
 
-#include "LogLevel.h"
+#include "Task.h"
+
+extern "C" {
+#include "lua.h"
+	//#include "lauxlib.h"
+	//#include "lualib.h"
+}
 
 namespace LuaWorker
 {
-	class LogItem
+	/// <summary>
+	/// Implementation of Task that sleeps for a minimum amount of time
+	/// </summary>
+	class TaskDoSleep : public Task
 	{
 	private:
 
-		std::string mMessage;
-		std::string mSection;
-		LogLevel mLevel;
-		std::time_t mTime;
+		unsigned int mSleepForMs;
+
+	protected:
+
+		/// <summary>
+		/// Do the lua work for this task
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		/// <returns> Result of the task</returns>
+		std::string DoExec(lua_State* pL) override;
 
 	public:
-
-		//---------------------
-		// Public methods
-		//---------------------
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		/// <param name="level">Log event type</param>
-		/// <param name="message">Log item details</param>
-		/// <param name="section">Section tag for events logged by this</param>
-		explicit LogItem(LogLevel level, std::string message, std::string section);
-
-		/// <summary>
-		/// Generate line for log file for this item 
-		/// </summary>
-		/// <returns>Line for a log file</returns>
-		std::string ToString();
-
-		/// <summary>
-		/// Get log level
-		/// </summary>
-		/// <returns>Log event level</returns>
-		LogLevel GetLevel();
+		/// <param name="sleepForMs">Time to sleep for</param>
+		explicit TaskDoSleep(unsigned int sleepForMs);
 	};
 };
 #endif

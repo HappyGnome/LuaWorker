@@ -26,6 +26,7 @@
 
 #include "LogItem.h"
 #include "LogStack.h"
+#include "LogLevel.h"
 
 namespace LuaWorker
 {

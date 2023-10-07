@@ -81,6 +81,12 @@
     <ClInclude Include="LuaCancellationException.h">
       <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="TaskDoSleep.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="LogLevel.h">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -98,10 +104,10 @@
     <ClCompile Include="WorkerLuaInterface.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
-    <ClCompile Include="TaskFile.cpp">
+    <ClCompile Include="TaskDoFile.cpp">
       <Filter>Source Files\Tasks</Filter>
     </ClCompile>
-    <ClCompile Include="TaskString.cpp">
+    <ClCompile Include="TaskDoString.cpp">
       <Filter>Source Files\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="LogStack.cpp">
@@ -118,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="LuaCancellationException.cpp">
       <Filter>Source Files\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskDoSleep.cpp">
+      <Filter>Source Files\Tasks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

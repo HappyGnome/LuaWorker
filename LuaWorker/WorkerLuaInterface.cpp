@@ -19,6 +19,7 @@
 #include "WorkerLuaInterface.h"
 #include "TaskDoFile.h"
 #include "TaskDoString.h"
+#include "TaskDoSleep.h"
 
 using namespace LuaWorker;
 
@@ -87,6 +88,9 @@ int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 	lua_pushcclosure(pL, l_Worker_DoFile, 1);
 	lua_setfield(pL, -2, "DoFile");
 	lua_pushinteger(pL, key);
+	lua_pushcclosure(pL, l_Worker_DoSleep, 1);
+	lua_setfield(pL, -2, "DoSleep");
+	lua_pushinteger(pL, key);
 	lua_pushcclosure(pL, l_Worker_Start, 1);
 	lua_setfield(pL, -2, "Start");
 	lua_pushinteger(pL, key);
@@ -102,10 +106,22 @@ int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 int WorkerLuaInterface::l_Worker_PopLogLine(lua_State* pL) 
 {
 	std::string msg;
-	if (sLog->PopLine(msg))
+	LogLevel level;
+	if (sLog->PopLine(msg, level))
 	{
 		lua_pushstring(pL, msg.c_str());
-		return 1;
+
+		int luaLevel;
+		switch (level)
+		{
+		case LogLevel::Info: luaLevel = LogLevel_Info; break;
+		case LogLevel::Error: luaLevel = LogLevel_Error; break;
+		case LogLevel::Warn: luaLevel = LogLevel_Warn; break;
+		default: luaLevel = LogLevel_Info; break;
+		}
+		lua_pushinteger(pL, luaLevel);
+
+		return 2;
 	}
 	 
 	return 0;
@@ -162,6 +178,26 @@ int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 			std::shared_ptr<Task> newItem(new TaskDoFile(str));
 			pWorker->AddTask(newItem);
 			
+			return TaskLuaInterface::l_PushTask(pL, newItem);
+		}
+	}
+
+	return 0;
+}
+
+int WorkerLuaInterface::l_Worker_DoSleep(lua_State* pL)
+{
+	std::shared_ptr<Worker> pWorker = l_PopWorker(pL);
+
+	if (pWorker != nullptr)
+	{
+		if (lua_isnumber(pL, -1))
+		{
+			unsigned int millis = std::max(0,(int)lua_tointeger(pL, -1));
+
+			std::shared_ptr<Task> newItem(new TaskDoSleep(millis));
+			pWorker->AddTask(newItem);
+
 			return TaskLuaInterface::l_PushTask(pL, newItem);
 		}
 	}

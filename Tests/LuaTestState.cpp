@@ -20,7 +20,6 @@
 #include<filesystem>
 
 #include "LuaTestState.h"
-#include "LuaError.h"
 #include "CppUnitTest.h"
 
 extern "C" {
@@ -82,8 +81,8 @@ bool LuaTestState::DoTestFile(const char* filepath)
 {
 	if (mLua == nullptr) return false;
 
-	std::filesystem::path path = std::filesystem::current_path().parent_path().parent_path();
-	path += "\\Tests\\LuaTests\\";
+	std::filesystem::path path = std::filesystem::current_path();
+	path += "\\";
 	path += filepath;
 
 	int execResult = luaL_dofile(mLua, path.string().c_str());
@@ -105,7 +104,17 @@ bool LuaTestState::DoTestFile(const char* filepath, std::chrono::duration<float>
 
 	std::chrono::duration<float> elapsed = system_clock::now() - start;
 
-	return (elapsed >= minTime && elapsed <= maxTime);
+	if (elapsed < minTime)
+	{
+		Logger::WriteMessage("Min time not reached");
+		return false;
+	}
+	else if (elapsed > maxTime)
+	{
+		Logger::WriteMessage("Max time exceeded");
+		return false;
+	}
+	else return true;
 }
 
 bool LuaTestState::DoTestString(const char* luaString)
@@ -131,6 +140,16 @@ bool LuaTestState::DoTestString(const char* luaString, std::chrono::duration<flo
 
 	std::chrono::duration<float> elapsed = system_clock::now() - start;
 
-	return (elapsed >= minTime && elapsed <= maxTime);
+	if (elapsed < minTime)
+	{
+		Logger::WriteMessage("Min time not reached");
+		return false;
+	}
+	else if (elapsed > maxTime)
+	{
+		Logger::WriteMessage("Max time exceeded");
+		return false;
+	}
+	else return true;
 }
 

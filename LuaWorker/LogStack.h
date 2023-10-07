@@ -26,6 +26,7 @@
 #include<mutex>
 
 #include "LogItem.h"
+#include "LogLevel.h"
 
 namespace LuaWorker
 {
@@ -46,6 +47,14 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="capacity">Max number of log lines to store</param>
 		explicit LogStack(std::size_t capacity = 100);
+
+		/// <summary>
+		/// Try to get next log line, removing that line from the log stack.
+		/// </summary>
+		/// <param name="message">Log line output</param>
+		/// <param name="message">Log level output</param>
+		/// <returns>True unless the list is empty</returns>
+		bool PopLine(std::string& message, LogLevel &level);
 
 		/// <summary>
 		/// Try to get next log line, removing that line from the log stack.
