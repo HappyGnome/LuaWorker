@@ -20,10 +20,13 @@ package.cpath = package.cpath..";".."LuaWorker.dll;"
 
 require('LuaWorker')
 
-local worker = LuaWorker.Create()			-- Create worker
+-- Create worker
+local worker = LuaWorker.Create()			
 
-worker:Start()								-- Start worker thread with separate lua state
+-- Start worker thread with separate lua state
+worker:Start()								
 
+-- Execute string in parallel lua thread
 local task = worker:DoString(
 		[[
 			local i = 0
@@ -33,26 +36,31 @@ local task = worker:DoString(
 			end
 
 			return 'Worker task done'
-		]])									-- Execute string in parallel lua thread
+		]])									
 
+-- Do some other work in calling thread
 local i = 0
 while i < 5000000 do
-	i = (i + 10000002)%10000001				 -- i+1 (slowly)
+	i = (i + 10000002)%10000001				 
 end
 
-print("Still in calling thread")			-- Demo that we're still executing here
+-- Demo that we're still executing here
+print("Still in calling thread")			
 
-local res = task:Await(1000)				-- Wait for up to 1 second for task to complete and print result
+-- Wait for up to 1 second for parallel task to complete
+local res = task:Await(1000)				
 
+-- Prints 'Worker task done'
 if task:Finalized() then
-	print(res)								-- Prints 'Worker task done'
+	print(res)								
 else
 	print("Task not finished in time!")
 end
 
 worker:Stop()
-											
-while (true) do								-- Readout any log entries
+
+-- Readout any log entries
+while (true) do								
 	local s = LuaWorker.PopLogLine()
 	if s == nil then break end
 	print(s)		
