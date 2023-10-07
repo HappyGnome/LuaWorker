@@ -37,6 +37,9 @@
     <Filter Include="Source Files\LuaTestState">
       <UniqueIdentifier>{85eb989f-27b5-4280-90f3-b40b221cb600}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LuaTests\DoFileFiles">
+      <UniqueIdentifier>{1a54ba1e-379e-4d9b-b52c-8ad214a6d9a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tests.cpp">
@@ -71,9 +74,19 @@
     <CopyFileToFolders Include="LuaTests\Common.lua">
       <Filter>LuaTests</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="LuaTests\TaskInfiniteLoop.lua" />
-    <CopyFileToFolders Include="LuaTests\TestDoFile_FileTask.lua" />
-    <CopyFileToFolders Include="LuaTests\TestInfiniteLoop_FileTask.lua">
+    <CopyFileToFolders Include="LuaTests\TaskInfiniteLoop_FileTask.lua">
+      <Filter>LuaTests\DoFileFiles</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="LuaTests\TaskDoFile_FileTask.lua">
+      <Filter>LuaTests\DoFileFiles</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="LuaTests\TaskInfiniteLoop.lua">
+      <Filter>LuaTests</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="LuaTests\TaskInfiniteCCalls_FileTask.lua">
+      <Filter>LuaTests\DoFileFiles</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="LuaTests\TaskInfiniteCCalls.lua">
       <Filter>LuaTests</Filter>
     </CopyFileToFolders>
   </ItemGroup>

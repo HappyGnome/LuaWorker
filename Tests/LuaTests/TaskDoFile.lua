@@ -26,7 +26,7 @@ Step1 = function()
 end 
 
 Step2 = function()
-	T = w:DoFile(RootDir .. "\\TestDoFile_FileTask.lua")
+	T = w:DoFile(RootDir .. "\\TaskDoFile_FileTask.lua")
 
 	local res = T:Await(500)
 
