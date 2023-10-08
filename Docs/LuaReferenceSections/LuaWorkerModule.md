@@ -11,22 +11,22 @@ Name		| Description
 **Error**	| Error
 
 ###	LuaWorker.TaskStatus
-Name			| Description
-----------------|---------------------------
-**Cancelled**	| Task cancelled before completion (final) 
-**Complete**	| Task completed without error (final) 
-**Error**		| Task failed due to an error (final) 
-**NotStarted**	| Execution not started
-**Running**		| Task currently executing
+Name			| Description						| Final
+----------------|-----------------------------------|--------
+**Cancelled**	| Task cancelled before completion	| :heavy_check_mark: 
+**Complete**	| Task completed without error		| :heavy_check_mark:
+**Error**		| Task failed due to an error		| :heavy_check_mark:
+**NotStarted**	| Execution not started				| 
+**Running**		| Task currently executing			| 
 
 ###	LuaWorker.WorkerStatus
-Name			| Description
-----------------|---------------------------
-**NotStarted**	| Worker thread not started
-**Starting**	| [Start](LuaWorker.md/#start) called but worker thread not ready
-**Processing**	| Worker thread executing
-**Cancelled**	| Worker thread cancelled e.g. after calling [Stop](LuaWorker.md/#stop) (final)  
-**Error**		| Worker thread ended with an error (final) 
+Name			| Description															| Final
+----------------|-----------------------------------------------------------------------|--------
+**NotStarted**	| Worker thread not started												| 
+**Starting**	| [Start](LuaWorker.md/#start) called but worker thread not ready		| 
+**Processing**	| Worker thread executing												| 
+**Cancelled**	| Worker thread cancelled e.g. after calling [Stop](LuaWorker.md/#stop) | :heavy_check_mark:  
+**Error**		| Worker thread ended with an error										| :heavy_check_mark:
 
 ## Methods
 
