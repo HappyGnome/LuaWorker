@@ -1,22 +1,6 @@
 # LuaWorker Reference
 
-# LuaWorker
-
-## Create worker
-### LuaWorker.Create
-#### Summary
-Create a new worker instance.
-#### Arguments
-None.
-#### Return
-THe worker object created.
-#### Examples
-```
-worker = LuaWorker.Create()
-```
-## Logging
-## Enums
-
-# Worker methods
-
-# Task methods
+## Sections
+* [Module scope](LuaReferenceSections\LuaWorkerModule.md)
+* [Worker object](LuaReferenceSections\LuaWorker.md)
+* [Task object](LuaReferenceSections\LuaTask.md)
