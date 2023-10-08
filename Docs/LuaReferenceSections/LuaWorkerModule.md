@@ -6,14 +6,15 @@
 
 ### LuaWorker.Create
 
-**Summary**
 Create a new [worker](LuaWorker.md) instance.
 
 **Arguments**
+
 None.
 
 **Return**
-The worker object created.
+
+The [worker](LuaWorker.md) object created.
 
 **Examples**
 ```
