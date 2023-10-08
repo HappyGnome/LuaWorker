@@ -24,7 +24,7 @@
 //#include <iostream>
 //#include <filesystem>
 //#include <thread>
-//#include <mutex>
+#include <mutex>
 //#include <string>
 #include <vector>
 #include <map>
@@ -58,6 +58,7 @@ namespace LuaWorker
 		std::map<K, std::shared_ptr<V>> mStore;
 		std::vector<K> mRecycledKeys;
 		K mNextNewKey;
+		std::mutex mStoreMtx;
 
 	public:
 
@@ -74,6 +75,8 @@ namespace LuaWorker
 		/// <returns>The key for retrieving value later</returns>
 		K push (std::shared_ptr<V> value) 
 		{
+			std::unique_lock<std::mutex> lock(mStoreMtx);
+
 			K key = mNextNewKey;
 
 			if (!mRecycledKeys.empty())
@@ -96,6 +99,8 @@ namespace LuaWorker
 		/// <exception>std::out_of_range if key invalid</exception>
 		std::shared_ptr<V> at (K key)
 		{
+			std::unique_lock<std::mutex> lock(mStoreMtx);
+
 			return mStore.at(key);
 		}
 
@@ -107,6 +112,8 @@ namespace LuaWorker
 		/// <exception>std::out_of_range if key invalid</exception>
 		std::shared_ptr<V> pop (K key)
 		{
+			std::unique_lock<std::mutex> lock(mStoreMtx);
+
 			std::shared_ptr<V> v = mStore.at(key);
 			mStore.erase(key);
 

@@ -193,6 +193,7 @@
     <ClInclude Include="Cancelable.h" />
     <ClInclude Include="InnerLuaState.h" />
     <ClInclude Include="LogLevel.h" />
+    <ClInclude Include="LogOutput.h" />
     <ClInclude Include="LogSection.h" />
     <ClInclude Include="LogStack.h" />
     <ClInclude Include="LogItem.h" />

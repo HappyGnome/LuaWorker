@@ -48,9 +48,8 @@ namespace LuaWorker
 	{
 	private:
 
-		static std::shared_ptr<LogStack> sLog;
-		static AutoKeyMap<int, Worker> sWorkers;
-		static int sNextWorkerId;
+		static AutoKeyMap<lua_Integer, Worker> sWorkers;
+		static lua_Integer sNextWorkerId;
 
 		//-------------------------------
 		// Static Lua helper methods
@@ -112,16 +111,6 @@ namespace LuaWorker
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
 		static int l_Worker_Create(lua_State* pL);
-
-		/// <summary>
-		/// Pop one log entry from library level logger
-		/// 
-		/// Lua syntax:
-		///		local logLine, level = LuaWorker.PopLogLine()
-		/// </summary>
-		/// <param name="pL">Lua state</param>
-		/// <returns>Number of items pushed to the stack</returns>
-		static int l_Worker_PopLogLine(lua_State* pL);
 
 		//-------------------------------
 		// Static Lua-callable methods 
@@ -196,6 +185,16 @@ namespace LuaWorker
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
 		static int l_Worker_Status(lua_State* pL);
+
+		/// <summary>
+		/// Pop one log entry from worker level logger
+		/// 
+		/// Lua syntax:
+		///		local logLine, level = worker:PopLogLine()
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		/// <returns>Number of items pushed to the stack</returns>
+		static int l_Worker_PopLogLine(lua_State* pL);
 	};
 }
 #endif

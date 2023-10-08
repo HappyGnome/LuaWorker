@@ -77,6 +77,12 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="e">Exception from which to generate log</param>
 		void Push(const std::exception& e);
+
+		/// <summary>
+		/// Get log stack underlying this instance
+		/// </summary>
+		/// <returns>The log stack in use</returns>
+		std::shared_ptr<LogOutput> GetLogOutput();
 	};
 }
 

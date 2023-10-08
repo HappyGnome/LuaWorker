@@ -21,9 +21,9 @@ package.cpath = package.cpath..";"..RootDir.."\\?.dll;"
 require('LuaWorker')
 
 -----------------------------------------
-RaiseFirstWorkerError = function()
+RaiseFirstWorkerError = function(worker)
 	while (true) do
-		local s, l = LuaWorker.PopLogLine()
+		local s, l = worker:PopLogLine()
 		if s == nil then break end
 		if l == LuaWorker.LogLevel.Error then
 			error(s)

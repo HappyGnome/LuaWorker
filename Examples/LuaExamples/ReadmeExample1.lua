@@ -67,7 +67,7 @@ print("\nWorker logs: ")
 
 -- Readout any log entries
 while (true) do								
-	local s = LuaWorker.PopLogLine()
+	local s = worker:PopLogLine()
 	if s == nil then break end
 	print(s)		
 end

@@ -16,36 +16,36 @@
 *
 \*****************************************************************************/
 
-#include "LogSection.h"
+#pragma once
 
-using namespace LuaWorker;
+#ifndef _LOG_OUTPUT_H_
+#define _LOG_OUTPUT_H_
 
-LogSection::LogSection(std::shared_ptr<LogStack> stack, std::string section) : mLog(stack), mSection(section) {}
+#include<string>
 
-LogSection::LogSection(const LogSection& other) : mLog(other.mLog), mSection (other.mSection) {}
+#include "LogLevel.h"
 
-LogSection& LogSection::operator= (const LogSection& other)
+namespace LuaWorker
 {
-	mLog = other.mLog;
-	mSection = other.mSection;
-
-	return *this;
-}
-
-void LogSection::Push(const LogLevel& level, const std::string& message)
-{
-	if (mLog != nullptr)
+	class LogOutput
 	{
-		mLog->Push(LogItem(level,message, mSection));
-	}
-}
 
-void LogSection::Push(const std::exception& e)
-{
-	Push ( LogLevel::Error, std::string(e.what()));
-}
+	public:
 
-std::shared_ptr<LogOutput> LogSection::GetLogOutput()
-{
-	return mLog;
+		/// <summary>
+		/// Try to get next log line, removing that line from the log stack.
+		/// </summary>
+		/// <param name="message">Log line output</param>
+		/// <param name="message">Log level output</param>
+		/// <returns>True unless the list is empty</returns>
+		virtual bool PopLine(std::string& message, LogLevel& level) = 0;
+
+		/// <summary>
+		/// Try to get next log line, removing that line from the log stack.
+		/// </summary>
+		/// <param name="message">Log line output</param>
+		/// <returns>True unless the list is empty</returns>
+		virtual bool PopLine(std::string& message) = 0;
+	};
 }
+#endif

@@ -19,7 +19,7 @@
 Step1 = function()
 	w = LuaWorker.Create()
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 	return w:Status() == LuaWorker.WorkerStatus.NotStarted
 end 
 
@@ -34,6 +34,6 @@ end
 Step4 = function()
 	w:Stop()
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 	return w:Status() == LuaWorker.WorkerStatus.Cancelled
 end 

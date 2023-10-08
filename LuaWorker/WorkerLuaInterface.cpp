@@ -27,11 +27,9 @@ using namespace LuaWorker;
 // Static private objects
 //-------------------------------
 
-AutoKeyMap<int, Worker> WorkerLuaInterface::sWorkers(0);
+AutoKeyMap<lua_Integer, Worker> WorkerLuaInterface::sWorkers(0);
 
-int WorkerLuaInterface::sNextWorkerId = 0;
-
-std::shared_ptr<LogStack> WorkerLuaInterface::sLog = std::shared_ptr<LogStack>(new LogStack());
+lua_Integer WorkerLuaInterface::sNextWorkerId = 0;
 
 //-------------------------------
 // Static Lua helper methods
@@ -66,12 +64,17 @@ std::shared_ptr<Worker> WorkerLuaInterface::l_PopWorker(lua_State* pL, int& outK
 
 int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 {
-	LogSection log(sLog, "Worker " + std::to_string(sNextWorkerId++));
+	lua_Integer logSize = 100;
+	if (lua_isnumber(pL, -1))
+	{
+		logSize = lua_tointeger(pL, -1);
+	}
+
+	LogSection log(std::make_shared<LogStack>(logSize), "Worker " + std::to_string(sNextWorkerId++));
 
 	std::shared_ptr<Worker> newWorker(new Worker(std::move(log)));
-	//newWorker->Start();
 
-	int key = sWorkers.push(newWorker);
+	lua_Integer key = sWorkers.push(newWorker);
 
 	lua_createtable(pL, 0, 5);
 	lua_newuserdata(pL, 1);
@@ -99,34 +102,12 @@ int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 	lua_pushinteger(pL, key);
 	lua_pushcclosure(pL, l_Worker_Status, 1);
 	lua_setfield(pL, -2, "Status");
+	lua_pushinteger(pL, key);
+	lua_pushcclosure(pL, l_Worker_PopLogLine, 1);
+	lua_setfield(pL, -2, "PopLogLine");
 
 	return 1;
 }
-
-int WorkerLuaInterface::l_Worker_PopLogLine(lua_State* pL) 
-{
-	std::string msg;
-	LogLevel level;
-	if (sLog->PopLine(msg, level))
-	{
-		lua_pushstring(pL, msg.c_str());
-
-		int luaLevel;
-		switch (level)
-		{
-		case LogLevel::Info: luaLevel = LogLevel_Info; break;
-		case LogLevel::Error: luaLevel = LogLevel_Error; break;
-		case LogLevel::Warn: luaLevel = LogLevel_Warn; break;
-		default: luaLevel = LogLevel_Info; break;
-		}
-		lua_pushinteger(pL, luaLevel);
-
-		return 2;
-	}
-	 
-	return 0;
-}
-
 
 //-------------------------------
 // Static Lua-callable methods 
@@ -250,4 +231,33 @@ int WorkerLuaInterface::l_Worker_Stop(lua_State* pL)
 	if (pWorker != nullptr) pWorker->Stop();
 
 	return l_PushStatus(pL, pWorker);
+}
+
+int WorkerLuaInterface::l_Worker_PopLogLine(lua_State* pL)
+{
+	std::shared_ptr<Worker> pWorker = l_PopWorker(pL);
+
+	if (pWorker == nullptr) return 0;
+
+	std::string msg;
+	LogLevel level;
+
+	if (pWorker->GetLogOutput()->PopLine(msg, level))
+	{
+		lua_pushstring(pL, msg.c_str());
+
+		int luaLevel;
+		switch (level)
+		{
+		case LogLevel::Info: luaLevel = LogLevel_Info; break;
+		case LogLevel::Error: luaLevel = LogLevel_Error; break;
+		case LogLevel::Warn: luaLevel = LogLevel_Warn; break;
+		default: luaLevel = LogLevel_Info; break;
+		}
+		lua_pushinteger(pL, luaLevel);
+
+		return 2;
+	}
+
+	return 0;
 }

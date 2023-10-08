@@ -27,22 +27,22 @@ Step2 = function()
 	T = w:DoString("NOT LUA")	-- Should error
 	T2 = w:DoSleep(1000)		-- Should execute after the error
 
-	--RaiseFirstWorkerError() 
+	--RaiseFirstWorkerError(w) 
 	return true
 end 
 
 Step3 = function()
 	
-T:Await(500)
+	T:Await(500)
 
-	-- RaiseFirstWorkerError()
+	-- RaiseFirstWorkerError(w)
 	return T:Status() == LuaWorker.TaskStatus.Error
 end 
 
 --Should raise error
 Step4 = function()
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 	return true
 end 
 
@@ -51,6 +51,6 @@ Step5 = function()
 
 	T2:Await(1100)
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 	return w:Status() == LuaWorker.WorkerStatus.Processing
 end 

@@ -28,7 +28,7 @@ end
 Step2 = function()
 	T = w:DoString("return [[" .. MyString .. "]]")
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 	return true
 end 
 
@@ -36,7 +36,7 @@ Step3 = function()
 
 	local res = T:Await(500)
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 	if not ( (T:Status() == LuaWorker.TaskStatus.Complete) and (res == MyString)) then
 		error(res)
 	else

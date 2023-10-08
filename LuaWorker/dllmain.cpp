@@ -32,7 +32,6 @@ using namespace LuaWorker;
 extern "C"  int luaopen_LuaWorker(lua_State* pL) {
     static const luaL_Reg Worker_Index[] = {
           {"Create", WorkerLuaInterface::l_Worker_Create},
-          {"PopLogLine", WorkerLuaInterface::l_Worker_PopLogLine},
           {nullptr, nullptr}  /* end */
     };
     luaL_register(pL, "LuaWorker", Worker_Index);

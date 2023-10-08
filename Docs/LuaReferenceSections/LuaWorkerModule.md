@@ -41,11 +41,14 @@ Name			| Description															| Final
 
 ### Create
 ```
-LuaWorker.Create()
+LuaWorker.Create( logSize )
 ```
 Create a new [worker](LuaWorker.md) instance.
 
-**Arguments** : None.
+**Arguments** : 
+\#  |Type		| Description					| Optional
+----|-----------|-------------------------------|-------------
+1	| Integer	| Maximum length of log queue	| :heavy_check_mark:
 
 **Returns** :
 
@@ -56,27 +59,4 @@ Create a new [worker](LuaWorker.md) instance.
 **Examples**
 ```
 worker = LuaWorker.Create()
-```
-
-### PopLogLine
-```
-LuaWorker.PopLogLine()
-```
-Get the next line logged by the worker (ordering is FIFO), removes that line from the log queue. Note that only a limited number of lines are stored, so it is advisable to pop all log lines regularly.
-
-**Arguments** : None.
-
-**Returns** :
-
-If log not empty:
-\#  |Type									| Description
-----|---------------------------------------|-----------
-1	| String								| The log line popped
-2	| [**LogLevel**](#loglevel)	| The type of log event
-
-otherwise nothing.
-
-**Examples**
-```
-line, level = LuaWorker.PopLogLine()
 ```

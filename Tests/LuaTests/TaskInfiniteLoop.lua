@@ -30,7 +30,7 @@ Step2 = function()
 
 	local res = T:Await(500)
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 
 	return (T:Status() == LuaWorker.TaskStatus.Running)
 end 
@@ -38,7 +38,7 @@ end
 -- should return with error state (assert false)
 Step3 = function()
 	w:Stop()
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 	return true
 end 
 

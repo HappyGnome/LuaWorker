@@ -27,10 +27,11 @@
 
 #include "LogItem.h"
 #include "LogLevel.h"
+#include "LogOutput.h"
 
 namespace LuaWorker
 {
-	class LogStack
+	class LogStack : public LogOutput
 	{
 	private:
 
@@ -54,14 +55,14 @@ namespace LuaWorker
 		/// <param name="message">Log line output</param>
 		/// <param name="message">Log level output</param>
 		/// <returns>True unless the list is empty</returns>
-		bool PopLine(std::string& message, LogLevel &level);
+		virtual bool PopLine(std::string& message, LogLevel &level) override;
 
 		/// <summary>
 		/// Try to get next log line, removing that line from the log stack.
 		/// </summary>
 		/// <param name="message">Log line output</param>
 		/// <returns>True unless the list is empty</returns>
-		bool PopLine(std::string& message);
+		virtual bool PopLine(std::string& message) override;
 
 		/// <summary>
 		/// Add log item to the current list

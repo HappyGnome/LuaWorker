@@ -30,7 +30,7 @@ Step2 = function()
 
 	local res = T:Await(500)
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 
 	return (T:Status() == LuaWorker.TaskStatus.Complete) and (res == "File Run")
 end 
@@ -38,7 +38,7 @@ end
 Step3 = function()
 	T2 = w:DoString("return MirrorString([[".. MyString .. "]])")
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 	return T2:Finalized() == false
 end 
 
@@ -46,6 +46,6 @@ Step4 = function()
 
 	local res = T2:Await(500)
 
-	RaiseFirstWorkerError()
+	RaiseFirstWorkerError(w)
 	return (T:Status() == LuaWorker.TaskStatus.Complete) and (T2:Status() == LuaWorker.TaskStatus.Complete) and (res == MyString)
 end

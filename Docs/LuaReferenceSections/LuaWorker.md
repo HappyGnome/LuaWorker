@@ -69,6 +69,29 @@ Queue a task for this worker. The task executes lua code from a string.
 task = worker:DoString("os.execute('timeout 5')")
 ```
 
+### PopLogLine
+```
+worker:PopLogLine()
+```
+Get the next line logged by the worker (ordering is FIFO), removes that line from the log queue. Note that only a limited number of lines are stored, so it is advisable to pop all log lines regularly.
+
+**Arguments** : None.
+
+**Returns** :
+
+If log not empty:
+\#  |Type											| Description
+----|-----------------------------------------------|-----------
+1	| String										| The log line popped
+2	| [**LogLevel**](LuaWorkerModule.md/#loglevel)	| The type of log event
+
+otherwise nothing.
+
+**Examples**
+```
+line, level = worker:PopLogLine()
+```
+
 ### Start
 ```
 worker:Start()

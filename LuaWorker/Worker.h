@@ -150,6 +150,12 @@ namespace LuaWorker
 		/// <returns>Current worker status</returns>
 		WorkerStatus AddTask(std::shared_ptr<Task> task);
 
+		/// <summary>
+		/// Get log output for reading this worker's logs
+		/// </summary>
+		/// <returns>The logger output</returns>
+		std::shared_ptr<LogOutput> GetLogOutput();
+
 	};
 }
 #endif

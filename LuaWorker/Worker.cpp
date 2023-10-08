@@ -252,3 +252,9 @@ WorkerStatus Worker::GetStatus()
 {
 	return mCurrentStatus;
 }
+
+//------
+std::shared_ptr<LogOutput> Worker::GetLogOutput()
+{
+	return mLog.GetLogOutput();
+}

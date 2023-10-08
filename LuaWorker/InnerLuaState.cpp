@@ -131,7 +131,7 @@ void InnerLuaState::Open()
 				lua_pushlightuserdata(mLua, this);
 				lua_pushcclosure(mLua, InnerLuaState::l_LogInfo, 1);
 			lua_setfield(mLua, -2, "LogInfo");
-		lua_setglobal(mLua, "LuaWorker");
+		lua_setglobal(mLua, "InLuaWorker");
 
 			lua_pushlightuserdata(mLua, this);
 		lua_setglobal(mLua, cLuaStateHandleKey);

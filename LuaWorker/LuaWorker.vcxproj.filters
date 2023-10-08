@@ -87,6 +87,9 @@
     <ClInclude Include="LogLevel.h">
       <Filter>Header Files\Logging</Filter>
     </ClInclude>
+    <ClInclude Include="LogOutput.h">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

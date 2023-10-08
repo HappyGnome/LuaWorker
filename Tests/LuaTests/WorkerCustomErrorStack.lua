@@ -16,39 +16,42 @@
 * 
 ]]--*****************************************************************************
 
-w = LuaWorker.Create()
+w = LuaWorker.Create(50)
 w:Start()
 
-Step1 = function()
-	w:DoSleep(500) -- Prevent main wait fromn starting during step 2
+logErrorLast = 
+	[[
+		InLuaWorker.LogError("Error in log!")
 
+		for i = 1,49 do
+			InLuaWorker.LogInfo("Log entry " .. i)
+		end
+	]]
+
+Step1 = function()
 	RaiseFirstWorkerError(w)
 	return w:Status() == LuaWorker.WorkerStatus.Processing
 end 
 
+-- Should raise error
 Step2 = function()
-	T = w:DoSleep(2000)
+	T = w:DoString(logErrorLast)
+
+	local res = T:Await(500)
 
 	RaiseFirstWorkerError(w)
-	return (T:Status() == LuaWorker.TaskStatus.NotStarted) and (T:Finalized() == false)
+
+	return true
 end 
 
--- Delay 1000
-
+-- Should not raise error
 Step3 = function()
-	return T:Status() == LuaWorker.TaskStatus.Running
-end 
+	w:DoString(logErrorLast)
+	T = w:DoString([[InLuaWorker.LogInfo("Push error off stack")]])
 
-Step4 = function()
-	T:Await(2000)
-
-	RaiseFirstWorkerError(w)
-	return (T:Status() == LuaWorker.TaskStatus.Complete) and (T:Finalized() == true)
-end 
-
-Step5 = function()
-	w:Stop()
+	local res = T:Await(500)
 
 	RaiseFirstWorkerError(w)
-	return w:Status() == LuaWorker.WorkerStatus.Cancelled
+
+	return true
 end 
