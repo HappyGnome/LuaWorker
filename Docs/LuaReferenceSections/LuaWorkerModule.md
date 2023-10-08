@@ -10,13 +10,13 @@ Create a new [worker](LuaWorker.md) instance.
 
 **Arguments**
 
-	None.
+* None.
 
 **Return**
 
-	The [worker](LuaWorker.md) object created.	
+* The [worker](LuaWorker.md) object created.
 
 **Examples**
-	```
-	worker = LuaWorker.Create()
-	```
+```
+worker = LuaWorker.Create()
+```
