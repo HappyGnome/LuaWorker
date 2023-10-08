@@ -1,7 +1,7 @@
 # LuaWorker
 
 ## Introduction
-LuaWorker aims to be a clean and lightweight Lua threading module. The original motivation for this project was the need to write a mod for a game running Lua 5.1.5 which could trigger asynchronous tasks (e.g. http requests) to the main game loop.
+LuaWorker aims to be a clean and lightweight Lua threading module. The original motivation for this project was the need to write a mod for a game running Lua 5.1.5 which could trigger asynchronous tasks (e.g. http requests) from the main game loop.
 
 ## Lua versions
 LuaWorker is initially targeted at [Lua 5.1.5](https://www.lua.org/versions.html), but it should be possible to adapt it for later versions. Required lua source to build LuaWorker for Lua 5.1.5 and to test it on Windows 10+ are included.
