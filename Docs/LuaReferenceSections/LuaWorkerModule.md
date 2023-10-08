@@ -30,13 +30,13 @@
 
 Create a new [worker](LuaWorker.md) instance.
 
-**Arguments**
-
-* None.
+**Arguments** : None.
 
 **Return**
 
-* The [worker](LuaWorker.md) object created.
+#   |Type                       | Description
+----|---------------------------|-----------
+1	|[LuaWorker](LuaWorker.md)	| The worker object created
 
 **Examples**
 ```
