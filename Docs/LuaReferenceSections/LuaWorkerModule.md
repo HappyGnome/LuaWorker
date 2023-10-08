@@ -55,7 +55,7 @@ Get the next line logged by the worker (ordering is FIFO), removes that line fro
 * None if the log queue is empty.
 * If there are log lines queued:
 	1. **string** The log line popped
-	2. [**LogLevel**](#luaworker.loglevel) The type of log event
+	2. [**LogLevel**](#luaworkerloglevel) The type of log event
 
 **Examples**
 ```
