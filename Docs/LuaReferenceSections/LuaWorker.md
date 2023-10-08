@@ -4,7 +4,7 @@
 
 ### DoFile
 ```
-worker:DoFile(path)
+worker:DoFile( path )
 ```
 
 Queue a task for this worker. The task executes the lua file at the specified path.
@@ -49,7 +49,7 @@ task = worker:DoSleep(1000)
 
 ### DoString
 ```
-worker:DoString(luaString)
+worker:DoString( luaString )
 ```
 
 Queue a task for this worker. The task executes lua code from a string.
@@ -81,7 +81,7 @@ Start the worker thread
 **Returns** :
 \#  |Type												| Description
 ----|---------------------------------------------------|-----------
-1	| [WorkerStatus](LuaWorkerModule.md/#wokerstatus)	| New status of the worker
+1	| [WorkerStatus](LuaWorkerModule.md/#workerstatus)	| New status of the worker
 
 **Examples**
 ```
@@ -100,7 +100,7 @@ Get current status of this worker
 **Returns** :
 \#  |Type												| Description
 ----|---------------------------------------------------|-----------
-1	| [WorkerStatus](LuaWorkerModule.md/#wokerstatus)	| Current status of the worker
+1	| [WorkerStatus](LuaWorkerModule.md/#workerstatus)	| Current status of the worker
 
 **Examples**
 ```
@@ -119,7 +119,7 @@ Permanently stop this worker thread, cancelling any queued tasks.
 **Returns** :
 \#  |Type												| Description
 ----|---------------------------------------------------|-----------
-1	| [WorkerStatus](LuaWorkerModule.md/#wokerstatus)	| New status of the worker
+1	| [WorkerStatus](LuaWorkerModule.md/#workerstatus)	| New status of the worker
 
 **Examples**
 ```
