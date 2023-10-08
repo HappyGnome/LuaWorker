@@ -28,7 +28,7 @@ Use LuaWorker to execute lua on a new thread:
 * Await task completion (for a limited time) on the main thread with `task:Await`
 * Stop the thread, and cancel queued tasks with `worker:Stop()`
 
-See the [full example](##lua-usage-example) below, and the [reference document](LuaReference.md) for full details.
+See the [full example](#lua-usage-example) below, and the [reference document](Docs/LuaReference.md) for full details.
 
 ## Lua usage example
 ```
