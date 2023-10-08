@@ -109,4 +109,4 @@ Worker logs:
 This project is released under an Apache 2.0 license, as set out in [LICENSE.txt](LICENSE.txt). 
 
 Individual contributor copyright:
-* Copyright 2023 HappyGnome
+* Copyright 2023 HappyGnome (https://github.com/HappyGnome)
