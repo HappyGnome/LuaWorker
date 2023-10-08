@@ -37,7 +37,7 @@ local task = worker:DoString(
 				i = (i + 10000002)%10000001 -- i+1 (slowly)
 			end
 
-			print("Work done")
+			print("Work done")		
 
 			return 'Worker task returned'
 		]])									

@@ -23,6 +23,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LuaReferenceSections", "LuaReferenceSections", "{9B816AA6-CF13-4525-B765-79419FE021C5}"
 	ProjectSection(SolutionItems) = preProject
 		Docs\LuaReferenceSections\LuaTask.md = Docs\LuaReferenceSections\LuaTask.md
+		LuaTaskContext.md = LuaTaskContext.md
 		Docs\LuaReferenceSections\LuaWorker.md = Docs\LuaReferenceSections\LuaWorker.md
 		Docs\LuaReferenceSections\LuaWorkerModule.md = Docs\LuaReferenceSections\LuaWorkerModule.md
 	EndProjectSection
