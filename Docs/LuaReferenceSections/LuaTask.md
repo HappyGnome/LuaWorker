@@ -7,7 +7,7 @@
 task:Await( millis )
 ```
 
-Wait for a limited time for the task to reach a final status. Returns when this is the case, or after the timeout, whichever occurs first.
+Wait for a limited time for this task to reach a final status. Returns when this is the case, or after the timeout, whichever occurs first.
 
 **Arguments** :
 \#  |Type		| Description
