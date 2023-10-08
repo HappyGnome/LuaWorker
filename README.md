@@ -15,7 +15,7 @@ The included solution file for Microsoft Visual Studio can be used to build LuaW
 ## Installation
 * Build the LuaWorker project
 * Copy the output `LuaWorker.dll` to a directory your lua instance can access.
-* 
+ 
 ## Usage quickstart
 From your lua scripts, add Luaworker to your environment:
 * Add the path to `LuaWorker.dll` to `package.cpath`. E.g. `package.cpath = package.cpath..";LuaWorker.dll;"`
