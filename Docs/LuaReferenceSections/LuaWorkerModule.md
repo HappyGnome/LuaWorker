@@ -2,7 +2,10 @@
 
 ## Enums
 
-###	LuaWorker.LogLevel
+###	LogLevel
+```
+LuaWorker.LogLevel
+```
 
 Name		| Description
 ------------|---------------------------
@@ -10,7 +13,10 @@ Name		| Description
 **Warn**	| Warning
 **Error**	| Error
 
-###	LuaWorker.TaskStatus
+###	TaskStatus
+```
+LuaWorker.TaskStatus
+```
 Name			| Description						| Final
 ----------------|-----------------------------------|--------
 **Cancelled**	| Task cancelled before completion	| :heavy_check_mark: 
@@ -19,7 +25,10 @@ Name			| Description						| Final
 **NotStarted**	| Execution not started				| 
 **Running**		| Task currently executing			| 
 
-###	LuaWorker.WorkerStatus
+###	WorkerStatus
+```
+LuaWorker.WorkerStatus
+```
 Name			| Description															| Final
 ----------------|-----------------------------------------------------------------------|--------
 **NotStarted**	| Worker thread not started												| 
@@ -30,8 +39,10 @@ Name			| Description															| Final
 
 ## Methods
 
-### LuaWorker.Create
-
+### Create
+```
+LuaWorker.Create()
+```
 Create a new [worker](LuaWorker.md) instance.
 
 **Arguments** : None.
@@ -47,8 +58,10 @@ Create a new [worker](LuaWorker.md) instance.
 worker = LuaWorker.Create()
 ```
 
-### LuaWorker.PopLogLine
-
+### PopLogLine
+```
+LuaWorker.PopLogLine()
+```
 Get the next line logged by the worker (ordering is FIFO), removes that line from the log queue. Note that only a limited number of lines are stored, so it is advisable to pop all log lines regularly.
 
 **Arguments** : None.
@@ -59,7 +72,7 @@ If log not empty:
 \#  |Type									| Description
 ----|---------------------------------------|-----------
 1	| String								| The log line popped
-2	| [**LogLevel**](#luaworkerloglevel)	| The type of log event
+2	| [**LogLevel**](#loglevel)	| The type of log event
 
 otherwise nothing.
 
