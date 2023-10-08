@@ -1,28 +1,28 @@
-# Lua worker scope
+# LuaWorker scope
 
 ## Enums
 
 ###	LuaWorker.LogLevel
 
-* **Info** Information only
-* **Warn** Warning
-* **Error** Error
+* **Info** - Information only
+* **Warn** - Warning
+* **Error** - Error
 
 ###	LuaWorker.TaskStatus
 
-* **Cancelled** Task cancelled before completion (final) 
-* **Complete** Task completed without error (final) 
-* **Error** Task failed due to an error (final) 
-* **NotStarted** Execution not started
-* **Running** Task currently executing
+* **Cancelled** - Task cancelled before completion (final) 
+* **Complete** - Task completed without error (final) 
+* **Error** - Task failed due to an error (final) 
+* **NotStarted** - Execution not started
+* **Running** - Task currently executing
 
 ###	LuaWorker.WorkerStatus
 
-* **NotStarted** Worker thread not started
-* **Starting** [Start](LuaWorker.md/#start) called but worker thread not ready
-* **Processing** Worker thread executing
-* **Cancelled** Worker thread cancelled e.g. after calling [Start](LuaWorker.md/#stop) (final)  
-* **Error** Worker thread ended with an error (final) 
+* **NotStarted** - Worker thread not started
+* **Starting** - [Start](LuaWorker.md/#start) called but worker thread not ready
+* **Processing** - Worker thread executing
+* **Cancelled** - Worker thread cancelled e.g. after calling [Stop](LuaWorker.md/#stop) (final)  
+* **Error** - Worker thread ended with an error (final) 
 
 ## Methods
 
@@ -55,7 +55,7 @@ Get the next line logged by the worker (ordering is FIFO), removes that line fro
 * None if the log queue is empty.
 * If there are log lines queued:
 	1. **string** The log line popped
-	2. [**LogLevel**](#loglevel) The type of log event
+	2. [**LogLevel**](#luaworker.loglevel) The type of log event
 
 **Examples**
 ```
