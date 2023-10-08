@@ -1,8 +1,36 @@
 # LuaWorker
 
-A simple/lightweight Lua threading module. 
+## Introduction
+LuaWorker aims to be a clean and lightweight Lua threading module. The original motivation for this project was the need to write a mod for a game running Lua 5.1.5 which could trigger asynchronous tasks (e.g. http requests) to the main game loop.
 
-## Lua Usage Example
+## Lua versions
+LuaWorker is initially targeted at [Lua 5.1.5](https://www.lua.org/versions.html), but it should be possible to adapt it for later versions. Required lua source to build LuaWorker for Lua 5.1.5 and to test it on Windows 10+ are included.
+
+## Build tools
+The included solution file for Microsoft Visual Studio can be used to build LuaWorker and test/example projects. The following software/language versions have been used for this project:
+* Visual Studio 2022
+* Build tools ('Platform Toolset') v143 
+* C++ 17 standard
+
+## Installation
+* Build the LuaWorker project
+* Copy the output `LuaWorker.dll` to a directory your lua instance can access.
+* 
+## Usage quickstart
+From your lua scripts, add Luaworker to your environment:
+* Add the path to `LuaWorker.dll` to `package.cpath`. E.g. `package.cpath = package.cpath..";LuaWorker.dll;"`
+* Call `require('LuaWorker')`
+
+Use LuaWorker to execute lua on a new thread:
+* Create a LuaWorker with `LuaWorker.Create()`. E.g. `local worker = LuaWorker.Create()`
+* Start the worker thread with `worker:Start()`
+* Send a task to the worker using `worker:DoString`, `worker:DoFile` or `worker:DoSleep`
+* Await task completion (for a limited time) on the main thread with `task:Await`
+* Stop the thread, and cancel queued tasks with `worker:Stop()`
+
+See the [full example](##lua-usage-example) below, and the [reference document](LuaReference.md) for full details.
+
+## Lua usage example
 ```
 package.cpath = package.cpath..";".."LuaWorker.dll;"
 
@@ -76,3 +104,6 @@ Worker logs:
 2023-10-07 21:09:21Z | Worker 0 | Info | Thread stop requested.
 2023-10-07 21:09:21Z | Worker 0 | Info | Thread stopping.
 ```
+
+## License
+This project is released under an Apache 2.0 license, as set out in [LICENSE.txt](LICENSE.txt).

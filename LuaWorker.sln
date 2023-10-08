@@ -15,6 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Examples", "Examples\Examples.vcxproj", "{F656E9AE-7909-4FFB-966F-E084B32797E1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{3429A69F-0174-4621-8659-25ED9E2489C4}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\LuaReference.md = Docs\LuaReference.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -50,6 +55,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3429A69F-0174-4621-8659-25ED9E2489C4} = {E6060C3C-E6BF-493D-8512-D4CD55D292F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7611AED-07C1-4657-8201-5FA92195C498}
