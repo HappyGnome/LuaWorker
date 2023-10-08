@@ -78,5 +78,5 @@ otherwise nothing.
 
 **Examples**
 ```
-local line, level = LuaWorker.PopLogLine()
+line, level = LuaWorker.PopLogLine()
 ```
