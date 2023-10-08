@@ -105,5 +105,8 @@ Worker logs:
 2023-10-07 21:09:21Z | Worker 0 | Info | Thread stopping.
 ```
 
-## License
-This project is released under an Apache 2.0 license, as set out in [LICENSE.txt](LICENSE.txt).
+## License and copyright
+This project is released under an Apache 2.0 license, as set out in [LICENSE.txt](LICENSE.txt). 
+
+Individual contributor copyright:
+* Copyright 2023 HappyGnome
