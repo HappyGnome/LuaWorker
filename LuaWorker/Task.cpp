@@ -54,7 +54,7 @@ void Task::SleepFor(unsigned int waitForMillis)
 		if (mStatus == TaskStatus::Cancelled
 			|| mStatus == TaskStatus::Error) return;
 
-		mResultStatusCv.wait_for(lock, sleepTill - system_clock::now());
+		mResultStatusCv.wait_until(lock, sleepTill);
 
 	}
 

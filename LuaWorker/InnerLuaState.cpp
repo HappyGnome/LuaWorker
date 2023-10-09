@@ -26,6 +26,11 @@ extern "C" {
 	#include "lualib.h"
 }
 
+#include <chrono>
+
+using namespace std::chrono_literals;
+using std::chrono::system_clock;
+
 using namespace LuaWorker;
 
 const char* InnerLuaState::cLuaStateHandleKey = "_LUAWORKER_STATE";
@@ -64,6 +69,30 @@ int InnerLuaState::l_LogError(lua_State* pL)
 int InnerLuaState::l_LogInfo(lua_State* pL)
 {
 	return l_Log(pL, LogLevel::Info);
+}
+
+//------
+int InnerLuaState::l_Sleep(lua_State* pL)
+{
+	InnerLuaState* pState = l_PopThis(pL);
+
+	if (pState != nullptr)
+	{
+		if (!lua_isnumber(pL, -1)) return 0;
+		lua_Integer millis = lua_tointeger(pL, -1);
+		if (millis <= 0) return 0;
+
+		system_clock::time_point sleepTill = system_clock::now() + (millis * 1ms);
+
+		while (system_clock::now() < sleepTill)
+		{
+			std::unique_lock<std::mutex> lock(pState->mCancelMtx);
+			pState->mCancelCv.wait_until(lock, sleepTill);
+
+			if (pState->mCancel) return 0;
+		}
+	}
+	return 0;
 }
 
 //------
@@ -116,8 +145,6 @@ InnerLuaState::~InnerLuaState()
 //------
 void InnerLuaState::Open()
 {
-	std::unique_lock<std::mutex> lock(mLuaMtx);
-
 	if (mLua == nullptr && !mCancel) 
 	{
 		mLua = lua_open();
@@ -131,6 +158,9 @@ void InnerLuaState::Open()
 				lua_pushlightuserdata(mLua, this);
 				lua_pushcclosure(mLua, InnerLuaState::l_LogInfo, 1);
 			lua_setfield(mLua, -2, "LogInfo");
+				lua_pushlightuserdata(mLua, this);
+				lua_pushcclosure(mLua, InnerLuaState::l_Sleep, 1);
+			lua_setfield(mLua, -2, "Sleep");
 		lua_setglobal(mLua, "InLuaWorker");
 
 			lua_pushlightuserdata(mLua, this);
@@ -147,8 +177,6 @@ void InnerLuaState::Close()
 {
 	Cancel(); // Cancel before waiting for any running lua to complete
 
-	std::unique_lock<std::mutex> lock(mLuaMtx);
-
 	if (mLua != nullptr)
 	{
 		lua_close(mLua);
@@ -160,8 +188,6 @@ void InnerLuaState::Close()
 //------
 void InnerLuaState::ExecTask(std::shared_ptr<Task> task)
 {
-	std::unique_lock<std::mutex> lock(mLuaMtx);
-
 	if(mCancel) throw LuaCancellationException();
 
 	if (mLua != nullptr)
@@ -174,6 +200,8 @@ void InnerLuaState::ExecTask(std::shared_ptr<Task> task)
 void InnerLuaState::Cancel()
 {
 	mCancel = true;
+
+	mCancelCv.notify_all();
 }
 
 //------

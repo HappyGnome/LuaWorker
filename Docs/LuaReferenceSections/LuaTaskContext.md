@@ -39,3 +39,21 @@ Add info message to the log of the calling [worker](LuaWorker.md).
 ```
 InLuaWorker.LogInfo( "Hello logger, from task context!" )
 ```
+
+### Sleep
+```
+InLuaWorker.Sleep( millis )
+```
+Sleep worker thread for at least the specified time.
+
+**Arguments** : 
+\#  |Type		| Description				
+----|-----------|------------------------------
+1	| Integer	| Milliseconds to sleep in worker thread
+
+**Returns** : Nothing
+
+**Examples**
+```
+InLuaWorker.Sleep(1000)
+```

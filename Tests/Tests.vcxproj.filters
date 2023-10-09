@@ -99,5 +99,8 @@
     <None Include="LuaTests\WorkerCustomErrorStack.lua">
       <Filter>LuaTests</Filter>
     </None>
+    <None Include="LuaTests\SleepInTask.lua">
+      <Filter>LuaTests</Filter>
+    </None>
   </ItemGroup>
 </Project>

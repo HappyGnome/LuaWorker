@@ -50,10 +50,12 @@ namespace LuaWorker
 		std::atomic<bool> mCancel;
 		std::atomic<bool> mOpen;
 
+		std::mutex mCancelMtx;
+		std::condition_variable mCancelCv;
+
 		LogSection mLog;
 
 		lua_State* mLua;
-		std::mutex mLuaMtx;
 
 		//---------------------
 		// InnerLuaState
@@ -63,6 +65,9 @@ namespace LuaWorker
 		static int l_Log(lua_State* pL, LogLevel level);
 		static int l_LogError(lua_State* pL);
 		static int l_LogInfo(lua_State* pL);
+
+		static int l_Sleep(lua_State* pL);
+
 		static void l_Hook(lua_State* pL, lua_Debug *pDebug);
 
 	public:
