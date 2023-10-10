@@ -22,7 +22,7 @@
 #define _INNER_LUA_STATE_H_
 
 #include <mutex> 
-//#include <map> 
+#include <chrono> 
 
 #include "LogSection.h"
 #include "Task.h"
@@ -46,6 +46,8 @@ namespace LuaWorker
 	private:
 
 		const static char* cLuaStateHandleKey;
+		const static char* cInLuaWorkerTableName;
+		const static char* cInLuaWorkerThreadsTableName;
 
 		std::atomic<bool> mCancel;
 		std::atomic<bool> mOpen;
@@ -55,7 +57,22 @@ namespace LuaWorker
 
 		LogSection mLog;
 
+		//Access in worker thread only
 		lua_State* mLua;
+
+		//Access in worker thread only
+		std::chrono::duration<float> mSuspendCurrentTaskFor;
+
+		//---------------------
+		// Private
+		//---------------------
+
+		/// <summary>
+		/// Call from worker thread only
+		/// <param name="pThread">Coroutine in which the task was running</param>
+		/// <param name="resumeAfter">If this is set to a positive value the task should be sheduled to resume after this delay</param>
+		/// </summary>
+		bool HandleSuspendedTask(lua_State* pThread, std::chrono::duration<float>& resumeAfter);
 
 		//---------------------
 		// InnerLuaState
@@ -69,6 +86,15 @@ namespace LuaWorker
 		static int l_Sleep(lua_State* pL);
 
 		static void l_Hook(lua_State* pL, lua_Debug *pDebug);
+
+		/// <summary>
+		/// 
+		/// Lua syntax:
+		///		InLuaWorker.ResumeIn( millis )
+		/// </summary>
+		/// <param name="pL"></param>
+		/// <returns></returns>
+		static int l_ResumeIn(lua_State* pL);
 
 	public:
 		/// <summary>
@@ -99,7 +125,7 @@ namespace LuaWorker
 		void Close();
 
 		/// <summary>
-		/// Exec task in lua state
+		/// Exec task in lua state. Call in worker thread only.
 		/// </summary>
 		/// <param name="task"></param>
 		void ExecTask(std::shared_ptr<Task> task);
@@ -116,4 +142,5 @@ namespace LuaWorker
 		bool IsOpen();
 	};
 }
+
 #endif

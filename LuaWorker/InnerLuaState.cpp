@@ -34,6 +34,42 @@ using std::chrono::system_clock;
 using namespace LuaWorker;
 
 const char* InnerLuaState::cLuaStateHandleKey = "_LUAWORKER_STATE";
+const char* InnerLuaState::cInLuaWorkerTableName = "InLuaWorker";
+const char* InnerLuaState::cInLuaWorkerThreadsTableName = "_Threads";
+
+//----------------------
+// Private
+//----------------------
+
+bool InnerLuaState::HandleSuspendedTask(lua_State *pThread, std::chrono::duration<float> &resumeAfter)
+{
+	if (mLua == nullptr) return false;
+
+	resumeAfter = mSuspendCurrentTaskFor;
+
+	int prevTop = lua_gettop(mLua);
+
+	lua_getglobal(mLua, cLuaStateHandleKey);
+	if (!lua_istable(mLua, -1))
+	{
+		lua_settop(mLua, prevTop);
+		return false;
+	}
+
+	lua_getfield(mLua, -1, cInLuaWorkerThreadsTableName);
+	if (!lua_istable(mLua, -1))
+	{
+		lua_settop(mLua, prevTop);
+		return false;
+	}
+
+	std::size_t nextIdx = lua_objlen(mLua, -1);
+
+
+
+	lua_settop(mLua, prevTop);
+	return true;
+}
 
 //---------------------
 // InnerLuaState
@@ -161,7 +197,7 @@ void InnerLuaState::Open()
 				lua_pushlightuserdata(mLua, this);
 				lua_pushcclosure(mLua, InnerLuaState::l_Sleep, 1);
 			lua_setfield(mLua, -2, "Sleep");
-		lua_setglobal(mLua, "InLuaWorker");
+		lua_setglobal(mLua, cInLuaWorkerTableName);
 
 			lua_pushlightuserdata(mLua, this);
 		lua_setglobal(mLua, cLuaStateHandleKey);
@@ -186,13 +222,30 @@ void InnerLuaState::Close()
 }
 
 //------
-void InnerLuaState::ExecTask(std::shared_ptr<Task> task)
+void InnerLuaState::ExecTask(std::shared_ptr<Task> task, std::chrono::duration<float> &resumeAfter)
 {
 	if(mCancel) throw LuaCancellationException();
 
 	if (mLua != nullptr)
 	{
-		task->Exec(mLua);
+		int prevTop = lua_gettop(mLua);
+
+		lua_State* taskThread = lua_newthread(mLua);
+
+		mSuspendCurrentTaskFor = 1000ms; // Default delay in case of a yield
+		resumeAfter = -1s;	//By default do not reschedule a task
+
+		task->Exec(taskThread);
+
+		if (task->GetStatus() == TaskStatus::Suspended)
+		{
+			//TODO
+		}
+		// If yielded, push to InLuaWorker._Threads
+		// and add to recall stack
+		// else clear stack
+
+		lua_settop(mLua, prevTop);
 	}
 }
 

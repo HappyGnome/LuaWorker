@@ -41,6 +41,7 @@ namespace LuaWorker
 	enum class TaskStatus {
 		NotStarted,
 		Running,
+		Suspended,
 		Complete,	// Final state
 		Cancelled,	// Final state
 		Error		// Final state

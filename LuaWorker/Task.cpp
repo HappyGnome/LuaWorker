@@ -119,6 +119,8 @@ Task::Task() : mStatus(TaskStatus::NotStarted) {}
 //------
 void Task::Exec(lua_State* pL)
 {
+	if (pL == nullptr) return;
+
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
@@ -130,10 +132,19 @@ void Task::Exec(lua_State* pL)
 	mResultStatusCv.notify_all();
 	SetResult(this -> DoExec(pL));
 
+	bool yielded = lua_status(pL) == LUA_YIELD;
+
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
-		if (mStatus != TaskStatus::Error) mStatus = TaskStatus::Complete;
+		if (mStatus != TaskStatus::Error)
+		{
+			if (yielded)
+			{
+				mStatus = TaskStatus::Suspended;
+			}
+			else mStatus = TaskStatus::Complete;
+		}
 	}
 
 	mResultStatusCv.notify_all();
