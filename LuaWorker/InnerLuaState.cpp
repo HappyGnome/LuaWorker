@@ -28,47 +28,100 @@ extern "C" {
 
 #include <chrono>
 
+#include "TaskResumeToken.h"
+
 using namespace std::chrono_literals;
 using std::chrono::system_clock;
 
 using namespace LuaWorker;
 
-const char* InnerLuaState::cLuaStateHandleKey = "_LUAWORKER_STATE";
+const char* InnerLuaState::cLuaRegistryThisKey = "LUAWORKER_STATE_THIS";
+const char* InnerLuaState::cLuaRegistryThreadTableKey = "LUAWORKER_STATE_THREADS";
 const char* InnerLuaState::cInLuaWorkerTableName = "InLuaWorker";
-const char* InnerLuaState::cInLuaWorkerThreadsTableName = "_Threads";
 
 //----------------------
 // Private
 //----------------------
 
-bool InnerLuaState::HandleSuspendedTask(lua_State *pThread, std::chrono::duration<float> &resumeAfter)
+bool InnerLuaState::HandleSuspendedTask(std::shared_ptr<Task> task, TaskResumeToken<int>& resumeToken)
 {
-	if (mLua == nullptr) return false;
+	if (mLua == nullptr || mSuspendCurrentTaskFor <= 0ms) return false;
 
-	resumeAfter = mSuspendCurrentTaskFor;
+	if (!lua_isthread(mLua, -1)) return false;
 
 	int prevTop = lua_gettop(mLua);
 
-	lua_getglobal(mLua, cLuaStateHandleKey);
+	lua_pushlightuserdata(mLua, &cLuaRegistryThreadTableKey);
+	lua_gettable(mLua, LUA_REGISTRYINDEX);
+
 	if (!lua_istable(mLua, -1))
 	{
-		lua_settop(mLua, prevTop);
+		lua_settop(mLua, prevTop - 1);
 		return false;
 	}
 
-	lua_getfield(mLua, -1, cInLuaWorkerThreadsTableName);
-	if (!lua_istable(mLua, -1))
-	{
-		lua_settop(mLua, prevTop);
-		return false;
-	}
+	int newTaskHandle = mResumableTasks.push(task);
 
-	std::size_t nextIdx = lua_objlen(mLua, -1);
+	lua_pushinteger(mLua, newTaskHandle);
 
+	lua_insert(mLua, -3); // handle (key) below thread
+	lua_insert(mLua, -3); // Threads table below handle
 
+	lua_settable(mLua, -3); // Add thread to threads table at newTaskHandle
+
+	resumeToken = std::move(TaskResumeToken<int>(mSuspendCurrentTaskFor, newTaskHandle));
 
 	lua_settop(mLua, prevTop);
 	return true;
+}
+
+lua_State* InnerLuaState::GetTaskThread(int taskHandle)
+{
+	if (mLua == nullptr) return nullptr;
+
+	int prevTop = lua_gettop(mLua);
+
+	lua_pushlightuserdata(mLua, &cLuaRegistryThreadTableKey);
+	lua_gettable(mLua, LUA_REGISTRYINDEX);
+
+	if (!lua_istable(mLua, -1)) {
+		lua_settop(mLua, prevTop);
+		return nullptr;
+	}
+
+	lua_pushinteger(mLua, taskHandle);
+	lua_gettable(mLua, -2);
+
+	if (!lua_isthread(mLua, -1))
+	{
+		lua_settop(mLua, prevTop);
+		return nullptr;
+	}
+
+	lua_State* taskThread = lua_tothread(mLua, -1);
+	lua_settop(mLua, prevTop);
+
+	return taskThread;
+}
+
+void InnerLuaState::RemoveTaskThread(int taskHandle)
+{
+	if (mLua == nullptr) return;
+
+	int prevTop = lua_gettop(mLua);
+
+	lua_pushlightuserdata(mLua, &cLuaRegistryThreadTableKey);
+	lua_gettable(mLua, LUA_REGISTRYINDEX);
+
+	if (!lua_istable(mLua, -1)) {
+		lua_settop(mLua, prevTop);
+		return;
+	}
+
+	lua_pushinteger(mLua, taskHandle);
+	lua_pushnil(mLua);
+	lua_gettable(mLua, -3);
+	lua_settop(mLua, prevTop);
 }
 
 //---------------------
@@ -135,7 +188,8 @@ int InnerLuaState::l_Sleep(lua_State* pL)
 void InnerLuaState::l_Hook(lua_State* pL, lua_Debug* pDebug)
 {
 	int stackDelta = -lua_gettop(pL);
-	lua_getglobal(pL, cLuaStateHandleKey);
+	lua_pushlightuserdata(pL, &cLuaRegistryThisKey);
+	lua_gettable(pL, LUA_REGISTRYINDEX);
 	stackDelta += lua_gettop(pL);
 
 	if (!lua_islightuserdata(pL, -1) || stackDelta == 0)
@@ -162,8 +216,8 @@ void InnerLuaState::l_Hook(lua_State* pL, lua_Debug* pDebug)
 // Public
 //---------------------
 
-InnerLuaState::InnerLuaState(LogSection&& log) : mLog(log), mCancel(false), mLua(nullptr)  {}
-InnerLuaState::InnerLuaState(const LogSection& log) : mLog(log), mCancel(false), mLua(nullptr) {}
+InnerLuaState::InnerLuaState(LogSection&& log) : mLog(log), mCancel(false), mLua(nullptr), mResumableTasks(0)  {}
+InnerLuaState::InnerLuaState(const LogSection& log) : mLog(log), mCancel(false), mLua(nullptr), mResumableTasks(0) {}
 
 //------
 InnerLuaState::~InnerLuaState()
@@ -187,20 +241,32 @@ void InnerLuaState::Open()
 
 		luaL_openlibs(mLua);
 
-			lua_createtable(mLua, 0, 2);
-				lua_pushlightuserdata(mLua, this);
-				lua_pushcclosure(mLua, InnerLuaState::l_LogError, 1);
-			lua_setfield(mLua, -2, "LogError");
-				lua_pushlightuserdata(mLua, this);
-				lua_pushcclosure(mLua, InnerLuaState::l_LogInfo, 1);
-			lua_setfield(mLua, -2, "LogInfo");
-				lua_pushlightuserdata(mLua, this);
-				lua_pushcclosure(mLua, InnerLuaState::l_Sleep, 1);
-			lua_setfield(mLua, -2, "Sleep");
+		// InLuaWorker object
+		lua_createtable(mLua, 0, 2);
+
+		lua_pushlightuserdata(mLua, this);
+		lua_pushcclosure(mLua, InnerLuaState::l_LogError, 1);
+		lua_setfield(mLua, -2, "LogError");
+
+		lua_pushlightuserdata(mLua, this);
+		lua_pushcclosure(mLua, InnerLuaState::l_LogInfo, 1);
+		lua_setfield(mLua, -2, "LogInfo");
+
+		lua_pushlightuserdata(mLua, this);
+		lua_pushcclosure(mLua, InnerLuaState::l_Sleep, 1);
+		lua_setfield(mLua, -2, "Sleep");
+
 		lua_setglobal(mLua, cInLuaWorkerTableName);
 
-			lua_pushlightuserdata(mLua, this);
-		lua_setglobal(mLua, cLuaStateHandleKey);
+		// This pointer in registry
+		lua_pushlightuserdata(mLua, &cLuaRegistryThisKey);
+		lua_pushlightuserdata(mLua, this);
+		lua_gettable(mLua, LUA_REGISTRYINDEX);
+
+		// Threads table in registry
+		lua_pushlightuserdata(mLua, &cLuaRegistryThreadTableKey);
+		lua_createtable(mLua, 0, 0);
+		lua_gettable(mLua, LUA_REGISTRYINDEX);
 
 		lua_sethook(mLua, InnerLuaState::l_Hook, LUA_MASKCALL | LUA_MASKCOUNT, (int)1e7);
 
@@ -222,9 +288,11 @@ void InnerLuaState::Close()
 }
 
 //------
-void InnerLuaState::ExecTask(std::shared_ptr<Task> task, std::chrono::duration<float> &resumeAfter)
+bool InnerLuaState::ExecTask(std::shared_ptr<Task> task, TaskResumeToken<int>& resumeToken)
 {
 	if(mCancel) throw LuaCancellationException();
+
+	bool taskSuspended = false;
 
 	if (mLua != nullptr)
 	{
@@ -232,21 +300,47 @@ void InnerLuaState::ExecTask(std::shared_ptr<Task> task, std::chrono::duration<f
 
 		lua_State* taskThread = lua_newthread(mLua);
 
-		mSuspendCurrentTaskFor = 1000ms; // Default delay in case of a yield
-		resumeAfter = -1s;	//By default do not reschedule a task
+		mSuspendCurrentTaskFor = 0ms;
 
 		task->Exec(taskThread);
 
-		if (task->GetStatus() == TaskStatus::Suspended)
+		if (mSuspendCurrentTaskFor > 0ms
+			&& task->GetStatus() == TaskStatus::Suspended 
+				&& lua_status(taskThread) == LUA_YIELD)
 		{
-			//TODO
+			taskSuspended = HandleSuspendedTask(task, resumeToken);
 		}
-		// If yielded, push to InLuaWorker._Threads
-		// and add to recall stack
-		// else clear stack
 
 		lua_settop(mLua, prevTop);
 	}
+
+	return taskSuspended;
+}
+
+//------
+bool InnerLuaState::ResumeTask(TaskResumeToken<int>& resumeToken)
+{
+	std::shared_ptr<Task> task = mResumableTasks.at(resumeToken.GetHandle());
+
+	if (task == nullptr) return false;
+
+	lua_State* taskThread = GetTaskThread(resumeToken.GetHandle());
+
+	if (taskThread == nullptr) return false;
+
+	mSuspendCurrentTaskFor = 0ms;
+
+	//TODO Call a new resume method on the task
+
+	if (mSuspendCurrentTaskFor > 0ms
+		&& task->GetStatus() == TaskStatus::Suspended
+		&& lua_status(taskThread) == LUA_YIELD)
+	{
+		resumeToken.Reschedule(mSuspendCurrentTaskFor);
+		return true;
+	}
+
+	return false;
 }
 
 //------

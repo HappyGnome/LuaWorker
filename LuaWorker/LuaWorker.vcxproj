@@ -191,6 +191,7 @@
   <ItemGroup>
     <ClInclude Include="AutoKeyMap.h" />
     <ClInclude Include="Cancelable.h" />
+    <ClInclude Include="ChronoKey.h" />
     <ClInclude Include="InnerLuaState.h" />
     <ClInclude Include="LogLevel.h" />
     <ClInclude Include="LogOutput.h" />
@@ -203,10 +204,12 @@
     <ClInclude Include="TaskDoString.h" />
     <ClInclude Include="TaskLuaInterface.h" />
     <ClInclude Include="TaskDoSleep.h" />
+    <ClInclude Include="TaskResumeToken.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="WorkerLuaInterface.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChronoKeyFactory.h" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="InnerLuaState.cpp" />
     <ClCompile Include="LogItem.cpp" />

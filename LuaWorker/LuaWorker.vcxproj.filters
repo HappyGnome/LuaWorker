@@ -40,6 +40,9 @@
     <Filter Include="Source Files\Exceptions">
       <UniqueIdentifier>{4bc10a93-6a64-420f-b253-54a8dcbc25b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\General">
+      <UniqueIdentifier>{4b2a271a-4273-443b-9697-df75237efd88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Task.h">
@@ -63,17 +66,11 @@
     <ClInclude Include="LogStack.h">
       <Filter>Header Files\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="AutoKeyMap.h">
-      <Filter>Header Files\LuaInterface</Filter>
-    </ClInclude>
     <ClInclude Include="LogItem.h">
       <Filter>Header Files\Logging</Filter>
     </ClInclude>
     <ClInclude Include="LogSection.h">
       <Filter>Header Files\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="InnerLuaState.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Cancelable.h">
       <Filter>Header Files\Interfaces</Filter>
@@ -89,6 +86,18 @@
     </ClInclude>
     <ClInclude Include="LogOutput.h">
       <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="InnerLuaState.h">
+      <Filter>Header Files\LuaInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoKeyMap.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskResumeToken.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="ChronoKey.h">
+      <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -122,14 +131,17 @@
     <ClCompile Include="LogSection.cpp">
       <Filter>Source Files\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="InnerLuaState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LuaCancellationException.cpp">
       <Filter>Source Files\Exceptions</Filter>
     </ClCompile>
     <ClCompile Include="TaskDoSleep.cpp">
       <Filter>Source Files\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ChronoKeyFactory.h">
+      <Filter>Header Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="InnerLuaState.cpp">
+      <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

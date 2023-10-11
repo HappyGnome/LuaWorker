@@ -24,9 +24,12 @@
 #include <mutex> 
 #include <chrono> 
 
+#include "Cancelable.h"
+#include "TaskResumeToken.h"
+#include "AutoKeyMap.h"
+
 #include "LogSection.h"
 #include "Task.h"
-#include "Cancelable.h"
 
 extern "C" {
 #include "lua.h"
@@ -45,9 +48,21 @@ namespace LuaWorker
 	{
 	private:
 
-		const static char* cLuaStateHandleKey;
+		/// <summary>
+		/// Lua registry key to InnerLuaState instance pointer
+		/// Use address of this as the actual key to instance data table in the lua registry 
+		/// (as there's a different lua state per instance, there won't be clashes between instances)
+		/// </summary>
+		const static char* cLuaRegistryThisKey;
+
+		/// <summary>
+		/// Lua registry key to table of instance threads
+		/// Use address of this as the actual key to instance data table in the lua registry 
+		/// (as there's a different lua state per instance, there won't be clashes between instances)
+		/// </summary>
+		const static char* cLuaRegistryThreadTableKey;
 		const static char* cInLuaWorkerTableName;
-		const static char* cInLuaWorkerThreadsTableName;
+
 
 		std::atomic<bool> mCancel;
 		std::atomic<bool> mOpen;
@@ -63,16 +78,25 @@ namespace LuaWorker
 		//Access in worker thread only
 		std::chrono::duration<float> mSuspendCurrentTaskFor;
 
+		//Access in worker thread only
+		AutoKeyMap<int, Task> mResumableTasks;
+
 		//---------------------
-		// Private
+		// Private methods
 		//---------------------
 
 		/// <summary>
 		/// Call from worker thread only
-		/// <param name="pThread">Coroutine in which the task was running</param>
+		/// The thread on which the task runs must be at the top of the stack for the internal state (mLua)
+		/// If there is a thread at index -1, it is popped
+		/// <param name="task">Task to push</param>
 		/// <param name="resumeAfter">If this is set to a positive value the task should be sheduled to resume after this delay</param>
 		/// </summary>
-		bool HandleSuspendedTask(lua_State* pThread, std::chrono::duration<float>& resumeAfter);
+		bool HandleSuspendedTask(std::shared_ptr<Task> task, TaskResumeToken<int>& resumeToken);
+
+		lua_State* GetTaskThread(int taskHandle);
+
+		void RemoveTaskThread(int taskHandle);
 
 		//---------------------
 		// InnerLuaState
@@ -111,32 +135,47 @@ namespace LuaWorker
 
 		/// <summary>
 		/// Destructor
+		/// Call in worker thread only.
 		/// </summary>
 		~InnerLuaState();
 
 		/// <summary>
 		/// Open lua state
+		/// Call in worker thread only.
 		/// </summary>
 		void Open();
 
 		/// <summary>
 		/// Close lua state
+		/// Call in worker thread only.
 		/// </summary>
 		void Close();
 
 		/// <summary>
-		/// Exec task in lua state. Call in worker thread only.
+		/// Exec task in lua state. 
+		/// Call in worker thread only.
 		/// </summary>
-		/// <param name="task"></param>
-		void ExecTask(std::shared_ptr<Task> task);
+		/// <param name="task">Task to execute</param>
+		/// <param name="resumeToken">Resume token output</param>
+		/// <returns>true if task can be resumed</returns>
+		bool ExecTask(std::shared_ptr<Task> task, TaskResumeToken<int> &resumeToken);
+
+		/// <summary>
+		/// Resume task from a token
+		/// </summary>
+		/// <param name="resumeToken">Handle to task to return</param>
+		/// <returns>True if Task can be resumed again (pass resumeToken to the next call)</returns>
+		bool ResumeTask(TaskResumeToken<int>& resumeToken);
 
 		/// <summary>
 		/// Raise cancel flag (ExecTask will throw a LuaCancellationException at next hook event)
+		/// Can be called from any thread
 		/// </summary>
 		void Cancel();
 
 		/// <summary>
 		/// Get whether lua state is open
+		/// Can be called from any thread
 		/// </summary>
 		/// <returns></returns>
 		bool IsOpen();
