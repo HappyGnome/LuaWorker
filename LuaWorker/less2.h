@@ -18,27 +18,25 @@
 
 #pragma once
 
-#ifndef _CHRONO_KEY_FACTORY_H_
-#define _CHRONO_KEY_FACTORY_H_
-
-#include <chrono>
-#include "ChronoKey.h"
+#ifndef _LESS_2_H_
+#define _LESS_2_H_
 
 namespace LuaWorker
 {
-	/*template<typename T>
-	class ChronoKeyFactory {
-	private:
-		T mNext
 
+	/// <summary>
+	/// Like std::less, but for heterogeneous types
+	/// </summary>
+	/// <typeparam name="A"></typeparam>
+	/// <typeparam name="B"></typeparam>
+	template <typename A, typename B>
+	class less2
+	{
 	public:
-		explicit ChronoKeyFactory(const T& tiebreakInit) : mNext(tiebreakInit) {}
-
-		ChronoKey<T>&& Make(const std::chrono::time_point& key) {
-			ChronoKey<T> newKey(key, mNext++);
-			return std::move(newKey);
+		bool operator()(const A& a, const B& b)
+		{
+			return a < b;
 		}
-	};*/
-}
-
+	};
+};
 #endif

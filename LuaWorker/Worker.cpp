@@ -71,6 +71,7 @@ bool Worker::ThreadMainCloseLua(InnerLuaState& lua)
 	try
 	{
 		lua.Close();
+		//TODO cancel queued resumes
 
 		{
 			std::unique_lock<std::mutex> lock(mLuaCancelMtx);
@@ -122,7 +123,11 @@ void Worker::ThreadMainLoop(InnerLuaState& lua)
 					break;
 				}
 
-				lua.ExecTask(currentTask);
+				TaskResumeToken<int> resumeTok;
+				if (lua.ExecTask(currentTask, resumeTok))
+				{
+					// TODO save task token to resume later
+				}
 
 				if (currentTask->GetStatus() == TaskStatus::Error) mLog.Push(LogLevel::Error, currentTask->GetError());
 

@@ -25,18 +25,20 @@
 
 namespace LuaWorker
 {
-	template<typename T>
+	template<typename T, typename T_Duration = float, typename T_Clock = std::chrono::system_clock>
 	class TaskResumeToken {
 	private:
-		std::chrono::time_point<float> mResumeAt;
+		std::chrono::time_point<T_Clock> mResumeAt;
 		T mTaskHandle;
 
 	public:
-		TaskResumeToken(const std::chrono::time_point<float>& resumeAt, const T& handle) : mTaskHandle(handle), mResumeAt(resume) {}
+		TaskResumeToken() = default;
 
-		TaskResumeToken(const std::chrono::duration<float>& resumeIn, const T& handle) : mTaskHandle(handle)
+		explicit TaskResumeToken(const std::chrono::time_point<T_Clock>& resumeAt, const T& handle) : mTaskHandle(handle), mResumeAt(resumeAt) {}
+
+		explicit TaskResumeToken(const std::chrono::duration<T_Duration>& resumeIn, const T& handle) : mTaskHandle(handle)
 		{
-			mResumeAt = std::chrono::system_clock::now() + resumeIn;
+			mResumeAt = T_Clock::now() + std::chrono::duration_cast<T_Clock::duration>(resumeIn);
 		}
 
 		const T& GetHandle() const
@@ -44,19 +46,19 @@ namespace LuaWorker
 			return mTaskHandle;
 		}
 
-		const std::chrono::time_point<float>& GetResumeAt() const
+		const std::chrono::time_point<T_Clock>& GetResumeAt() const
 		{
 			return mResumeAt;
 		}
 
-		void Reschedule(const std::chrono::time_point<float>& resumeAt) const
+		void Reschedule(const std::chrono::time_point<T_Clock>& resumeAt) const
 		{
 			mResumeAt = resumeAt;
 		}
 
-		void Reschedule(const std::chrono::duration<float>& resumeIn) const
+		void Reschedule(const std::chrono::duration<T_Duration>& resumeIn)
 		{
-			mResumeAt = std::chrono::system_clock::now() + resumeIn;
+			mResumeAt = T_Clock::now() + std::chrono::duration_cast<T_Clock::duration>(resumeIn);
 		}
 
 	};

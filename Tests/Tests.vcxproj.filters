@@ -42,11 +42,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Tests.cpp">
+    <ClCompile Include="LuaTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LuaTestState.cpp">
       <Filter>Source Files\LuaTestState</Filter>
+    </ClCompile>
+    <ClCompile Include="SortedDeck.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -25,7 +25,7 @@
 
 namespace LuaWorker
 {
-	template<typename T>
+	/*template<typename T>
 	class ChronoKey {
 	private:
 		std::chrono::time_point mKey;
@@ -45,7 +45,7 @@ namespace LuaWorker
 		{
 			return A.mKey < B;
 		}
-	};
+	};*/
 }
 
 #endif

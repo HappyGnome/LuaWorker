@@ -187,14 +187,13 @@ int InnerLuaState::l_Sleep(lua_State* pL)
 //------
 void InnerLuaState::l_Hook(lua_State* pL, lua_Debug* pDebug)
 {
-	int stackDelta = -lua_gettop(pL);
+	int prevTop = lua_gettop(pL);
 	lua_pushlightuserdata(pL, &cLuaRegistryThisKey);
 	lua_gettable(pL, LUA_REGISTRYINDEX);
-	stackDelta += lua_gettop(pL);
 
-	if (!lua_islightuserdata(pL, -1) || stackDelta == 0)
+	if (!lua_islightuserdata(pL, -1))
 	{
-		lua_pop(pL, stackDelta);
+		lua_settop(pL, prevTop);
 		return;
 	}
 
@@ -261,12 +260,12 @@ void InnerLuaState::Open()
 		// This pointer in registry
 		lua_pushlightuserdata(mLua, &cLuaRegistryThisKey);
 		lua_pushlightuserdata(mLua, this);
-		lua_gettable(mLua, LUA_REGISTRYINDEX);
+		lua_settable(mLua, LUA_REGISTRYINDEX);
 
 		// Threads table in registry
 		lua_pushlightuserdata(mLua, &cLuaRegistryThreadTableKey);
 		lua_createtable(mLua, 0, 0);
-		lua_gettable(mLua, LUA_REGISTRYINDEX);
+		lua_settable(mLua, LUA_REGISTRYINDEX);
 
 		lua_sethook(mLua, InnerLuaState::l_Hook, LUA_MASKCALL | LUA_MASKCOUNT, (int)1e7);
 
@@ -311,6 +310,11 @@ bool InnerLuaState::ExecTask(std::shared_ptr<Task> task, TaskResumeToken<int>& r
 			taskSuspended = HandleSuspendedTask(task, resumeToken);
 		}
 
+		if (task->GetStatus() == TaskStatus::Suspended && !taskSuspended)
+		{
+			task->Cancel();  // Task was expecting to be resumed, but will not be
+		}
+
 		lua_settop(mLua, prevTop);
 	}
 
@@ -330,7 +334,7 @@ bool InnerLuaState::ResumeTask(TaskResumeToken<int>& resumeToken)
 
 	mSuspendCurrentTaskFor = 0ms;
 
-	//TODO Call a new resume method on the task
+	task->Resume(taskThread);
 
 	if (mSuspendCurrentTaskFor > 0ms
 		&& task->GetStatus() == TaskStatus::Suspended
@@ -338,6 +342,10 @@ bool InnerLuaState::ResumeTask(TaskResumeToken<int>& resumeToken)
 	{
 		resumeToken.Reschedule(mSuspendCurrentTaskFor);
 		return true;
+	}
+	else if (task->GetStatus() == TaskStatus::Suspended)
+	{
+		task->Cancel(); // Task was expecting to be resumed, but will not be
 	}
 
 	return false;

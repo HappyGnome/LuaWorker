@@ -183,7 +183,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="LuaTestState.cpp" />
-    <ClCompile Include="Tests.cpp" />
+    <ClCompile Include="LuaTests.cpp" />
+    <ClCompile Include="SortedDeck.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaTestState.h" />

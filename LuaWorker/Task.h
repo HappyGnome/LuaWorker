@@ -93,6 +93,14 @@ namespace LuaWorker
 		virtual std::string DoExec(lua_State* pL) = 0;
 
 		/// <summary>
+		/// Resume execution of this task on the given lua state, 
+		///		passing any 
+		/// Is this is not the same state previously passed to Exec, behaviour is undefined.
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		virtual std::string DoResume(lua_State* pL);
+
+		/// <summary>
 		/// Block until specified time has elapsed (or task cancelled)
 		/// </summary>
 		/// <param name="waitForMillis">Min time to wait</param>
@@ -124,6 +132,13 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		void Exec(lua_State* pL);
+
+		/// <summary>
+		/// Resume execution of this task on the given lua state.
+		/// Is this is not the same state previously passed to Exec, behaviour is undefined.
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		void Resume(lua_State* pL);
 
 		/// <summary>
 		/// Get result of this task
