@@ -23,10 +23,10 @@
 
 #include<list>
 
-#include "less2.h"
+#include "AutoKeyLess.h"
 
 
-namespace LuaWorker
+namespace AutoKeyCollections
 {
 	/// <summary>
 	/// Simple template class to maintain a sorted list, allowing removal at the front, and random inserts
@@ -49,13 +49,13 @@ namespace LuaWorker
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		explicit SortedDeck() {}
+		SortedDeck() {}
 
 		/// <summary>
 		/// Add an item to the collection
 		/// </summary>
 		/// <param name="value">value to store</param>
-		void push(V value)
+		void push(V&& value)
 		{
 			Comp less = Comp{};
 
@@ -63,12 +63,12 @@ namespace LuaWorker
 			{
 				if (less(value, *it))
 				{
-					mDeck.insert(it, value);
+					mDeck.insert(it, std::move(value));
 					return;
 				}
 			}
 
-			mDeck.push_back(value);
+			mDeck.push_back(std::move(value));
 		}
 
 		/// <summary>
@@ -79,7 +79,7 @@ namespace LuaWorker
 		bool pop(V &out)
 		{
 			if (mDeck.empty()) return false;
-			out = mDeck.front();
+			out = std::move(mDeck.front());
 			mDeck.pop_front();
 			return true;
 		}
@@ -92,14 +92,14 @@ namespace LuaWorker
 		/// <param name="thresh">Cuttoff</param>
 		/// <param name="out">Value popped</param>
 		/// <returns>True if value popped</returns>
-		template <typename T_Threshold, class T_ThreshComp = less2<V, T_Threshold>>
+		template <typename T_Threshold, class T_ThreshComp = less<V, T_Threshold>>
 		bool popIfLess(const T_Threshold& thresh, V& out)
 		{
 			T_ThreshComp less{};
 
 			if (!mDeck.empty() && less(mDeck.front(), thresh))
 			{
-				out = mDeck.front();
+				out = std::move(mDeck.front());
 				mDeck.pop_front();
 				return true;
 			}

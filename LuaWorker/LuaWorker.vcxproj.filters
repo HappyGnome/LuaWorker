@@ -96,10 +96,16 @@
     <ClInclude Include="TaskResumeToken.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="ChronoKey.h">
+    <ClInclude Include="AutoKeyLess.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="less2.h">
+    <ClInclude Include="AutoKeyDeck.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoKey.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoKeyDeckCard.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
@@ -139,9 +145,6 @@
     </ClCompile>
     <ClCompile Include="TaskDoSleep.cpp">
       <Filter>Source Files\Tasks</Filter>
-    </ClCompile>
-    <ClCompile Include="ChronoKeyFactory.h">
-      <Filter>Header Files\General</Filter>
     </ClCompile>
     <ClCompile Include="InnerLuaState.cpp">
       <Filter>Source Files\LuaInterface</Filter>

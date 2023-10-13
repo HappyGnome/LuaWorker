@@ -189,11 +189,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AutoKey.h" />
+    <ClInclude Include="AutoKeyDeck.h" />
+    <ClInclude Include="AutoKeyDeckCard.h" />
     <ClInclude Include="AutoKeyMap.h" />
     <ClInclude Include="Cancelable.h" />
-    <ClInclude Include="ChronoKey.h" />
     <ClInclude Include="InnerLuaState.h" />
-    <ClInclude Include="less2.h" />
+    <ClInclude Include="AutoKeyLess.h" />
     <ClInclude Include="LogLevel.h" />
     <ClInclude Include="LogOutput.h" />
     <ClInclude Include="LogSection.h" />
@@ -210,7 +212,6 @@
     <ClInclude Include="WorkerLuaInterface.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ChronoKeyFactory.h" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="InnerLuaState.cpp" />
     <ClCompile Include="LogItem.cpp" />

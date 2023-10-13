@@ -182,6 +182,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AutoKeyDeck.cpp" />
     <ClCompile Include="LuaTestState.cpp" />
     <ClCompile Include="LuaTests.cpp" />
     <ClCompile Include="SortedDeck.cpp" />

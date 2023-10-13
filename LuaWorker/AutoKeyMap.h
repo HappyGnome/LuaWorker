@@ -21,28 +21,19 @@
 #ifndef _AUTO_KEY_MAP_H_
 #define _AUTO_KEY_MAP_H_
 
-//#include <iostream>
-//#include <filesystem>
-//#include <thread>
+
 #include <mutex>
-//#include <string>
 #include <vector>
 #include <map>
 
-//#include "Task.h"
+#include "AutoKey.h"
 
-extern "C" {
-//#include "lua.h"
-//#include "lauxlib.h"
-//#include "lualib.h"
-}
-//using namespace std::chrono_literals;
-
-namespace LuaWorker
+namespace AutoKeyCollections
 {
 	/// <summary>
 	/// Simple template class to push and pop a collection of objects 
-	/// using keys that are generated and recycled automatically
+	/// using keys that are generated and recycled automatically.
+	/// Safe to be called by multiple threads.
 	/// </summary>
 	/// <typeparam name="K">Key type</typeparam>
 	/// <typeparam name="V">Value type</typeparam>
@@ -56,8 +47,7 @@ namespace LuaWorker
 		//-------------------------------
 
 		std::map<K, std::shared_ptr<V>> mStore;
-		std::vector<K> mRecycledKeys;
-		K mNextNewKey;
+		AutoKey<K> mAutoKey;
 		std::mutex mStoreMtx;
 
 	public:
@@ -66,7 +56,7 @@ namespace LuaWorker
 		/// Constructor
 		/// </summary>
 		/// <param name="k0">Initial key value</param>
-		explicit AutoKeyMap(K k0) : mNextNewKey(k0) {}
+		explicit AutoKeyMap(K k0) : mAutoKey(k0) {}
 
 		/// <summary>
 		/// Add an item to the collection
@@ -77,14 +67,7 @@ namespace LuaWorker
 		{
 			std::unique_lock<std::mutex> lock(mStoreMtx);
 
-			K key = mNextNewKey;
-
-			if (!mRecycledKeys.empty())
-			{
-				key = mRecycledKeys.back();
-				mRecycledKeys.pop_back();
-			}
-			else mNextNewKey++;
+			K key = mAutoKey.Get();
 
 			mStore[key] = value;
 
@@ -117,7 +100,7 @@ namespace LuaWorker
 			std::shared_ptr<V> v = mStore.at(key);
 			mStore.erase(key);
 
-			mRecycledKeys.push_back(key);
+			mAutoKey.Recycle(key);
 
 			return v;
 		}

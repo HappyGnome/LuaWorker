@@ -20,7 +20,7 @@
 #include "../LuaWorker/SortedDeck.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace LuaWorker;
+using namespace AutoKeyCollections;
 
 namespace Tests
 {

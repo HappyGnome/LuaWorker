@@ -215,8 +215,18 @@ void InnerLuaState::l_Hook(lua_State* pL, lua_Debug* pDebug)
 // Public
 //---------------------
 
-InnerLuaState::InnerLuaState(LogSection&& log) : mLog(log), mCancel(false), mLua(nullptr), mResumableTasks(0)  {}
-InnerLuaState::InnerLuaState(const LogSection& log) : mLog(log), mCancel(false), mLua(nullptr), mResumableTasks(0) {}
+InnerLuaState::InnerLuaState(LogSection&& log) 
+	: mLog(log), 
+	mCancel(false), 
+	mLua(nullptr), 
+	mResumableTasks(0),
+	mSuspendCurrentTaskFor (0ms) {}
+InnerLuaState::InnerLuaState(const LogSection& log) 
+	: mLog(log), 
+	mCancel(false), 
+	mLua(nullptr), 
+	mResumableTasks(0),
+	mSuspendCurrentTaskFor(0ms) {}
 
 //------
 InnerLuaState::~InnerLuaState()

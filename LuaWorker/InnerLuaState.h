@@ -37,6 +37,7 @@ extern "C" {
 //#include "lualib.h"
 }
 
+using namespace AutoKeyCollections;
 
 namespace LuaWorker
 {

@@ -18,10 +18,12 @@
 
 #pragma once
 
-#ifndef _LESS_2_H_
-#define _LESS_2_H_
+#ifndef _AUTO_KEY_LESS_H_
+#define _AUTO_KEY_LESS_H_
 
-namespace LuaWorker
+#include<memory>
+
+namespace AutoKeyCollections
 {
 
 	/// <summary>
@@ -30,13 +32,48 @@ namespace LuaWorker
 	/// <typeparam name="A"></typeparam>
 	/// <typeparam name="B"></typeparam>
 	template <typename A, typename B>
-	class less2
+	class less
 	{
 	public:
 		bool operator()(const A& a, const B& b)
 		{
 			return a < b;
 		}
+
+		bool operator()(const std::unique_ptr<A>& a, const B& b)
+		{
+			return a == nullptr || *a < b;
+		}
+
+		bool operator()(const B& b, const std::unique_ptr<A>& a)
+		{
+			return a != nullptr && b < *a;
+		}
+
+		bool operator()(const std::unique_ptr<A>& a, const std::unique_ptr<B>& b)
+		{
+			return a == nullptr || (b != nullptr && *a < *b);
+		}
 	};
+
+	/*/// <summary>
+	/// Like std::less, but for heterogeneous types
+	/// </summary>
+	/// <typeparam name="A"></typeparam>
+	/// <typeparam name="B"></typeparam>
+	template <typename A, typename B>
+	class less_deref
+	{
+	public:
+		bool operator()(const A& a, const B& b)
+		{
+			return *a < b;
+		}
+
+		bool operator()(const B& b, const A& a)
+		{
+			return b < *a;
+		}
+	};*/
 };
 #endif

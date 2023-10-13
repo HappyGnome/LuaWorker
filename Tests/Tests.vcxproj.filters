@@ -51,6 +51,9 @@
     <ClCompile Include="SortedDeck.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AutoKeyDeck.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\Lua_5_1_5\bin\x64\lua.dll">
