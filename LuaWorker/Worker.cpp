@@ -198,7 +198,7 @@ Worker::~Worker()
 			//Perhaps add a timeout here, or where the thread calls Exec.
 		}
 	}
-	catch (const std::exception& ex)
+	catch (const std::exception&)
 	{
 		//Suppress exceptions from destructor
 	}

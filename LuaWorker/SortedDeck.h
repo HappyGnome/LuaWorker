@@ -18,10 +18,11 @@
 
 #pragma once
 
-#ifndef _SORTED_DECK_H_
-#define _SORTED_DECK_H_
+#ifndef _DECK_H_
+#define _DECK_H_
 
 #include<list>
+#include<optional>
 
 #include "AutoKeyLess.h"
 
@@ -33,7 +34,7 @@ namespace AutoKeyCollections
 	/// </summary>
 	/// <typeparam name="V">Value type</typeparam>
 	/// <typeparam name="Comp">Key comparator</typeparam>
-	template <typename V, class Comp = std::less<V>>
+	template <typename T_Value, class T_Comp = std::less<T_Value>>
 	class SortedDeck
 	{
 	private:
@@ -42,7 +43,7 @@ namespace AutoKeyCollections
 		// Properties
 		//-------------------------------
 
-		std::list<V> mDeck;
+		std::list<T_Value> mDeck;
 
 	public:
 
@@ -55,9 +56,9 @@ namespace AutoKeyCollections
 		/// Add an item to the collection
 		/// </summary>
 		/// <param name="value">value to store</param>
-		void push(V&& value)
+		void push(T_Value&& value)
 		{
-			Comp less = Comp{};
+			T_Comp less = T_Comp{};
 
 			for (auto it = mDeck.begin(); it != mDeck.end(); ++it) 
 			{
@@ -76,12 +77,13 @@ namespace AutoKeyCollections
 		/// </summary>
 		/// <param name="out">set to value popped if 'true' returned</param>
 		/// <returns>True if and only if item found</returns>
-		bool pop(V &out)
+		std::optional<T_Value> pop()
 		{
-			if (mDeck.empty()) return false;
-			out = std::move(mDeck.front());
+			std::optional<T_Value> ret;
+			if (mDeck.empty()) return ret;
+			ret = std::move(mDeck.front());
 			mDeck.pop_front();
-			return true;
+			return ret;
 		}
 
 		/// <summary>
@@ -92,18 +94,18 @@ namespace AutoKeyCollections
 		/// <param name="thresh">Cuttoff</param>
 		/// <param name="out">Value popped</param>
 		/// <returns>True if value popped</returns>
-		template <typename T_Threshold, class T_ThreshComp = less<V, T_Threshold>>
-		bool popIfLess(const T_Threshold& thresh, V& out)
+		template <typename T_Threshold, class T_ThreshComp = less<T_Value, T_Threshold>>
+		std::optional<T_Value> popIfLess(const T_Threshold& thresh)
 		{
 			T_ThreshComp less{};
+			std::optional<T_Value> ret;
 
 			if (!mDeck.empty() && less(mDeck.front(), thresh))
 			{
-				out = std::move(mDeck.front());
+				ret = std::move(mDeck.front());
 				mDeck.pop_front();
-				return true;
 			}
-			return false;
+			return ret;
 		}
 	};
 };

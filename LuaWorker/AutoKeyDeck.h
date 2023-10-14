@@ -22,6 +22,7 @@
 #define _AUTO_KEY_DECK_H_
 
 #include<list>
+#include<optional>
 
 #include "AutoKeyLess.h"
 #include "SortedDeck.h"
@@ -35,47 +36,46 @@ namespace AutoKeyCollections
 	/// </summary>
 	/// <typeparam name="V">Value type</typeparam>
 	/// <typeparam name="Comp">Key comparator</typeparam>
-	template <typename T_Tag, typename V, class Comp = std::less<V>>
+	template <typename T_Tag, typename T_OrderKey, typename T_Card, class T_Comp = std::less<T_OrderKey>>
 	class AutoKeyDeck
 	{
 	private:
 
-		typedef Card<T_Tag, V, Comp> Card;
-		typedef SortedDeck<std::unique_ptr<Card>, less<Card, Card>> T_Deck;
+		static_assert(std::is_base_of<AutoKeyDeckCard<T_Tag, T_OrderKey, T_Comp>, T_Card>::value);
+
+		typedef SortedDeck<T_Card, std::less<T_Card>> T_Deck;
+		typedef AutoKey<T_Tag> T_AutoKey;
+
 		//-------------------------------
 		// Properties
 		//-------------------------------
 
-		std::shared_ptr<AutoKey<T_Tag>> mAutoKey;
+		std::shared_ptr<T_AutoKey> mAutoKey;
 		std::shared_ptr<T_Deck> mDeck;
 	public:
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		explicit AutoKeyDeck(const T_Tag& k0) : 
-			mAutoKey(new AutoKey<T_Tag>(k0)),
+		explicit AutoKeyDeck() : 
+			mAutoKey(new AutoKey<T_Tag>()),
 			mDeck(new T_Deck())
 		{}
 
-		void push(V&& value)
+		T_Card&& push()
 		{
-			mDeck -> push(std::make_unique<Card>(value, mAutoKey, mDeck));
+			return T_Card(mDeck, mAutoKey);
 		}
 
-		std::unique_ptr<Card> pop()
+		std::optional<T_Card> pop()
 		{
-			std::unique_ptr<Card> out;
-			if (mDeck->pop(out)) return out;
-			return nullptr;
+			return mDeck->pop();
 		}
 
 		template <typename T_Threshold, class T_ThreshComp = less<Card, T_Threshold>>
-		std::unique_ptr<Card>  popIfLess(const T_Threshold& thresh)
+		std::optional<T_Card>  popIfLess(const T_Threshold& thresh)
 		{
-			std::unique_ptr<Card> out;
-			if (mDeck->popIfLess<T_Threshold, T_ThreshComp>(thresh,out)) return out;
-			return nullptr;
+			return mDeck->popIfLess<T_Threshold, T_ThreshComp>(thresh);
 		}
 	};
 };

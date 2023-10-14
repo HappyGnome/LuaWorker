@@ -48,10 +48,10 @@
     <ClCompile Include="LuaTestState.cpp">
       <Filter>Source Files\LuaTestState</Filter>
     </ClCompile>
-    <ClCompile Include="SortedDeck.cpp">
+    <ClCompile Include="SortedDeckTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AutoKeyDeck.cpp">
+    <ClCompile Include="AutoKeyDeckTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

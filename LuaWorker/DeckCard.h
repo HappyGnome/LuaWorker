@@ -18,57 +18,53 @@
 
 #pragma once
 
-#ifndef _AUTO_KEY_DECK_CARD_H_
-#define _AUTO_KEY_DECK_CARD_H_
+#ifndef _DECK_CARD_H_
+#define _DECK_CARD_H_
 
 #include <list>
 
 #include "AutoKeyLess.h"
 #include "SortedDeck.h"
-#include "AutoKey.h"
-#include "AutoKeyDeck.h"
-#include "DeckCard.h"
 
 
 namespace AutoKeyCollections
 {
-	template <typename T_Tag, typename T_OrderKey, class T_Comp = std::less<T_OrderKey>>
-	class AutoKeyDeckCard : public DeckCard<T_OrderKey,T_Comp>
+	template <typename T_OrderKey, class T_Comp = std::less<T_OrderKey>>
+	class DeckCard
 	{
-		typedef AutoKey<T_Tag> T_AutoKey;
-		typedef std::shared_ptr<SortedDeck<AutoKeyDeckCard, std::less<AutoKeyDeckCard>>> T_HomeDeck;
-		//typedef DeckCard<T_OrderKey, T_Comp> T_DeckCard;
+		typedef std::shared_ptr<SortedDeck<DeckCard, std::less<DeckCard>>> T_HomeDeck;
 
-		T_Tag mTag;
-		std::shared_ptr<T_AutoKey> mAutoKey;
+		T_OrderKey mOrderKey;
 		T_HomeDeck mHomeDeck;
 	public:
 
-		explicit AutoKeyDeckCard(
-			const T_HomeDeck& homeDeck, T_AutoKey& autoKey)
-			: DeckCard(homeDeck),
-			mAutoKey(autoKey)
+		explicit DeckCard(const T_HomeDeck& homeDeck)
+			: mHomeDeck(homeDeck), mOrderKey(){}
+
+		void SetOrderKey(const T_OrderKey& newKey) 
 		{
-			if (mAutoKey != nullptr) mTag = mAutoKey->Get();
+			mOrderKey = newKey;
 		}
 
-		~AutoKeyDeckCard()
+		template<typename T_Tag, typename V, class Comp = std::less<V>>
+		friend void ReturnToDeck(DeckCard&& card)
 		{
-			try
-			{
-				if (mAutoKey != nullptr)
-					mAutoKey->Recycle(mTag);
-			}
-			catch (const std::exception&)
-			{
-				// Suppress non-critical exceptions in destructor
-			}
+			card.mHomeDeck->push(std::move(card));
 		}
 
-		T_Tag GetTag()
+		//Set up so we can use std::less to call the specified Comp class
+		friend bool operator<(const DeckCard& a, const DeckCard& b)
 		{
-			return mTag;
+			T_Comp less{};
+			return less(a.mValue, b.mValue);
 		}
+
+		friend bool operator<(const DeckCard& a, const T_OrderKey& b)
+		{
+			T_Comp less{};
+			return less(a.mValue, b);
+		}
+
 	};
 };
 

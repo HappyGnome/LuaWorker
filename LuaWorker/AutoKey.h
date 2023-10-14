@@ -54,6 +54,8 @@ namespace AutoKeyCollections
 		/// <param name="k0">Initial key value</param>
 		explicit AutoKey(K k0) : mNextNewKey(k0) {}
 
+		explicit AutoKey() : mNextNewKey() {}
+
 		/// <summary>
 		/// Generate a new key, not matching any in the wild
 		/// </summary>

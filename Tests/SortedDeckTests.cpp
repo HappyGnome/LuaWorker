@@ -66,8 +66,7 @@ namespace Tests
 		{
 			SortedDeck<int> deck;
 
-			int result;
-			Assert::IsFalse(deck.pop(result));
+			Assert::IsFalse(deck.pop().has_value());
 
 		}
 
@@ -79,17 +78,19 @@ namespace Tests
 			deck.push(45);
 			deck.push(1);
 
-			int result;
-			Assert::IsTrue(deck.pop(result));
-			Assert::AreEqual(result, 1);
+			std::optional<int> result = deck.pop();
+			Assert::IsTrue(result.has_value());
+			Assert::AreEqual(result.value(), 1);
 
-			Assert::IsTrue(deck.pop(result));
-			Assert::AreEqual(result, 43);
+			result = deck.pop();
+			Assert::IsTrue(result.has_value());
+			Assert::AreEqual(result.value(), 43);
 
-			Assert::IsTrue(deck.pop(result));
-			Assert::AreEqual(result, 45);
+			result = deck.pop();
+			Assert::IsTrue(result.has_value());
+			Assert::AreEqual(result.value(), 45);
 
-			Assert::IsFalse(deck.pop(result));
+			Assert::IsFalse(deck.pop().has_value());
 		}
 
 		TEST_METHOD(ConditionalPop)
@@ -100,21 +101,26 @@ namespace Tests
 			deck.push(SillyWrapper <int>(45));
 			deck.push(SillyWrapper <int>(1));
 
-			SillyWrapper <int> result;
-			Assert::IsFalse(deck.popIfLess(1, result));
+			std::optional<SillyWrapper <int>> result = deck.popIfLess(1);
+			Assert::IsFalse(result.has_value());
 
-			Assert::IsFalse(deck.popIfLess(SillyWrapper <int>(1), result));
+			result = deck.popIfLess(SillyWrapper <int>(1));
+			Assert::IsFalse(result.has_value());
 
-			Assert::IsTrue(deck.popIfLess(2, result));
-			Assert::AreEqual(result.GetValue(), 1);
+			result = deck.popIfLess(SillyWrapper <int>(2));
+			Assert::IsTrue(result.has_value());
+			Assert::AreEqual(result.value().GetValue(), 1);
 
-			Assert::IsTrue(deck.popIfLess(SillyWrapper <int>(44), result));
-			Assert::AreEqual(result.GetValue(), 43);
+			result = deck.popIfLess(SillyWrapper <int>(44));
+			Assert::IsTrue(result.has_value());
+			Assert::AreEqual(result.value().GetValue(), 43);
 
-			Assert::IsTrue(deck.popIfLess(SillyWrapper <int>(46), result));
-			Assert::AreEqual(result.GetValue(), 45);
+			result = deck.popIfLess(SillyWrapper <int>(46));
+			Assert::IsTrue(result.has_value());
+			Assert::AreEqual(result.value().GetValue(), 45);
 
-			Assert::IsFalse(deck.pop(result));
+			result = deck.pop();
+			Assert::IsFalse(result.has_value());
 		}
 	};
 }

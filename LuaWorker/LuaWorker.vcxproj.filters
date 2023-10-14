@@ -152,6 +152,9 @@
     <ClCompile Include="SortedDeck.h">
       <Filter>Header Files\General</Filter>
     </ClCompile>
+    <ClCompile Include="DeckCard.h">
+      <Filter>Header Files\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">

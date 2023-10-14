@@ -40,7 +40,7 @@ namespace AutoKeyCollections
 			return a < b;
 		}
 
-		bool operator()(const std::unique_ptr<A>& a, const B& b)
+		/*bool operator()(const std::unique_ptr<A>& a, const B& b)
 		{
 			return a == nullptr || *a < b;
 		}
@@ -53,7 +53,7 @@ namespace AutoKeyCollections
 		bool operator()(const std::unique_ptr<A>& a, const std::unique_ptr<B>& b)
 		{
 			return a == nullptr || (b != nullptr && *a < *b);
-		}
+		}*/
 	};
 
 	/*/// <summary>
