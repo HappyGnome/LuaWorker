@@ -17,36 +17,56 @@
 \*****************************************************************************/
 
 #include "CppUnitTest.h"
-#include "../LuaWorker/AutoKeyDeck.h"
+#include "../LuaWorker/AutoKeyLoanDeck.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace AutoKeyCollections;
 
 namespace Tests
 {
+	
+	/*class SimpleCard : public AutoKeyDeckCard<int, int, SimpleCard, int>
+	{
+		using T_HomeDeck = DeckCard::T_HomeDeck;
+		using T_AutoKey = AutoKeyDeckCard::T_AutoKey;
+
+		int NewInChild;
+	public:
+		using AutoKeyDeckCard::AutoKeyDeckCard;
+
+		//SimpleCard(SimpleCard&& other) : AutoKeyDeckCard(std::move(other))
+		//{
+		//	std::cout << "Test";
+		//}
+		//SimpleCard& operator=(SimpleCard&& other) = default;
+
+		int GetVal() { return mValue; }
+	};*/
 
 	TEST_CLASS(AutoKeyDeckTests)
 	{
 	public:
-		typedef AutoKeyDeckCard<int, int> T_Card;
 		TEST_METHOD(EmptyDeck)
 		{
-			AutoKeyDeck<int,int,T_Card> deck;
-			Assert::IsFalse(deck.pop().has_value());
+			AutoKeyLoanDeck<int,int,int> deck;
+			Assert::IsFalse(deck.Pop().has_value());
 		}
-		/*TEST_METHOD(Pop)
+		
+		TEST_METHOD(Pop)
 		{
-			AutoKeyDeck<int, int> deck;
-			deck.push(12);
+			AutoKeyLoanDeck<int, int, int> deck;
 
-			auto card = deck.pop();
-			Assert::IsTrue(card != nullptr);
-			Assert::AreEqual(card->GetValue(),12);
-			Assert::AreEqual(card->GetTag(), 0);
+			auto cardIn = deck.MakeCard(12);
+			cardIn.Return(std::move(cardIn));
 
-			Assert::IsTrue(deck.pop() == nullptr);
+			auto card = deck.Pop();
+			Assert::IsTrue(card.has_value());
+			Assert::AreEqual(card.value()., 12);
+			Assert::AreEqual(card.value().GetTag(), 0);
+
+			Assert::IsFalse(deck.Pop().has_value());
 		}
-
+		/*
 		TEST_METHOD(Reorder)
 		{
 			AutoKeyDeck<int, int> deck(0);

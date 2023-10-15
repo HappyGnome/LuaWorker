@@ -225,7 +225,7 @@ WorkerStatus Worker::Stop()
 {
 	mLog.Push(LogLevel::Info, "Thread stop requested.");
 
-	Cancel();
+	Worker::Cancel();
 	if (mThread.joinable())
 	{
 		mThread.join();

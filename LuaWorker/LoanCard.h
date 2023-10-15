@@ -18,8 +18,8 @@
 
 #pragma once
 
-#ifndef _DECK_CARD_H_
-#define _DECK_CARD_H_
+#ifndef _LOAN_CARD_H_
+#define _LOAN_CARD_H_
 
 #include <list>
 
@@ -29,40 +29,51 @@
 
 namespace AutoKeyCollections
 {
-	template <typename T_OrderKey, class T_Comp = std::less<T_OrderKey>>
-	class DeckCard
+	template <typename T_Value, typename T_OrderKey, class T_Comp>
+	class LoanCard
 	{
-		typedef std::shared_ptr<SortedDeck<DeckCard, std::less<DeckCard>>> T_HomeDeck;
+		//Typedefs
+
+		using T_HomeDeck = std::shared_ptr<SortedDeck<LoanCard, std::less<LoanCard>>>;
+
+	private:
 
 		T_OrderKey mOrderKey;
 		T_HomeDeck mHomeDeck;
+
+		T_Value mValue;
+
 	public:
 
-		explicit DeckCard(const T_HomeDeck& homeDeck)
-			: mHomeDeck(homeDeck), mOrderKey(){}
+		static void Return(LoanCard&& card)
+		{
+			if (card.mHomeDeck == nullptr) return;
+
+			card.mHomeDeck->push(std::move(card));
+		}
+
+		explicit LoanCard(const T_HomeDeck& homeDeck, T_Value&& value)
+			: mHomeDeck(homeDeck), mValue(value), mOrderKey(){}
+
+		explicit LoanCard(const T_HomeDeck& homeDeck, const T_Value& value)
+			: mHomeDeck(homeDeck), mValue(value), mOrderKey() {}
 
 		void SetOrderKey(const T_OrderKey& newKey) 
 		{
 			mOrderKey = newKey;
 		}
 
-		template<typename T_Tag, typename V, class Comp = std::less<V>>
-		friend void ReturnToDeck(DeckCard&& card)
-		{
-			card.mHomeDeck->push(std::move(card));
-		}
-
 		//Set up so we can use std::less to call the specified Comp class
-		friend bool operator<(const DeckCard& a, const DeckCard& b)
+		friend bool operator<(const LoanCard& a, const LoanCard& b)
 		{
 			T_Comp less{};
-			return less(a.mValue, b.mValue);
+			return less(a.mOrderKey, b.mOrderKey);
 		}
 
-		friend bool operator<(const DeckCard& a, const T_OrderKey& b)
+		friend bool operator<(const LoanCard& a, const T_OrderKey& b)
 		{
 			T_Comp less{};
-			return less(a.mValue, b);
+			return less(a.mOrderKey, b);
 		}
 
 	};

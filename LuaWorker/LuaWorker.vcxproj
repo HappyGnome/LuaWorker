@@ -78,7 +78,7 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <TargetName>LuaWorker</TargetName>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -86,21 +86,21 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <TargetName>LuaWorker</TargetName>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\$(Platform)\$(Configuration)\</OutDir>
     <TargetName>LuaWorker</TargetName>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\$(Platform)\$(Configuration)\</OutDir>
     <TargetName>LuaWorker</TargetName>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -198,10 +198,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AutoKey.h" />
-    <ClInclude Include="AutoKeyDeck.h" />
-    <ClInclude Include="AutoKeyDeckCard.h" />
+    <ClInclude Include="AutoKeyLoanDeck.h" />
+    <ClInclude Include="AutoKeyCard.h" />
     <ClInclude Include="AutoKeyMap.h" />
     <ClInclude Include="Cancelable.h" />
+    <ClInclude Include="LoanDeck.h" />
     <ClInclude Include="InnerLuaState.h" />
     <ClInclude Include="AutoKeyLess.h" />
     <ClInclude Include="LogLevel.h" />
@@ -220,7 +221,7 @@
     <ClInclude Include="WorkerLuaInterface.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DeckCard.h" />
+    <ClCompile Include="LoanCard.h" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="InnerLuaState.cpp" />
     <ClCompile Include="LogItem.cpp" />

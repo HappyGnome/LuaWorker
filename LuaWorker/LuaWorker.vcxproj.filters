@@ -99,13 +99,16 @@
     <ClInclude Include="AutoKeyLess.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="AutoKeyDeck.h">
+    <ClInclude Include="AutoKeyLoanDeck.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
     <ClInclude Include="AutoKey.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="AutoKeyDeckCard.h">
+    <ClInclude Include="AutoKeyCard.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="LoanDeck.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
@@ -152,7 +155,7 @@
     <ClCompile Include="SortedDeck.h">
       <Filter>Header Files\General</Filter>
     </ClCompile>
-    <ClCompile Include="DeckCard.h">
+    <ClCompile Include="LoanCard.h">
       <Filter>Header Files\General</Filter>
     </ClCompile>
   </ItemGroup>

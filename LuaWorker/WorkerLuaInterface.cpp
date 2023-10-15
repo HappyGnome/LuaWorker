@@ -115,7 +115,7 @@ int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 //-------------------------------
 int WorkerLuaInterface::l_Worker_Delete(lua_State* pL) 
 {
-	int key;
+	int key{};
 	std::shared_ptr<Worker> pWorker = l_PopWorker(pL, key);
 
 	if (pWorker != nullptr)

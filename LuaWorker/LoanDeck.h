@@ -18,16 +18,15 @@
 
 #pragma once
 
-#ifndef _AUTO_KEY_DECK_H_
-#define _AUTO_KEY_DECK_H_
+#ifndef _LOAN_DECK_H_
+#define _LOAN_DECK_H_
 
 #include<list>
 #include<optional>
 
 #include "AutoKeyLess.h"
 #include "SortedDeck.h"
-#include "AutoKey.h"
-#include "AutoKeyDeckCard.h"
+#include "LoanCard.h"
 
 namespace AutoKeyCollections
 {
@@ -36,46 +35,45 @@ namespace AutoKeyCollections
 	/// </summary>
 	/// <typeparam name="V">Value type</typeparam>
 	/// <typeparam name="Comp">Key comparator</typeparam>
-	template <typename T_Tag, typename T_OrderKey, typename T_Card, class T_Comp = std::less<T_OrderKey>>
-	class AutoKeyDeck
+	template <typename T_Value,
+		typename T_OrderKey, 
+		class T_Comp = std::less<T_OrderKey>, 
+		class T_Card = LoanCard<T_Value, T_OrderKey, T_Comp>>
+	class LoanDeck
 	{
 	private:
 
-		static_assert(std::is_base_of<AutoKeyDeckCard<T_Tag, T_OrderKey, T_Comp>, T_Card>::value);
-
-		typedef SortedDeck<T_Card, std::less<T_Card>> T_Deck;
-		typedef AutoKey<T_Tag> T_AutoKey;
+		using T_Deck = SortedDeck<T_Card, std::less<T_Card>>;
 
 		//-------------------------------
 		// Properties
 		//-------------------------------
 
-		std::shared_ptr<T_AutoKey> mAutoKey;
 		std::shared_ptr<T_Deck> mDeck;
 	public:
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		explicit AutoKeyDeck() : 
-			mAutoKey(new AutoKey<T_Tag>()),
+		explicit LoanDeck() :
 			mDeck(new T_Deck())
 		{}
 
-		T_Card&& push()
-		{
-			return T_Card(mDeck, mAutoKey);
+		template<typename... T_Args>
+		T_Card MakeCard(T_Args&& ...args)
+		{			
+			return T_Card(mDeck, T_Value(std::forward <T_Args>(args)...));
 		}
 
-		std::optional<T_Card> pop()
+		std::optional<T_Card> Pop()
 		{
-			return mDeck->pop();
+			return mDeck->Pop();
 		}
 
-		template <typename T_Threshold, class T_ThreshComp = less<Card, T_Threshold>>
-		std::optional<T_Card>  popIfLess(const T_Threshold& thresh)
+		template <typename T_Threshold, class T_ThreshComp = less<T_Card, T_Threshold>>
+		std::optional<T_Card>  PopIfLess(const T_Threshold& thresh)
 		{
-			return mDeck->popIfLess<T_Threshold, T_ThreshComp>(thresh);
+			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(thresh);
 		}
 	};
 };

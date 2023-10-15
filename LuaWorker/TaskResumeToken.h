@@ -32,7 +32,7 @@ namespace LuaWorker
 		T mTaskHandle;
 
 	public:
-		TaskResumeToken() = default;
+		TaskResumeToken() :mTaskHandle(0){};
 
 		explicit TaskResumeToken(const std::chrono::time_point<T_Clock>& resumeAt, const T& handle) : mTaskHandle(handle), mResumeAt(resumeAt) {}
 

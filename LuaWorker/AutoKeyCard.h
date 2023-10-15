@@ -23,36 +23,54 @@
 
 #include <list>
 
-#include "AutoKeyLess.h"
-#include "SortedDeck.h"
 #include "AutoKey.h"
-#include "AutoKeyDeck.h"
-#include "DeckCard.h"
 
 
 namespace AutoKeyCollections
 {
-	template <typename T_Tag, typename T_OrderKey, class T_Comp = std::less<T_OrderKey>>
-	class AutoKeyDeckCard : public DeckCard<T_OrderKey,T_Comp>
+	template <typename T_Value, typename T_Tag>
+	class AutoKeyCard
 	{
-		typedef AutoKey<T_Tag> T_AutoKey;
-		typedef std::shared_ptr<SortedDeck<AutoKeyDeckCard, std::less<AutoKeyDeckCard>>> T_HomeDeck;
-		//typedef DeckCard<T_OrderKey, T_Comp> T_DeckCard;
+		typedef std::shared_ptr <AutoKey<T_Tag>> T_AutoKey;
 
+	private:
 		T_Tag mTag;
-		std::shared_ptr<T_AutoKey> mAutoKey;
-		T_HomeDeck mHomeDeck;
-	public:
+		T_AutoKey mAutoKey;
 
-		explicit AutoKeyDeckCard(
-			const T_HomeDeck& homeDeck, T_AutoKey& autoKey)
-			: DeckCard(homeDeck),
-			mAutoKey(autoKey)
+		T_Value mValue;
+
+		void InitTag()
 		{
 			if (mAutoKey != nullptr) mTag = mAutoKey->Get();
 		}
 
-		~AutoKeyDeckCard()
+	public:
+
+		explicit AutoKeyCard(const T_AutoKey& autoKey, T_Value&& value)
+			: mAutoKey(autoKey),
+			mTag()
+		{
+			InitTag();
+		}
+
+		explicit AutoKeyCard(const T_AutoKey& autoKey, const T_Value& value)
+			: mAutoKey(autoKey),
+			mTag()
+		{
+			InitTag();
+		}
+
+		// 
+
+		/// <summary>
+		/// Copy constructor
+		/// Not copyable (Tags must remain unique)
+		/// </summary>
+		/// <param name=""></param>
+		AutoKeyCard(const AutoKeyCard&) = delete;
+		AutoKeyCard& operator=(const AutoKeyCard&) = delete;
+
+		~AutoKeyCard()
 		{
 			try
 			{
