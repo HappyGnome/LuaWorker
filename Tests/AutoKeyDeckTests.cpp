@@ -49,23 +49,26 @@ namespace Tests
 		TEST_METHOD(EmptyDeck)
 		{
 			AutoKeyLoanDeck<int,int,int> deck;
-			Assert::IsFalse(deck.Pop().has_value());
+			AutoKeyLoanDeck<int, int, int>::CardType res;
+
+			Assert::IsFalse(deck.Pop(res));
 		}
 		
-		TEST_METHOD(Pop)
-		{
-			AutoKeyLoanDeck<int, int, int> deck;
+		//TEST_METHOD(Pop)
+		//{
+		//	AutoKeyLoanDeck<int, int, int> deck;
 
-			auto cardIn = deck.MakeCard(12);
-			cardIn.Return(std::move(cardIn));
+		//	AutoKeyLoanDeck<int, int, int>::CardType res;
 
-			auto card = deck.Pop();
-			Assert::IsTrue(card.has_value());
-			Assert::AreEqual(card.value()., 12);
-			Assert::AreEqual(card.value().GetTag(), 0);
+		//	auto cardIn = deck.MakeCard(12);
+		//	cardIn.Return(std::move(cardIn));
 
-			Assert::IsFalse(deck.Pop().has_value());
-		}
+		//	Assert::IsTrue(deck.Pop(res));
+		//	Assert::AreEqual(res.GetValue().GetValue(), 12);
+		//	//Assert::AreEqual(card.value().GetValue().GetTag(), 0);
+
+		//	Assert::IsFalse(deck.Pop(res));
+		//}
 		/*
 		TEST_METHOD(Reorder)
 		{

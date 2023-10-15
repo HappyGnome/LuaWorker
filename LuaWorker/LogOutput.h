@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _LOG_OUTPUT_H_
 #define _LOG_OUTPUT_H_
+#pragma once
 
 #include<string>
 

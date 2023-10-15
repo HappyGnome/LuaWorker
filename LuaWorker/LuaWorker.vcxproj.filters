@@ -111,6 +111,12 @@
     <ClInclude Include="LoanDeck.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="Sortable.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="ValueGetter.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

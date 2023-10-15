@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _LOAN_DECK_H_
 #define _LOAN_DECK_H_
+#pragma once
 
 #include<list>
 #include<optional>
@@ -36,14 +35,13 @@ namespace AutoKeyCollections
 	/// <typeparam name="V">Value type</typeparam>
 	/// <typeparam name="Comp">Key comparator</typeparam>
 	template <typename T_Value,
-		typename T_OrderKey, 
-		class T_Comp = std::less<T_OrderKey>, 
-		class T_Card = LoanCard<T_Value, T_OrderKey, T_Comp>>
+		class T_Comp = std::less<T_Value>, 
+		class T_Card = LoanCard<T_Value, T_Comp>>
 	class LoanDeck
 	{
 	private:
 
-		using T_Deck = SortedDeck<T_Card, std::less<T_Card>>;
+		using T_Deck = SortedDeck<T_Card, typename T_Card::Less>;
 
 		//-------------------------------
 		// Properties
@@ -65,15 +63,15 @@ namespace AutoKeyCollections
 			return T_Card(mDeck, T_Value(std::forward <T_Args>(args)...));
 		}
 
-		std::optional<T_Card> Pop()
+		bool Pop(T_Card& out)
 		{
-			return mDeck->Pop();
+			return mDeck->Pop(out);
 		}
 
-		template <typename T_Threshold, class T_ThreshComp = less<T_Card, T_Threshold>>
-		std::optional<T_Card>  PopIfLess(const T_Threshold& thresh)
+		template <typename T_Threshold, class T_ThreshComp = typename T_Card::Less>
+		bool  PopIfLess(const T_Threshold& thresh, T_Card& out)
 		{
-			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(thresh);
+			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(thresh, out);
 		}
 	};
 };

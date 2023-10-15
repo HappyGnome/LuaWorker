@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _TASK_RESUME_TOKEN_H_
 #define _TASK_RESUME_TOKEN_H_
+#pragma once
 
 #include <chrono>
 

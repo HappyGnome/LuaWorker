@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _DECK_H_
 #define _DECK_H_
+#pragma once
 
 #include<list>
 #include<optional>
@@ -56,7 +55,7 @@ namespace AutoKeyCollections
 		/// Add an item to the collection
 		/// </summary>
 		/// <param name="value">value to store</param>
-		void push(T_Value&& value)
+		void Push(T_Value&& value)
 		{
 			T_Comp less = T_Comp{};
 
@@ -77,13 +76,14 @@ namespace AutoKeyCollections
 		/// </summary>
 		/// <param name="out">set to value popped if 'true' returned</param>
 		/// <returns>True if and only if item found</returns>
-		std::optional<T_Value> pop()
+		bool Pop(T_Value& out)
 		{
-			std::optional<T_Value> ret;
-			if (mDeck.empty()) return ret;
-			ret = std::move(mDeck.front());
+			if (mDeck.empty()) return false;
+
+			out = std::move(mDeck.front());
 			mDeck.pop_front();
-			return ret;
+
+			return true;
 		}
 
 		/// <summary>
@@ -95,17 +95,13 @@ namespace AutoKeyCollections
 		/// <param name="out">Value popped</param>
 		/// <returns>True if value popped</returns>
 		template <typename T_Threshold, class T_ThreshComp = less<T_Value, T_Threshold>>
-		std::optional<T_Value> popIfLess(const T_Threshold& thresh)
+		bool PopIfLess(const T_Threshold& thresh, T_Value& out)
 		{
 			T_ThreshComp less{};
-			std::optional<T_Value> ret;
 
-			if (!mDeck.empty() && less(mDeck.front(), thresh))
-			{
-				ret = std::move(mDeck.front());
-				mDeck.pop_front();
-			}
-			return ret;
+			if (mDeck.empty() || !less(mDeck.front(), thresh)) return false;
+			
+			return Pop(out);
 		}
 	};
 };

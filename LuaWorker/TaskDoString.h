@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _TASKDOSTRING_H_
 #define _TASKDOSTRING_H_
+#pragma once
 
 #include<string>
 

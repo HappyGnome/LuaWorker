@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _TASKDOFILE_H_
 #define _TASKDOFILE_H_
+#pragma once
 
 #include<string>
 

@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _LUA_TEST_STATE_H_
 #define _LUA_TEST_STATE_H_
+#pragma once
 
 #include<chrono>
 

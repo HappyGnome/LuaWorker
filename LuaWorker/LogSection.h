@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _LOGSECTION_H_
 #define _LOGSECTION_H_
+#pragma once
 
 #include<string>
 #include<memory>

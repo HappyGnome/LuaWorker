@@ -211,12 +211,14 @@
     <ClInclude Include="LogStack.h" />
     <ClInclude Include="LogItem.h" />
     <ClInclude Include="LuaCancellationException.h" />
+    <ClInclude Include="Sortable.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="TaskDoFile.h" />
     <ClInclude Include="TaskDoString.h" />
     <ClInclude Include="TaskLuaInterface.h" />
     <ClInclude Include="TaskDoSleep.h" />
     <ClInclude Include="TaskResumeToken.h" />
+    <ClInclude Include="ValueGetter.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="WorkerLuaInterface.h" />
   </ItemGroup>

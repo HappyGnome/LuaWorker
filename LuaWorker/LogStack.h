@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _LOGSTACKBASE_H_
 #define _LOGSTACKBASE_H_
+#pragma once
 
 #include<deque>
 #include<string>

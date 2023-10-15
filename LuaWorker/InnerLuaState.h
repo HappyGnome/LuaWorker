@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _INNER_LUA_STATE_H_
 #define _INNER_LUA_STATE_H_
+#pragma once
 
 #include <mutex> 
 #include <chrono> 

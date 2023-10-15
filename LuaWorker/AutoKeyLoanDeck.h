@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _AUTO_KEY_DECK_H_
 #define _AUTO_KEY_DECK_H_
+#pragma once
 
 #include<list>
 #include<optional>
@@ -31,18 +30,18 @@
 
 namespace AutoKeyCollections
 {
+
 	/// <summary>
 	/// Wrapper for SortedDeck which tags each contained object with a key. Keys may be reused but no two objects will hold the same key at once.
 	/// </summary>
 	/// <typeparam name="V">Value type</typeparam>
 	/// <typeparam name="Comp">Key comparator</typeparam>
-	template <typename T_Value, 
-		typename T_OrderKey, 
+	template <typename T_Value,
 		typename T_Tag = std::size_t,
-		class T_Comp = std::less<T_OrderKey>, 
-		class T_Card = LoanCard<AutoKeyCard<T_Value, T_Tag>, T_OrderKey, T_Comp>>
+		class T_Comp = std::less<T_Value>, 
+		class T_Card = LoanCard<AutoKeyCard<T_Value, T_Tag>, typename AutoKeyCard<T_Value, T_Tag>::Less<T_Comp>/*, ValueGetter<AutoKeyCard<T_Value, T_Tag>, T_Value> //TODO */ >>
 
-	class AutoKeyLoanDeck : public LoanDeck<AutoKeyCard<T_Value, T_Tag>, T_OrderKey, T_Comp, T_Card>
+	class AutoKeyLoanDeck : public LoanDeck<AutoKeyCard<T_Value, T_Tag>, AutoKeyCard<T_Value, T_Tag>::Less<T_Comp>, T_Card>
 	{
 	private:
 
@@ -55,6 +54,7 @@ namespace AutoKeyCollections
 		std::shared_ptr<T_AutoKey> mAutoKey;
 
 	public:
+		typedef T_Card CardType;
 
 		/// <summary>
 		/// Constructor

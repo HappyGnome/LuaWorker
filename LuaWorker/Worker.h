@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _WORKER_H_
 #define _WORKER_H_
+#pragma once
 
 //#include <iostream>
 //#include <filesystem>

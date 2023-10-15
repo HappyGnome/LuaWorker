@@ -15,11 +15,10 @@
 *  limitations under the License.
 *
 \*****************************************************************************/
- 
-#pragma once
 
 #ifndef _LOGITEM_H_
 #define _LOGITEM_H_
+#pragma once
 
 #include<string>
 #include<ctime>

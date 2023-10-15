@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _LOG_LEVEL_H_
 #define _LOG_LEVEL_H_
+#pragma once
 
 namespace LuaWorker
 {

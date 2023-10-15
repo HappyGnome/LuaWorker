@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _LUA_CANCELLATION_EXCEPTION_H_
 #define _LUA_CANCELLATION_EXCEPTION_H_
+#pragma once
 
 #include <exception>
 

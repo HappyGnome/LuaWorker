@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _AUTO_KEY_MAP_H_
 #define _AUTO_KEY_MAP_H_
+#pragma once
 
 
 #include <mutex>

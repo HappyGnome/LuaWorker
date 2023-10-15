@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _TASK_LUA_INTERFACE_H_
 #define _TASK_LUA_INTERFACE_H_
+#pragma once
 
 //#include <iostream>
 //#include <filesystem>

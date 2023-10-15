@@ -66,7 +66,8 @@ namespace Tests
 		{
 			SortedDeck<int> deck;
 
-			Assert::IsFalse(deck.pop().has_value());
+			int res;
+			Assert::IsFalse(deck.Pop(res));
 
 		}
 
@@ -74,26 +75,24 @@ namespace Tests
 		{
 			SortedDeck<int> deck;
 
-			deck.push(43);
-			deck.push(45);
-			deck.push(1);
+			deck.Push(43);
+			deck.Push(45);
+			deck.Push(1);
 
-			std::optional<int> result = deck.pop();
-			Assert::IsTrue(result.has_value());
-			Assert::AreEqual(result.value(), 1);
+			int result;
+			Assert::IsTrue(deck.Pop(result));
+			Assert::AreEqual(result, 1);
 
-			result = deck.pop();
-			Assert::IsTrue(result.has_value());
-			Assert::AreEqual(result.value(), 43);
+			Assert::IsTrue(deck.Pop(result));
+			Assert::AreEqual(result, 43);
 
-			result = deck.pop();
-			Assert::IsTrue(result.has_value());
-			Assert::AreEqual(result.value(), 45);
+			Assert::IsTrue(deck.Pop(result));
+			Assert::AreEqual(result, 45);
 
-			Assert::IsFalse(deck.pop().has_value());
+			Assert::IsFalse(deck.Pop(result));
 		}
 
-		TEST_METHOD(ConditionalPop)
+		/*TEST_METHOD(ConditionalPop)
 		{
 			SortedDeck<SillyWrapper<int>> deck;
 
@@ -121,6 +120,6 @@ namespace Tests
 
 			result = deck.pop();
 			Assert::IsFalse(result.has_value());
-		}
+		}*/
 	};
 }

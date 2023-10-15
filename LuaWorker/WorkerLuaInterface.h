@@ -15,11 +15,10 @@
 *  limitations under the License.
 *
 \*****************************************************************************/
- 
-#pragma once
 
 #ifndef _WORKER_LUA_INTERFACE_H_
 #define _WORKER_LUA_INTERFACE_H_
+#pragma once
 
 //#include <iostream>
 //#include <filesystem>

@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _AUTO_KEY_DECK_CARD_H_
 #define _AUTO_KEY_DECK_CARD_H_
+#pragma once
 
 #include <list>
 
@@ -46,6 +45,19 @@ namespace AutoKeyCollections
 
 	public:
 
+		template <class T_Comp>
+		class Less
+		{
+		public:
+			bool operator()(const AutoKeyCard& a, const AutoKeyCard& b)
+			{
+				T_Comp less{};
+				return less(a.mValue, b.mValue);
+			}
+		};
+
+		AutoKeyCard() : mAutoKey(),mTag(){}
+
 		explicit AutoKeyCard(const T_AutoKey& autoKey, T_Value&& value)
 			: mAutoKey(autoKey),
 			mTag()
@@ -60,7 +72,8 @@ namespace AutoKeyCollections
 			InitTag();
 		}
 
-		// 
+		AutoKeyCard(AutoKeyCard&&) = default;
+		AutoKeyCard& operator=(AutoKeyCard&&) = default;
 
 		/// <summary>
 		/// Copy constructor
@@ -87,6 +100,28 @@ namespace AutoKeyCollections
 		{
 			return mTag;
 		}
+
+		const T_Value& GetValue() const
+		{
+			return mValue;
+		}
+
+		T_Value& GetValue()
+		{
+			return mValue;
+
+		}
+		/*const typename T_ValueGet::T_Value& GetValue() const
+		{
+			T_ValueGet get{};
+			return get(mValue);
+		}
+
+		typename T_ValueGet::T_Value& GetValue()
+		{
+			T_ValueGet get{};
+			return get(mValue);
+		}*/ //TODO
 	};
 };
 

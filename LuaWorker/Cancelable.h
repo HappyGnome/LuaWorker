@@ -16,10 +16,9 @@
 *
 \*****************************************************************************/
 
-#pragma once
-
 #ifndef _CANCELABLE_H_
 #define _CANCELABLE_H_
+#pragma once
 
 /// <summary>
 /// Interface for objects that can have execution cancelled

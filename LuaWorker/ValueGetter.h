@@ -16,47 +16,47 @@
 *
 \*****************************************************************************/
 
-#ifndef _TASK_SLEEP_H_
-#define _TASK_SLEEP_H_
+#ifndef _VALUE_GETTER_H_
+#define _VALUE_GETTER_H_
 #pragma once
 
-#include<chrono>
+#include <functional>
 
-#include "Task.h"
-
-extern "C" {
-#include "lua.h"
-	//#include "lauxlib.h"
-	//#include "lualib.h"
-}
-
-namespace LuaWorker
+namespace AutoKeyCollections
 {
-	/// <summary>
-	/// Implementation of Task that sleeps for a minimum amount of time
-	/// </summary>
-	class TaskDoSleep : public Task
+
+	template <typename T_ValueIn, typename T_ValueOut = T_ValueIn>
+	class ValueGetter
 	{
-	private:
-
-		unsigned int mSleepForMs;
-
-	protected:
-
-		/// <summary>
-		/// Do the lua work for this task
-		/// </summary>
-		/// <param name="pL">Lua state</param>
-		/// <returns> Result of the task</returns>
-		std::string DoExec(lua_State* pL) override;
-
 	public:
+		typedef T_ValueOut T_Value;
 
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="sleepForMs">Time to sleep for</param>
-		explicit TaskDoSleep(unsigned int sleepForMs);
+		const T_ValueOut& operator()(const T_ValueIn& in)
+		{
+			return in.GetValue();
+		}
+
+		T_ValueOut& operator()(T_ValueIn& in)
+		{
+			return in.GetValue();
+		}
+	};
+
+	template <typename T_ValueIn>
+	class ValueGetter<T_ValueIn,T_ValueIn>
+	{
+	public:
+		typedef T_ValueIn T_Value;
+
+		const T_ValueIn& operator()(const T_ValueIn& in)
+		{
+			return in;
+		}
+
+		T_ValueIn& operator()(T_ValueIn& in)
+		{
+			return in;
+		}
 	};
 };
 #endif
