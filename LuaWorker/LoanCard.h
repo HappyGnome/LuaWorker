@@ -26,46 +26,23 @@
 #include "AutoKeyLess.h"
 #include "SortedDeck.h"
 #include "ValueGetter.h"
+#include "SimpleValueR.h"
 
 namespace AutoKeyCollections
 {
-	template <typename T_Value, class T_Comp = std::less<T_Value>, class T_ValueGet = ValueGetter<T_Value>>
-	class LoanCard
-	{
-	public:
-		class Less;
-	
+	template <class T_Comp,class T_Base>
+	class LoanCard : public T_Base
+	{	
 	private:
 		//Typedefs
 
-		using T_HomeDeck = std::shared_ptr<SortedDeck<LoanCard, typename LoanCard::Less>>;
+		using T_HomeDeck = std::shared_ptr<SortedDeck<LoanCard, T_Comp>>;
 
 		T_HomeDeck mHomeDeck;
 
-		T_Value mValue;
-
 	public:
 
-		//Convert value comparisson to Card (and Card-Value) comparisson
-		class Less
-		{
-		public:
-			bool operator()(const LoanCard& a, const LoanCard& b)
-			{
-				T_Comp less{};
-				return less(a.mValue, b.mValue);
-			}
-
-			bool operator()(const LoanCard& a, const T_Value& b)
-			{
-				T_Comp less{};
-				return less(a.mValue, b);
-			}
-		};
-
 		//Static
-
-
 		static void Return(LoanCard&& card)
 		{
 			if (card.mHomeDeck == nullptr) return;
@@ -78,31 +55,15 @@ namespace AutoKeyCollections
 		// Public methods
 		//-------------------------------
 
-		explicit LoanCard()
-			: mHomeDeck(), mValue() {}
+		LoanCard()
+			: T_Base(), mHomeDeck() {}
 
-		explicit LoanCard(const T_HomeDeck& homeDeck, T_Value&& value)
-			: mHomeDeck(homeDeck), mValue(value){}
-
-		explicit LoanCard(const T_HomeDeck& homeDeck, const T_Value& value)
-			: mHomeDeck(homeDeck), mValue(value) {}
+		template<typename ...T_Args>
+		explicit LoanCard(const T_HomeDeck& homeDeck,T_Args&& ...args)
+			: T_Base(std::forward<T_Args>(args)...), mHomeDeck(homeDeck){}
 
 		LoanCard(LoanCard&&) = default;
 		LoanCard& operator=(LoanCard&&) = default;
-
-
-		const typename T_ValueGet::T_Value& GetValue() const
-		{
-			T_ValueGet get{};
-			return get(mValue);
-		}
-
-		typename T_ValueGet::T_Value& GetValue()
-		{
-			T_ValueGet get{};
-			return get(mValue);
-		}
-
 	};
 };
 

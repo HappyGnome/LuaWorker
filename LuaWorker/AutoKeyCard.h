@@ -27,16 +27,14 @@
 
 namespace AutoKeyCollections
 {
-	template <typename T_Value, typename T_Tag>
-	class AutoKeyCard
+	template <typename T_Tag, typename T_Base>
+	class AutoKeyCard : public T_Base
 	{
 		typedef std::shared_ptr <AutoKey<T_Tag>> T_AutoKey;
 
 	private:
 		T_Tag mTag;
 		T_AutoKey mAutoKey;
-
-		T_Value mValue;
 
 		void InitTag()
 		{
@@ -45,29 +43,11 @@ namespace AutoKeyCollections
 
 	public:
 
-		template <class T_Comp>
-		class Less
-		{
-		public:
-			bool operator()(const AutoKeyCard& a, const AutoKeyCard& b)
-			{
-				T_Comp less{};
-				return less(a.mValue, b.mValue);
-			}
-		};
-
 		AutoKeyCard() : mAutoKey(),mTag(){}
 
-		explicit AutoKeyCard(const T_AutoKey& autoKey, T_Value&& value)
-			: mAutoKey(autoKey),
-			mTag()
-		{
-			InitTag();
-		}
-
-		explicit AutoKeyCard(const T_AutoKey& autoKey, const T_Value& value)
-			: mAutoKey(autoKey),
-			mTag()
+		template <typename ...T_Args>
+		explicit AutoKeyCard(const T_AutoKey& autoKey, T_Args&& ...args)
+			: T_Base(std::forward<T_Args>(args)...), mAutoKey(autoKey)
 		{
 			InitTag();
 		}
@@ -101,16 +81,6 @@ namespace AutoKeyCollections
 			return mTag;
 		}
 
-		const T_Value& GetValue() const
-		{
-			return mValue;
-		}
-
-		T_Value& GetValue()
-		{
-			return mValue;
-
-		}
 		/*const typename T_ValueGet::T_Value& GetValue() const
 		{
 			T_ValueGet get{};

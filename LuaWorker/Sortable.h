@@ -29,12 +29,10 @@ namespace AutoKeyCollections
 	/// </summary>
 	/// <typeparam name="V">Value type</typeparam>
 	/// <typeparam name="Comp">Key comparator</typeparam>
-	template <typename T_Value, typename T_OrderKey = std::size_t>
-	class Sortable
+	template <typename T_OrderKey, class T_Base>
+	class Sortable : public T_Base
 	{
 	private:
-
-		T_Value mValue;
 		T_OrderKey mKey;
 
 	public:
@@ -42,36 +40,25 @@ namespace AutoKeyCollections
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		explicit Sortable() 
-			: mValue(), mKey() {}
+		Sortable() 
+			: T_Base(),mKey() {}
 
-		explicit Sortable(const T_Value& value) 
-			: mValue(value), mKey() {}
-		explicit Sortable(const T_OrderKey& key) 
-			: mValue(), mKey(key) {}
-		explicit Sortable(const T_Value& value, const T_OrderKey& key) 
-			: mValue(value), mKey(key) {}
+		template<typename ...T_Args>
+		explicit Sortable(T_Args&& ...args) 
+			: T_Base(std::forward<T_Args>(args)...), mKey() {}
 
-		explicit Sortable(T_Value&& value) 
-			: mValue(std::move(value)), mKey() {}
-		explicit Sortable(T_OrderKey&& key) 
-			: mValue(), mKey(std::move(key)) {}
-		explicit Sortable(T_Value&& value,T_OrderKey&& key) 
-			: mValue(std::move(value)), mKey(std::move(key)) {}
+		template<typename ...T_Args>
+		explicit Sortable(const T_OrderKey& key, T_Args&& ...args)
+			: T_Base(std::forward<T_Args>(args)...), mKey(key) {}
 
-		void SetValue(const T_Value& value) 
-		{ 
-			mValue = value; 
-		}
+		template<typename ...T_Args>
+		explicit Sortable(T_OrderKey&& key, T_Args&& ...args)
+			: T_Base(std::forward<T_Args>(args)...), mKey(std::move(key)) {}
+
 
 		void SetSortKey(const T_OrderKey& key) 
 		{ 
 			mKey = key; 
-		}
-
-		void SetValue(T_Value&& value) 
-		{ 
-			mValue = std::move(value); 
 		}
 
 		void SetSortKey(T_OrderKey&& key) 
@@ -79,33 +66,25 @@ namespace AutoKeyCollections
 			mKey = std::move(key); 
 		}
 
-		const T_Value& GetValue() const
+		const T_OrderKey& GetSortKey() const
 		{
-			return mValue;
-		}
-
-		const T_Value& GetSortKey() const
-		{
-			return mValue;
-		}
-
-		T_Value& GetValue()
-		{
-			return mValue;
-		}
-
-		T_Value& GetSortKey()
-		{
-			return mValue;
+			return mKey;
 		}
 
 		template<class T_Comp>
 		class Order
 		{
+		public:
 			bool operator()(const Sortable& a, const Sortable& b)
 			{
 				T_Comp less{};
 				return less(a.mKey, b.mKey);
+			}
+
+			bool operator()(const Sortable& a, const T_OrderKey& b)
+			{
+				T_Comp less{};
+				return less(a.mKey, b);
 			}
 		};
 		

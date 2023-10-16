@@ -230,6 +230,7 @@
     <ClCompile Include="LogSection.cpp" />
     <ClCompile Include="LogStack.cpp" />
     <ClCompile Include="LuaCancellationException.cpp" />
+    <ClCompile Include="SimpleValueR.h" />
     <ClCompile Include="SortedDeck.h" />
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="TaskDoFile.cpp" />

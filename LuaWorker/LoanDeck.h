@@ -26,6 +26,7 @@
 #include "AutoKeyLess.h"
 #include "SortedDeck.h"
 #include "LoanCard.h"
+//#include "SimpleValueR.h"
 
 namespace AutoKeyCollections
 {
@@ -34,14 +35,13 @@ namespace AutoKeyCollections
 	/// </summary>
 	/// <typeparam name="V">Value type</typeparam>
 	/// <typeparam name="Comp">Key comparator</typeparam>
-	template <typename T_Value,
-		class T_Comp = std::less<T_Value>, 
-		class T_Card = LoanCard<T_Value, T_Comp>>
+	template <typename T_Card,
+			  class T_Comp>
 	class LoanDeck
 	{
 	private:
 
-		using T_Deck = SortedDeck<T_Card, typename T_Card::Less>;
+		using T_Deck = SortedDeck<T_Card, T_Comp>;
 
 		//-------------------------------
 		// Properties
@@ -60,7 +60,13 @@ namespace AutoKeyCollections
 		template<typename... T_Args>
 		T_Card MakeCard(T_Args&& ...args)
 		{			
-			return T_Card(mDeck, T_Value(std::forward <T_Args>(args)...));
+			return T_Card(mDeck, std::forward <T_Args>(args)...);
+		}
+
+		template<typename... T_Args>
+		void MakeAndKeep(T_Args&& ...args)
+		{
+			T_Card::Return(T_Card(mDeck, std::forward <T_Args>(args)...));
 		}
 
 		bool Pop(T_Card& out)
@@ -68,10 +74,21 @@ namespace AutoKeyCollections
 			return mDeck->Pop(out);
 		}
 
-		template <typename T_Threshold, class T_ThreshComp = typename T_Card::Less>
+		bool Pop()
+		{
+			return mDeck->Pop();
+		}
+
+		template <typename T_Threshold, class T_ThreshComp = T_Comp>
 		bool  PopIfLess(const T_Threshold& thresh, T_Card& out)
 		{
 			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(thresh, out);
+		}
+
+		template <typename T_Threshold, class T_ThreshComp = T_Comp>
+		bool  PopIfLess(const T_Threshold& thresh)
+		{
+			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(thresh);
 		}
 	};
 };

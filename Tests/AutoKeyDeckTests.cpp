@@ -54,54 +54,61 @@ namespace Tests
 			Assert::IsFalse(deck.Pop(res));
 		}
 		
-		//TEST_METHOD(Pop)
-		//{
-		//	AutoKeyLoanDeck<int, int, int> deck;
+		TEST_METHOD(Pop)
+		{
+			AutoKeyLoanDeck<int, int, int> deck;
 
-		//	AutoKeyLoanDeck<int, int, int>::CardType res;
+			AutoKeyLoanDeck<int, int, int>::CardType res;
 
-		//	auto cardIn = deck.MakeCard(12);
-		//	cardIn.Return(std::move(cardIn));
+			deck.MakeAndKeep(0,12);
 
-		//	Assert::IsTrue(deck.Pop(res));
-		//	Assert::AreEqual(res.GetValue().GetValue(), 12);
-		//	//Assert::AreEqual(card.value().GetValue().GetTag(), 0);
+			Assert::IsTrue(deck.Pop(res));
+			Assert::AreEqual(12, res.GetValue());
+			//Assert::AreEqual(card.value().GetValue().GetTag(), 0);
 
-		//	Assert::IsFalse(deck.Pop(res));
-		//}
-		/*
+			Assert::IsFalse(deck.Pop(res));
+		}
+		
 		TEST_METHOD(Reorder)
 		{
-			AutoKeyDeck<int, int> deck(0);
-			deck.push(12);
-			deck.push(11);
-			auto card = deck.pop();
-			Assert::AreEqual(card->GetValue(), 11);
-			Assert::AreEqual(card->GetTag(), 1);
+			AutoKeyLoanDeck<int, int, int> deck;
 
-			card = deck.pop();
-			Assert::AreEqual(card->GetValue(), 12);
-			Assert::AreEqual(card->GetTag(), 0);
+			AutoKeyLoanDeck<int, int, int>::CardType res;
 
-			Assert::IsTrue(deck.pop() == nullptr);
+			deck.MakeAndKeep(1,12);//TODO reverse key and value in constructor
+			deck.MakeAndKeep(0,11);
+
+			deck.Pop(res);
+			Assert::AreEqual(11, res.GetValue());
+			Assert::AreEqual(1, res.GetTag());
+
+			deck.Pop(res);
+			Assert::AreEqual(12, res.GetValue());
+			Assert::AreEqual(0, res.GetTag());
+
+			Assert::IsFalse(deck.Pop());
 		}
 
 		TEST_METHOD(ConditionalPop)
 		{
-			AutoKeyDeck<int, int> deck(0);
-			deck.push(12);
-			deck.push(11);
-			auto card = deck.popIfLess(11);
-			Assert::IsTrue(card == nullptr);
+			AutoKeyLoanDeck<int, int, int> deck;
 
-			card = deck.popIfLess(12);
-			Assert::AreEqual(card->GetValue(), 11);
+			AutoKeyLoanDeck<int, int, int>::CardType res;
 
-			card = deck.popIfLess(12);
-			Assert::IsTrue(card == nullptr);
+			deck.MakeAndKeep(12,99);
+			deck.MakeAndKeep(11,-7);
 
-			deck.pop();
-			Assert::IsTrue(deck.pop() == nullptr);
-		}*/
+			
+			Assert::IsFalse(deck.PopIfLess(11));
+			Assert::IsFalse(deck.PopIfLess(11,res));
+
+			Assert::IsTrue(deck.PopIfLess(12,res));
+			Assert::AreEqual(-7, res.GetValue());
+
+			Assert::IsFalse(deck.PopIfLess(12));
+
+			Assert::IsTrue(deck.Pop());
+			Assert::IsFalse(deck.Pop());
+		}
 	};
 }

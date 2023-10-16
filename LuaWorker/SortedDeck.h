@@ -75,7 +75,7 @@ namespace AutoKeyCollections
 		/// Remove first item (out parameter receives the value)
 		/// </summary>
 		/// <param name="out">set to value popped if 'true' returned</param>
-		/// <returns>True if and only if item found</returns>
+		/// <returns>True if and only if item found and removed</returns>
 		bool Pop(T_Value& out)
 		{
 			if (mDeck.empty()) return false;
@@ -87,14 +87,25 @@ namespace AutoKeyCollections
 		}
 
 		/// <summary>
+		/// Remove first item 
+		/// </summary>
+		/// <returns>True if and only if item found and removed</returns>
+		bool Pop()
+		{
+			if (mDeck.empty()) return false;
+			mDeck.pop_front();
+			return true;
+		}
+
+		/// <summary>
 		/// Pop the first element of the deck, if it is less that a comparable value threshold
 		/// </summary>
 		/// <typeparam name="T_Threshold">Type of threshold</typeparam>
-		/// <typeparam name="T_ThreshComp">CClass implementing () operator for comparisson</typeparam>
+		/// <typeparam name="T_ThreshComp">Class implementing () operator for comparisson</typeparam>
 		/// <param name="thresh">Cuttoff</param>
 		/// <param name="out">Value popped</param>
 		/// <returns>True if value popped</returns>
-		template <typename T_Threshold, class T_ThreshComp = less<T_Value, T_Threshold>>
+		template <typename T_Threshold, class T_ThreshComp = T_Comp>
 		bool PopIfLess(const T_Threshold& thresh, T_Value& out)
 		{
 			T_ThreshComp less{};
@@ -102,6 +113,23 @@ namespace AutoKeyCollections
 			if (mDeck.empty() || !less(mDeck.front(), thresh)) return false;
 			
 			return Pop(out);
+		}
+
+		/// <summary>
+		/// Pop the first element of the deck, if it is less that a comparable value threshold
+		/// </summary>
+		/// <typeparam name="T_Threshold">Type of threshold</typeparam>
+		/// <typeparam name="T_ThreshComp">Class implementing () operator for comparisson</typeparam>
+		/// <param name="thresh">Cuttoff</param>
+		/// <returns>True if value popped</returns>
+		template <typename T_Threshold, class T_ThreshComp = T_Comp>
+		bool PopIfLess(const T_Threshold& thresh)
+		{
+			T_ThreshComp less{};
+
+			if (mDeck.empty() || !less(mDeck.front(), thresh)) return false;
+
+			return Pop();
 		}
 	};
 };

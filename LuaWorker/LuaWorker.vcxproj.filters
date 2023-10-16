@@ -164,6 +164,9 @@
     <ClCompile Include="LoanCard.h">
       <Filter>Header Files\General</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleValueR.h">
+      <Filter>Header Files\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">

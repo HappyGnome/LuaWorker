@@ -27,9 +27,33 @@
 #include "LoanDeck.h"
 #include "AutoKey.h"
 #include "AutoKeyCard.h"
+#include "Sortable.h"
+#include "SimpleValueR.h"
 
 namespace AutoKeyCollections
 {
+	namespace Internal
+	{
+		template<typename T_Value,
+			typename T_OrderKey>
+		using AutoKeyLoanCard_Sortable = Sortable<T_OrderKey, SimpleValueR_Base<T_Value>>;
+
+		template<typename T_Value,
+			typename T_OrderKey,
+			class T_Comp>
+		using AutoKeyLoanCard_SortOrder = typename AutoKeyLoanCard_Sortable<T_Value, T_OrderKey>::template Order<T_Comp>;
+
+		template<typename T_Value,
+			typename T_OrderKey,
+			typename T_Tag>
+		using AutoKeyLoanCard_AutoKeyCard = AutoKeyCard<T_Tag, AutoKeyLoanCard_Sortable<T_Value, T_OrderKey>>;
+
+		template<typename T_Value,
+			typename T_OrderKey,
+			typename T_Tag,
+			class T_Comp>
+		using AutoKeyLoanCard = LoanCard<AutoKeyLoanCard_SortOrder<T_Value, T_OrderKey, T_Comp>, AutoKeyLoanCard_AutoKeyCard<T_Value, T_OrderKey, T_Tag>>;
+	};
 
 	/// <summary>
 	/// Wrapper for SortedDeck which tags each contained object with a key. Keys may be reused but no two objects will hold the same key at once.
@@ -37,13 +61,13 @@ namespace AutoKeyCollections
 	/// <typeparam name="V">Value type</typeparam>
 	/// <typeparam name="Comp">Key comparator</typeparam>
 	template <typename T_Value,
+		typename T_OrderKey,
 		typename T_Tag = std::size_t,
-		class T_Comp = std::less<T_Value>, 
-		class T_Card = LoanCard<AutoKeyCard<T_Value, T_Tag>, typename AutoKeyCard<T_Value, T_Tag>::Less<T_Comp>/*, ValueGetter<AutoKeyCard<T_Value, T_Tag>, T_Value> //TODO */ >>
-
-	class AutoKeyLoanDeck : public LoanDeck<AutoKeyCard<T_Value, T_Tag>, AutoKeyCard<T_Value, T_Tag>::Less<T_Comp>, T_Card>
+		class T_Comp = std::less<T_OrderKey>>
+	class AutoKeyLoanDeck : public LoanDeck<Internal::AutoKeyLoanCard<T_Value,T_OrderKey,T_Tag, T_Comp>, Internal::AutoKeyLoanCard_SortOrder<T_Value, T_OrderKey, T_Comp>>
 	{
 	private:
+		typedef Internal::AutoKeyLoanCard<T_Value, T_OrderKey, T_Tag, T_Comp> T_Card;
 
 		typedef AutoKey<T_Tag> T_AutoKey;
 
@@ -67,7 +91,13 @@ namespace AutoKeyCollections
 		template <typename ...T_Args>
 		T_Card MakeCard(T_Args&& ...args)
 		{
-			return LoanDeck::MakeCard(mAutoKey, T_Value(std::forward <T_Args>(args)...));
+			return LoanDeck::MakeCard(mAutoKey, std::forward <T_Args>(args)...);
+		}
+
+		template <typename ...T_Args>
+		void MakeAndKeep(T_Args&& ...args)
+		{
+			LoanDeck::MakeAndKeep(mAutoKey, std::forward <T_Args>(args)...);
 		}
 	};
 };
