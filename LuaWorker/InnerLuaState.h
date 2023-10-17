@@ -25,7 +25,7 @@
 
 #include "Cancelable.h"
 #include "TaskResumeToken.h"
-#include "AutoKeyMap.h"
+#include "AutoKeyLoanDeck.h"
 
 #include "LogSection.h"
 #include "Task.h"
@@ -36,8 +36,6 @@ extern "C" {
 //#include "lualib.h"
 }
 
-using namespace AutoKeyDeck;
-
 namespace LuaWorker
 {
 
@@ -47,6 +45,9 @@ namespace LuaWorker
 	class InnerLuaState : public Cancelable
 	{
 	private:
+
+		typedef AutoKeyDeck::AutoKeyLoanDeck<std::shared_ptr<Task>,std::chrono::system_clock::time_point,int> T_SuspendedTaskDeck;
+		typedef T_SuspendedTaskDeck::CardType T_SuspendedTaskCard;
 
 		/// <summary>
 		/// Lua registry key to InnerLuaState instance pointer
@@ -76,10 +77,10 @@ namespace LuaWorker
 		lua_State* mLua;
 
 		//Access in worker thread only
-		std::chrono::duration<float> mSuspendCurrentTaskFor;
+		T_SuspendedTaskDeck mResumableTasks;
 
-		//Access in worker thread only
-		AutoKeyMap<int, Task> mResumableTasks;
+		std::chrono::system_clock::time_point mResumeCurrentTaskAt;
+		bool mCurrentTaskYielded;
 
 		//---------------------
 		// Private methods
@@ -90,9 +91,9 @@ namespace LuaWorker
 		/// The thread on which the task runs must be at the top of the stack for the internal state (mLua)
 		/// If there is a thread at index -1, it is popped
 		/// <param name="task">Task to push</param>
-		/// <param name="resumeAfter">If this is set to a positive value the task should be sheduled to resume after this delay</param>
+		/// <param name="resumeAt">Target resume time for this task</param>
 		/// </summary>
-		bool HandleSuspendedTask(std::shared_ptr<Task> task, TaskResumeToken<int>& resumeToken);
+		bool HandleSuspendedTask(std::shared_ptr<Task> task, std::chrono::system_clock::time_point resumeAt);
 
 		lua_State* GetTaskThread(int taskHandle);
 
@@ -114,11 +115,11 @@ namespace LuaWorker
 		/// <summary>
 		/// 
 		/// Lua syntax:
-		///		InLuaWorker.ResumeIn( millis )
+		///		InLuaWorker.YieldFor( millis, resultString )
 		/// </summary>
 		/// <param name="pL"></param>
 		/// <returns></returns>
-		static int l_ResumeIn(lua_State* pL);
+		static int l_YieldFor(lua_State* pL);
 
 	public:
 		/// <summary>
@@ -158,14 +159,14 @@ namespace LuaWorker
 		/// <param name="task">Task to execute</param>
 		/// <param name="resumeToken">Resume token output</param>
 		/// <returns>true if task can be resumed</returns>
-		bool ExecTask(std::shared_ptr<Task> task, TaskResumeToken<int> &resumeToken);
+		bool ExecTask(std::shared_ptr<Task> task);
 
 		/// <summary>
 		/// Resume task from a token
 		/// </summary>
 		/// <param name="resumeToken">Handle to task to return</param>
 		/// <returns>True if Task can be resumed again (pass resumeToken to the next call)</returns>
-		bool ResumeTask(TaskResumeToken<int>& resumeToken);
+		//bool ResumeTask(TaskResumeToken<int>& resumeToken);//TODO
 
 		/// <summary>
 		/// Raise cancel flag (ExecTask will throw a LuaCancellationException at next hook event)

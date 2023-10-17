@@ -47,7 +47,7 @@ namespace LuaWorker
 	{
 	private:
 
-		static AutoKeyMap<lua_Integer, Worker> sWorkers;
+		static AutoKeyDeck::AutoKeyMap<lua_Integer, Worker> sWorkers;
 		static lua_Integer sNextWorkerId;
 
 		//-------------------------------

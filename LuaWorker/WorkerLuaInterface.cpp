@@ -22,7 +22,7 @@
 #include "TaskDoSleep.h"
 
 using namespace LuaWorker;
-
+using namespace AutoKeyDeck;
 //-------------------------------
 // Static private objects
 //-------------------------------

@@ -69,7 +69,7 @@ namespace AutoKeyDeck
 	{
 	private:
 		typedef Internal::AutoKeyLoanCard<T_Value, T_OrderKey, T_Tag, T_Comp> T_Card;
-
+		typedef LoanDeck<Internal::AutoKeyLoanCard<T_Value, T_OrderKey, T_Tag, T_Comp>, Internal::AutoKeyLoanCard_SortOrder<T_Value, T_OrderKey, T_Comp>> T_Base;
 		typedef AutoKey<T_Tag> T_AutoKey;
 
 		//-------------------------------
@@ -85,7 +85,7 @@ namespace AutoKeyDeck
 		/// Default constructor
 		/// </summary>
 		AutoKeyLoanDeck() : 
-			LoanDeck(),
+			T_Base(),
 			mAutoKey(new AutoKey<T_Tag>())
 		{}
 
@@ -106,7 +106,7 @@ namespace AutoKeyDeck
 		/// <returns>The new card</returns>
 		T_Card MakeCard(T_Value&& value, T_OrderKey&& key = T_OrderKey())
 		{
-			return LoanDeck::MakeCard(mAutoKey, std::move(value), std::move(key));
+			return T_Base::MakeCard(mAutoKey, std::move(value), std::move(key));
 		}
 
 		/// <summary>
@@ -118,7 +118,7 @@ namespace AutoKeyDeck
 		/// <returns>The new card</returns>
 		T_Card MakeCard(const T_Value& value, const T_OrderKey& key = T_OrderKey())
 		{
-			return LoanDeck::MakeCard(mAutoKey, value, key);
+			return T_Base::MakeCard(mAutoKey, value, key);
 		}
 
 		/// <summary>
@@ -129,7 +129,7 @@ namespace AutoKeyDeck
 		/// <param name="key">Initial key used for ordering this card</param>
 		void MakeAndKeep(T_Value&& value, T_OrderKey&& key = T_OrderKey())
 		{
-			LoanDeck::MakeAndKeep(mAutoKey, std::move(value), std::move(key));
+			T_Base::MakeAndKeep(mAutoKey, std::move(value), std::move(key));
 		}
 
 		/// <summary>
@@ -140,7 +140,7 @@ namespace AutoKeyDeck
 		/// <param name="key">Initial key used for ordering this card</param>
 		void MakeAndKeep(const T_Value& value, const T_OrderKey& key = T_OrderKey())
 		{
-			LoanDeck::MakeAndKeep(mAutoKey, value, key);
+			T_Base::MakeAndKeep(mAutoKey, value, key);
 		}
 
 	};

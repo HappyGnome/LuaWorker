@@ -38,7 +38,6 @@ extern "C" {
 #include "lualib.h"
 }
 //using namespace std::chrono_literals;
-using namespace AutoKeyDeck;
 
 namespace LuaWorker
 {
@@ -49,7 +48,7 @@ namespace LuaWorker
 	{
 	private:
 
-		static AutoKeyMap<int, Task> sTasks;
+		static AutoKeyDeck::AutoKeyMap<int, Task> sTasks;
 
 		//-------------------------------
 		// Static Lua helper methods

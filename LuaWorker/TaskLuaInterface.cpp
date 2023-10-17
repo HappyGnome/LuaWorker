@@ -19,6 +19,7 @@
 #include "TaskLuaInterface.h"
 
 using namespace LuaWorker;
+using namespace AutoKeyDeck;
 
 AutoKeyMap<int, Task> TaskLuaInterface::sTasks(0);
 

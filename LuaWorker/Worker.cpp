@@ -123,8 +123,8 @@ void Worker::ThreadMainLoop(InnerLuaState& lua)
 					break;
 				}
 
-				TaskResumeToken<int> resumeTok;
-				if (lua.ExecTask(currentTask, resumeTok))
+				//TaskResumeToken<int> resumeTok;
+				if (lua.ExecTask(currentTask))
 				{
 					// TODO save task token to resume later
 				}

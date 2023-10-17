@@ -43,9 +43,9 @@ const char* InnerLuaState::cInLuaWorkerTableName = "InLuaWorker";
 // Private
 //----------------------
 
-bool InnerLuaState::HandleSuspendedTask(std::shared_ptr<Task> task, TaskResumeToken<int>& resumeToken)
+bool InnerLuaState::HandleSuspendedTask(std::shared_ptr<Task> task, std::chrono::system_clock::time_point resumeAt)
 {
-	if (mLua == nullptr || mSuspendCurrentTaskFor <= 0ms) return false;
+	if (mLua == nullptr) return false;
 
 	if (!lua_isthread(mLua, -1)) return false;
 
@@ -60,16 +60,16 @@ bool InnerLuaState::HandleSuspendedTask(std::shared_ptr<Task> task, TaskResumeTo
 		return false;
 	}
 
-	int newTaskHandle = mResumableTasks.push(task);
+	T_SuspendedTaskCard card  = mResumableTasks.MakeCard(std::move(task),std::move(resumeAt)); // TODO why not copy?
 
-	lua_pushinteger(mLua, newTaskHandle);
+	lua_pushinteger(mLua, card.GetTag());
 
 	lua_insert(mLua, -3); // handle (key) below thread
 	lua_insert(mLua, -3); // Threads table below handle
 
-	lua_settable(mLua, -3); // Add thread to threads table at newTaskHandle
+	lua_settable(mLua, -3); // Add thread to threads table at card tag index
 
-	resumeToken = std::move(TaskResumeToken<int>(mSuspendCurrentTaskFor, newTaskHandle));
+	T_SuspendedTaskCard::Return(std::move(card));
 
 	lua_settop(mLua, prevTop);
 	return true;
@@ -184,6 +184,34 @@ int InnerLuaState::l_Sleep(lua_State* pL)
 	return 0;
 }
 
+int InnerLuaState::l_YieldFor(lua_State* pL)
+{
+	InnerLuaState* pState = l_PopThis(pL);
+
+	if (pState != nullptr)
+	{
+		if (!lua_isnumber(pL, -1)) {
+			lua_pushstring(pL, "YieldFor expects parameters (<number>,...<results>)");
+			lua_error(pL);
+			return 0;
+		}
+		lua_Integer millis = lua_tointeger(pL, -1);
+		if (millis <= 0)
+		{
+			lua_pushstring(pL, "YieldFor delay must be positive");
+			lua_error(pL);
+			return 0;
+		}
+
+		pState -> mResumeCurrentTaskAt = system_clock::now() + (millis * 1ms);
+		pState -> mCurrentTaskYielded = true;
+
+		lua_pop(pL,1); // pop delay
+		return lua_yield(pL, lua_gettop(pL)); //Yield remaining parameters to resume
+	}
+	return 0;
+}
+
 //------
 void InnerLuaState::l_Hook(lua_State* pL, lua_Debug* pDebug)
 {
@@ -219,14 +247,16 @@ InnerLuaState::InnerLuaState(LogSection&& log)
 	: mLog(log), 
 	mCancel(false), 
 	mLua(nullptr), 
-	mResumableTasks(0),
-	mSuspendCurrentTaskFor (0ms) {}
+	mResumableTasks(),
+	mResumeCurrentTaskAt(),
+	mCurrentTaskYielded(){}
 InnerLuaState::InnerLuaState(const LogSection& log) 
 	: mLog(log), 
 	mCancel(false), 
 	mLua(nullptr), 
-	mResumableTasks(0),
-	mSuspendCurrentTaskFor(0ms) {}
+	mResumableTasks(),
+	mResumeCurrentTaskAt(),
+	mCurrentTaskYielded() {}
 
 //------
 InnerLuaState::~InnerLuaState()
@@ -265,6 +295,10 @@ void InnerLuaState::Open()
 		lua_pushcclosure(mLua, InnerLuaState::l_Sleep, 1);
 		lua_setfield(mLua, -2, "Sleep");
 
+		lua_pushlightuserdata(mLua, this);
+		lua_pushcclosure(mLua, InnerLuaState::l_YieldFor, 1);
+		lua_setfield(mLua, -2, "YieldFor");
+
 		lua_setglobal(mLua, cInLuaWorkerTableName);
 
 		// This pointer in registry
@@ -297,7 +331,7 @@ void InnerLuaState::Close()
 }
 
 //------
-bool InnerLuaState::ExecTask(std::shared_ptr<Task> task, TaskResumeToken<int>& resumeToken)
+bool InnerLuaState::ExecTask(std::shared_ptr<Task> task)
 {
 	if(mCancel) throw LuaCancellationException();
 
@@ -309,15 +343,13 @@ bool InnerLuaState::ExecTask(std::shared_ptr<Task> task, TaskResumeToken<int>& r
 
 		lua_State* taskThread = lua_newthread(mLua);
 
-		mSuspendCurrentTaskFor = 0ms;
+		mCurrentTaskYielded = false;
 
 		task->Exec(taskThread);
 
-		if (mSuspendCurrentTaskFor > 0ms
-			&& task->GetStatus() == TaskStatus::Suspended 
-				&& lua_status(taskThread) == LUA_YIELD)
+		if (mCurrentTaskYielded)
 		{
-			taskSuspended = HandleSuspendedTask(task, resumeToken);
+			taskSuspended = HandleSuspendedTask(task, mResumeCurrentTaskAt);
 		}
 
 		if (task->GetStatus() == TaskStatus::Suspended && !taskSuspended)
@@ -332,34 +364,35 @@ bool InnerLuaState::ExecTask(std::shared_ptr<Task> task, TaskResumeToken<int>& r
 }
 
 //------
-bool InnerLuaState::ResumeTask(TaskResumeToken<int>& resumeToken)
-{
-	std::shared_ptr<Task> task = mResumableTasks.at(resumeToken.GetHandle());
-
-	if (task == nullptr) return false;
-
-	lua_State* taskThread = GetTaskThread(resumeToken.GetHandle());
-
-	if (taskThread == nullptr) return false;
-
-	mSuspendCurrentTaskFor = 0ms;
-
-	task->Resume(taskThread);
-
-	if (mSuspendCurrentTaskFor > 0ms
-		&& task->GetStatus() == TaskStatus::Suspended
-		&& lua_status(taskThread) == LUA_YIELD)
-	{
-		resumeToken.Reschedule(mSuspendCurrentTaskFor);
-		return true;
-	}
-	else if (task->GetStatus() == TaskStatus::Suspended)
-	{
-		task->Cancel(); // Task was expecting to be resumed, but will not be
-	}
-
-	return false;
-}
+// //TODO
+//bool InnerLuaState::ResumeTask(TaskResumeToken<int>& resumeToken)
+//{
+//	std::shared_ptr<Task> task = mResumableTasks.at(resumeToken.GetHandle());
+//
+//	if (task == nullptr) return false;
+//
+//	lua_State* taskThread = GetTaskThread(resumeToken.GetHandle());
+//
+//	if (taskThread == nullptr) return false;
+//
+//	mSuspendCurrentTaskFor = 0ms;
+//
+//	task->Resume(taskThread);
+//
+//	if (mSuspendCurrentTaskFor > 0ms
+//		&& task->GetStatus() == TaskStatus::Suspended
+//		&& lua_status(taskThread) == LUA_YIELD)
+//	{
+//		resumeToken.Reschedule(mSuspendCurrentTaskFor);
+//		return true;
+//	}
+//	else if (task->GetStatus() == TaskStatus::Suspended)
+//	{
+//		task->Cancel(); // Task was expecting to be resumed, but will not be
+//	}
+//
+//	return false;
+//}
 
 //------
 void InnerLuaState::Cancel()
