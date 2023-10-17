@@ -23,11 +23,16 @@
 #include <list>
 
 #include "AutoKey.h"
-
+#include "Empty.h"
 
 namespace AutoKeyCollections
 {
-	template <typename T_Tag, typename T_Base>
+	/// <summary>
+	/// Chainable template class, holding a tag from an autokey. Automatically returning the key upon destruction.
+	/// </summary>
+	/// <typeparam name="T_Base">Base class in chain</typeparam>
+	/// <typeparam name="T_Tag">Tag type</typeparam>
+	template <typename T_Tag, class T_Base = Empty>
 	class AutoKeyCard : public T_Base
 	{
 		typedef std::shared_ptr <AutoKey<T_Tag>> T_AutoKey;
@@ -36,6 +41,9 @@ namespace AutoKeyCollections
 		T_Tag mTag;
 		T_AutoKey mAutoKey;
 
+		/// <summary>
+		/// Get tag from linked autokey
+		/// </summary>
 		void InitTag()
 		{
 			if (mAutoKey != nullptr) mTag = mAutoKey->Get();
@@ -43,8 +51,17 @@ namespace AutoKeyCollections
 
 	public:
 
+		/// <summary>
+		/// Default constructor
+		/// </summary>
 		AutoKeyCard() : mAutoKey(),mTag(){}
 
+		/// <summary>
+		/// Chained fully-initializing constructor
+		/// </summary>
+		/// <typeparam name="...T_Args"></typeparam>
+		/// <param name="autoKey">Home autokey</param>
+		/// <param name="...args">Args for base class</param>
 		template <typename ...T_Args>
 		explicit AutoKeyCard(const T_AutoKey& autoKey, T_Args&& ...args)
 			: T_Base(std::forward<T_Args>(args)...), mAutoKey(autoKey)
@@ -52,17 +69,36 @@ namespace AutoKeyCollections
 			InitTag();
 		}
 
+		/// <summary>
+		/// Move constructor
+		/// </summary>
+		/// <param name=""></param>
 		AutoKeyCard(AutoKeyCard&&) = default;
+
+		/// <summary>
+		/// Move assignment
+		/// </summary>
+		/// <param name=""></param>
+		/// <returns></returns>
 		AutoKeyCard& operator=(AutoKeyCard&&) = default;
 
 		/// <summary>
-		/// Copy constructor
+		/// Copy constructor deleted
 		/// Not copyable (Tags must remain unique)
 		/// </summary>
 		/// <param name=""></param>
 		AutoKeyCard(const AutoKeyCard&) = delete;
+
+		/// <summary>
+		/// Copy assignment deleted
+		/// Not copyable (Tags must remain unique)
+		/// </summary>
+		/// <param name=""></param>
 		AutoKeyCard& operator=(const AutoKeyCard&) = delete;
 
+		/// <summary>
+		/// Destructor - return key to autokey
+		/// </summary>
 		~AutoKeyCard()
 		{
 			try
@@ -76,22 +112,14 @@ namespace AutoKeyCollections
 			}
 		}
 
+		/// <summary>
+		/// Tag getter
+		/// </summary>
+		/// <returns>Tag assigned to this</returns>
 		T_Tag GetTag()
 		{
 			return mTag;
 		}
-
-		/*const typename T_ValueGet::T_Value& GetValue() const
-		{
-			T_ValueGet get{};
-			return get(mValue);
-		}
-
-		typename T_ValueGet::T_Value& GetValue()
-		{
-			T_ValueGet get{};
-			return get(mValue);
-		}*/ //TODO
 	};
 };
 

@@ -202,9 +202,9 @@
     <ClInclude Include="AutoKeyCard.h" />
     <ClInclude Include="AutoKeyMap.h" />
     <ClInclude Include="Cancelable.h" />
+    <ClInclude Include="Empty.h" />
     <ClInclude Include="LoanDeck.h" />
     <ClInclude Include="InnerLuaState.h" />
-    <ClInclude Include="AutoKeyLess.h" />
     <ClInclude Include="LogLevel.h" />
     <ClInclude Include="LogOutput.h" />
     <ClInclude Include="LogSection.h" />

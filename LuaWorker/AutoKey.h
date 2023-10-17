@@ -24,8 +24,6 @@
 #include <vector>
 #include <map>
 
-
-
 namespace AutoKeyCollections
 {
 	/// <summary>
@@ -53,6 +51,9 @@ namespace AutoKeyCollections
 		/// <param name="k0">Initial key value</param>
 		explicit AutoKey(K k0) : mNextNewKey(k0) {}
 
+		/// <summary>
+		/// Default constructor
+		/// </summary>
 		explicit AutoKey() : mNextNewKey() {}
 
 		/// <summary>

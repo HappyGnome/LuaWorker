@@ -21,15 +21,16 @@
 #pragma once
 
 #include <functional>
+#include "Empty.h"
 
 namespace AutoKeyCollections
 {
 	/// <summary>
-	/// Wrapper for SortedDeck which tags each contained object with a key. Keys may be reused but no two objects will hold the same key at once.
+	/// Chainable template class, adding a sort order via member keys.
 	/// </summary>
-	/// <typeparam name="V">Value type</typeparam>
-	/// <typeparam name="Comp">Key comparator</typeparam>
-	template <typename T_OrderKey, class T_Base>
+	/// <typeparam name="T_Base">Chain base class</typeparam>
+	/// <typeparam name="T_OrderKey"></typeparam>
+	template <typename T_OrderKey, class T_Base = Empty>
 	class Sortable : public T_Base
 	{
 	private:
@@ -38,49 +39,87 @@ namespace AutoKeyCollections
 	public:
 
 		/// <summary>
-		/// Constructor
+		/// Default constructor
 		/// </summary>
 		Sortable() 
 			: T_Base(),mKey() {}
 
+		/// <summary>
+		/// Chainable constructor with default order key
+		/// </summary>
+		/// <typeparam name="...T_Args"></typeparam>
+		/// <param name="...args">Args for base class</param>
 		template<typename ...T_Args>
 		explicit Sortable(T_Args&& ...args) 
 			: T_Base(std::forward<T_Args>(args)...), mKey() {}
 
+		/// <summary>
+		/// Chainable constructor setting order key
+		/// </summary>
+		/// <typeparam name="...T_Args"></typeparam>
+		/// <param name="key">Sort key</param>
+		/// <param name="...args">Args for base class</param>
 		template<typename ...T_Args>
 		explicit Sortable(const T_OrderKey& key, T_Args&& ...args)
 			: T_Base(std::forward<T_Args>(args)...), mKey(key) {}
 
+		/// <summary>
+		/// Chainable constructor setting order key
+		/// </summary>
+		/// <typeparam name="...T_Args"></typeparam>
+		/// <param name="key">Sort key</param>
+		/// <param name="...args">Args for base class</param>
 		template<typename ...T_Args>
 		explicit Sortable(T_OrderKey&& key, T_Args&& ...args)
 			: T_Base(std::forward<T_Args>(args)...), mKey(std::move(key)) {}
 
 
+		/// <summary>
+		/// (Re)assign sort key
+		/// </summary>
+		/// <param name="key"></param>
 		void SetSortKey(const T_OrderKey& key) 
 		{ 
 			mKey = key; 
 		}
 
+		/// <summary>
+		/// (Re)assign sort key
+		/// </summary>
+		/// <param name="key"></param>
 		void SetSortKey(T_OrderKey&& key) 
 		{ 
 			mKey = std::move(key); 
 		}
 
+		/// <summary>
+		/// Returns current sort key
+		/// </summary>
+		/// <returns></returns>
 		const T_OrderKey& GetSortKey() const
 		{
 			return mKey;
 		}
 
+		/// <summary>
+		/// Sample implementation of an ordering class, compatible with popIfLess functionality of LoanDeck
+		/// </summary>
 		template<class T_Comp>
 		class Order
 		{
 		public:
+			/// <summary>
+			/// Compares sort cards directly
+			/// </summary>
 			bool operator()(const Sortable& a, const Sortable& b)
 			{
 				T_Comp less{};
 				return less(a.mKey, b.mKey);
 			}
 
+			/// <summary>
+			/// Compares a sort card with a raw orderkey
+			/// </summary>
 			bool operator()(const Sortable& a, const T_OrderKey& b)
 			{
 				T_Comp less{};

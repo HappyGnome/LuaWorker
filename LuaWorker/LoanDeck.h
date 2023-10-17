@@ -23,7 +23,6 @@
 #include<list>
 #include<optional>
 
-#include "AutoKeyLess.h"
 #include "SortedDeck.h"
 #include "LoanCard.h"
 //#include "SimpleValueR.h"
@@ -31,10 +30,10 @@
 namespace AutoKeyCollections
 {
 	/// <summary>
-	/// Wrapper for SortedDeck which tags each contained object with a key. Keys may be reused but no two objects will hold the same key at once.
+	/// Wrapper for SortedDeck and factory for LoanCards linked to it.
 	/// </summary>
-	/// <typeparam name="V">Value type</typeparam>
-	/// <typeparam name="Comp">Key comparator</typeparam>
+	/// <typeparam name="T_Card">Card type</typeparam>
+	/// <typeparam name="T_Comp">Card comparison class</typeparam>
 	template <typename T_Card,
 			  class T_Comp>
 	class LoanDeck
@@ -50,41 +49,80 @@ namespace AutoKeyCollections
 		std::shared_ptr<T_Deck> mDeck;
 	public:
 
+		//-------------------------------
+		// Public methods
+		//-------------------------------
+
 		/// <summary>
-		/// Constructor
+		/// Default constructor
 		/// </summary>
-		explicit LoanDeck() :
+		LoanDeck() :
 			mDeck(new T_Deck())
 		{}
 
+		/// <summary>
+		/// Construct a card with this a home deck and return it to caller.
+		/// </summary>
+		/// <typeparam name="...T_Args"></typeparam>
+		/// <param name="...args">Arguments for the card constructor</param>
+		/// <returns>The new card</returns>
 		template<typename... T_Args>
 		T_Card MakeCard(T_Args&& ...args)
 		{			
 			return T_Card(mDeck, std::forward <T_Args>(args)...);
 		}
 
+		/// <summary>
+		/// Construct a card with this a home deck and add it to the deck.
+		/// </summary>
+		/// <typeparam name="...T_Args"></typeparam>
+		/// <param name="...args">Arguments for the card constructor</param>
 		template<typename... T_Args>
 		void MakeAndKeep(T_Args&& ...args)
 		{
 			T_Card::Return(T_Card(mDeck, std::forward <T_Args>(args)...));
 		}
 
+		/// <summary>
+		/// Try to remove top card of the deck.
+		/// </summary>
+		/// <param name="out">Set to the card popped on success</param>
+		/// <returns>True if a card was removed from the deck</returns>
 		bool Pop(T_Card& out)
 		{
 			return mDeck->Pop(out);
 		}
 
+		/// <summary>
+		/// Try to remove top card of the deck
+		/// </summary>
+		/// <returns>True if a card was removed from the deck</returns>
 		bool Pop()
 		{
 			return mDeck->Pop();
 		}
 
+		/// <summary>
+		/// Conditionally pop the top card of the deck
+		/// </summary>
+		/// <typeparam name="T_Threshold"></typeparam>
+		/// <typeparam name="T_ThreshComp">Comparison class (see std::less)</typeparam>
+		/// <param name="thresh">Value to which the top card is compared</param>
+		/// <param name="out">Receives popped value</param>
+		/// <returns>True if card removed from deck</returns>
 		template <typename T_Threshold, class T_ThreshComp = T_Comp>
 		bool  PopIfLess(const T_Threshold& thresh, T_Card& out)
 		{
 			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(thresh, out);
 		}
 
+		/// <summary>
+		/// Conditionally pop the top card of the deck
+		/// </summary>
+		/// <typeparam name="T_Threshold"></typeparam>
+		/// <typeparam name="T_ThreshComp">Comparison class (see std::less)</typeparam>
+		/// <param name="thresh">Value to which the top card is compared</param>
+		/// <returns>True if card removed from deck</returns>
 		template <typename T_Threshold, class T_ThreshComp = T_Comp>
 		bool  PopIfLess(const T_Threshold& thresh)
 		{

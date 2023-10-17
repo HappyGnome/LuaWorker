@@ -23,9 +23,6 @@
 #include<list>
 #include<optional>
 
-#include "AutoKeyLess.h"
-
-
 namespace AutoKeyCollections
 {
 	/// <summary>
@@ -47,7 +44,7 @@ namespace AutoKeyCollections
 	public:
 
 		/// <summary>
-		/// Constructor
+		/// Default constructor
 		/// </summary>
 		SortedDeck() {}
 
@@ -101,7 +98,7 @@ namespace AutoKeyCollections
 		/// Pop the first element of the deck, if it is less that a comparable value threshold
 		/// </summary>
 		/// <typeparam name="T_Threshold">Type of threshold</typeparam>
-		/// <typeparam name="T_ThreshComp">Class implementing () operator for comparisson</typeparam>
+		/// <typeparam name="T_ThreshComp">Class implementing () operator for comparison</typeparam>
 		/// <param name="thresh">Cuttoff</param>
 		/// <param name="out">Value popped</param>
 		/// <returns>True if value popped</returns>
@@ -119,7 +116,7 @@ namespace AutoKeyCollections
 		/// Pop the first element of the deck, if it is less that a comparable value threshold
 		/// </summary>
 		/// <typeparam name="T_Threshold">Type of threshold</typeparam>
-		/// <typeparam name="T_ThreshComp">Class implementing () operator for comparisson</typeparam>
+		/// <typeparam name="T_ThreshComp">Class implementing () operator for comparison</typeparam>
 		/// <param name="thresh">Cuttoff</param>
 		/// <returns>True if value popped</returns>
 		template <typename T_Threshold, class T_ThreshComp = T_Comp>

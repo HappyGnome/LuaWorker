@@ -23,26 +23,42 @@
 #include <list>
 #include <memory>
 
-#include "AutoKeyLess.h"
 #include "SortedDeck.h"
 #include "ValueGetter.h"
 #include "SimpleValueR.h"
+#include "Empty.h"
 
 namespace AutoKeyCollections
 {
-	template <class T_Comp,class T_Base>
+	/// <summary>
+	/// Chainable template class with a linked home LoanDeck, to which instances can be returned
+	/// </summary>
+	/// <typeparam name="T_Base">Base class in the chain</typeparam>
+	/// <typeparam name="T_Comp">Class whose operator() compares instances</typeparam>
+	template <class T_Comp,class T_Base = Empty>
 	class LoanCard : public T_Base
 	{	
 	private:
-		//Typedefs
 
+		//Typedefs
 		using T_HomeDeck = std::shared_ptr<SortedDeck<LoanCard, T_Comp>>;
+
+		//-------------------------------
+		// Properties
+		//-------------------------------
 
 		T_HomeDeck mHomeDeck;
 
 	public:
 
-		//Static
+		//-------------------------------
+		// Static methods
+		//-------------------------------
+
+		/// <summary>
+		/// Move a card back to its home deck
+		/// </summary>
+		/// <param name="card">Card to move</param>
 		static void Return(LoanCard&& card)
 		{
 			if (card.mHomeDeck == nullptr) return;
@@ -55,15 +71,22 @@ namespace AutoKeyCollections
 		// Public methods
 		//-------------------------------
 
+		/// <summary>
+		/// Default constructor
+		/// </summary>
 		LoanCard()
 			: T_Base(), mHomeDeck() {}
 
+		/// <summary>
+		/// Chainable constructor, setting the instance home deck
+		/// </summary>
+		/// <typeparam name="...T_Args"></typeparam>
+		/// <param name="homeDeck"></param>
+		/// <param name="...args"></param>
 		template<typename ...T_Args>
 		explicit LoanCard(const T_HomeDeck& homeDeck,T_Args&& ...args)
 			: T_Base(std::forward<T_Args>(args)...), mHomeDeck(homeDeck){}
 
-		LoanCard(LoanCard&&) = default;
-		LoanCard& operator=(LoanCard&&) = default;
 	};
 };
 

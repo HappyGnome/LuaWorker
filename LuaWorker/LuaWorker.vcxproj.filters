@@ -96,9 +96,6 @@
     <ClInclude Include="TaskResumeToken.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="AutoKeyLess.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
     <ClInclude Include="AutoKeyLoanDeck.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
@@ -115,6 +112,9 @@
       <Filter>Header Files\General</Filter>
     </ClInclude>
     <ClInclude Include="ValueGetter.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Empty.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>

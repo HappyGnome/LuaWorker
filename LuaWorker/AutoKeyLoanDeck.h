@@ -23,7 +23,6 @@
 #include<list>
 #include<optional>
 
-#include "AutoKeyLess.h"
 #include "LoanDeck.h"
 #include "AutoKey.h"
 #include "AutoKeyCard.h"
@@ -36,7 +35,7 @@ namespace AutoKeyCollections
 	{
 		template<typename T_Value,
 			typename T_OrderKey>
-		using AutoKeyLoanCard_Sortable = Sortable<T_OrderKey, SimpleValueR_Base<T_Value>>;
+		using AutoKeyLoanCard_Sortable = SimpleValueR<T_Value,Sortable<T_OrderKey>>;
 
 		template<typename T_Value,
 			typename T_OrderKey,
@@ -56,10 +55,12 @@ namespace AutoKeyCollections
 	};
 
 	/// <summary>
-	/// Wrapper for SortedDeck which tags each contained object with a key. Keys may be reused but no two objects will hold the same key at once.
+	/// A LoanDeck with built in autokey and sortable cards for specified value type
 	/// </summary>
-	/// <typeparam name="V">Value type</typeparam>
-	/// <typeparam name="Comp">Key comparator</typeparam>
+	/// <typeparam name="T_Value">Value type held by the card</typeparam>
+	/// <typeparam name="T_OrderKey">Type used to sort the cards</typeparam>
+	/// <typeparam name="T_Tag">Type used to uniquelly* tag each card. *Tags are unique at any time, but may be reused.</typeparam>
+	/// <typeparam name="T_Comp">Comparison class used to sort cards by order key</typeparam>
 	template <typename T_Value,
 		typename T_OrderKey,
 		typename T_Tag = std::size_t,
@@ -81,24 +82,67 @@ namespace AutoKeyCollections
 		typedef T_Card CardType;
 
 		/// <summary>
-		/// Constructor
+		/// Default constructor
 		/// </summary>
 		AutoKeyLoanDeck() : 
 			LoanDeck(),
 			mAutoKey(new AutoKey<T_Tag>())
 		{}
 
-		template <typename ...T_Args>
-		T_Card MakeCard(T_Args&& ...args)
+		// Hide Make functions - give these more concrete implementations below
+		template<typename... T_Args>
+		T_Card MakeCard(T_Args&& ...args) = delete;
+
+		// Hide Make functions - give these more concrete implementations below
+		template<typename... T_Args>
+		void MakeAndKeep(T_Args&& ...args) = delete;
+
+		/// <summary>
+		/// Create a new card and return it (the card is not held by the deck).
+		/// Arguments moved.
+		/// </summary>
+		/// <param name="value">Value held by new card</param>
+		/// <param name="key">Initial key used for ordering this card</param>
+		/// <returns>The new card</returns>
+		T_Card MakeCard(T_Value&& value, T_OrderKey&& key = T_OrderKey())
 		{
-			return LoanDeck::MakeCard(mAutoKey, std::forward <T_Args>(args)...);
+			return LoanDeck::MakeCard(mAutoKey, std::move(value), std::move(key));
 		}
 
-		template <typename ...T_Args>
-		void MakeAndKeep(T_Args&& ...args)
+		/// <summary>
+		/// Create a new card and return it (the card is not held by the deck).
+		/// Arguments copied.
+		/// </summary>
+		/// <param name="value">Value held by new card</param>
+		/// <param name="key">Initial key used for ordering this card</param>
+		/// <returns>The new card</returns>
+		T_Card MakeCard(const T_Value& value, const T_OrderKey& key = T_OrderKey())
 		{
-			LoanDeck::MakeAndKeep(mAutoKey, std::forward <T_Args>(args)...);
+			return LoanDeck::MakeCard(mAutoKey, value, key);
 		}
+
+		/// <summary>
+		/// Create a new card and add it to the deck.
+		/// Arguments moved.
+		/// </summary>
+		/// <param name="value">Value held by new card</param>
+		/// <param name="key">Initial key used for ordering this card</param>
+		void MakeAndKeep(T_Value&& value, T_OrderKey&& key = T_OrderKey())
+		{
+			LoanDeck::MakeAndKeep(mAutoKey, std::move(value), std::move(key));
+		}
+
+		/// <summary>
+		/// Create a new card and add it to the deck.
+		/// Arguments copied.
+		/// </summary>
+		/// <param name="value">Value held by new card</param>
+		/// <param name="key">Initial key used for ordering this card</param>
+		void MakeAndKeep(const T_Value& value, const T_OrderKey& key = T_OrderKey())
+		{
+			LoanDeck::MakeAndKeep(mAutoKey, value, key);
+		}
+
 	};
 };
 #endif
