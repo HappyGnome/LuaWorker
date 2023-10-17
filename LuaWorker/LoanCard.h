@@ -24,7 +24,6 @@
 #include <memory>
 
 #include "SortedDeck.h"
-#include "ValueGetter.h"
 #include "SimpleValueR.h"
 #include "Empty.h"
 
