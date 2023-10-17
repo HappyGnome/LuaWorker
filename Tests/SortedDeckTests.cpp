@@ -17,10 +17,10 @@
 \*****************************************************************************/
 
 #include "CppUnitTest.h"
-#include "../LuaWorker/SortedDeck.h"
+#include "SortedDeck.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace AutoKeyCollections;
+using namespace AutoKeyDeck;
 
 namespace Tests
 {

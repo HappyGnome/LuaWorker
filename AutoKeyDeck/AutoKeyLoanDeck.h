@@ -29,7 +29,7 @@
 #include "Sortable.h"
 #include "SimpleValueR.h"
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 	namespace Internal
 	{

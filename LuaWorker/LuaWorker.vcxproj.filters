@@ -90,28 +90,7 @@
     <ClInclude Include="InnerLuaState.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
-    <ClInclude Include="AutoKeyMap.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
     <ClInclude Include="TaskResumeToken.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="AutoKeyLoanDeck.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="AutoKey.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="AutoKeyCard.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="LoanDeck.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="Sortable.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="Empty.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
@@ -154,15 +133,6 @@
     </ClCompile>
     <ClCompile Include="InnerLuaState.cpp">
       <Filter>Source Files\LuaInterface</Filter>
-    </ClCompile>
-    <ClCompile Include="SortedDeck.h">
-      <Filter>Header Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="LoanCard.h">
-      <Filter>Header Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleValueR.h">
-      <Filter>Header Files\General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@
 #include<list>
 #include<optional>
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 	/// <summary>
 	/// Simple template class to maintain a sorted list, allowing removal at the front, and random inserts

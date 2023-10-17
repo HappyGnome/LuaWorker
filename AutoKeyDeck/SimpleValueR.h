@@ -24,7 +24,7 @@
 
 #include "Empty.h"
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 
 	/// <summary>

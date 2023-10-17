@@ -20,7 +20,7 @@
 #define _EMPTY_H_
 #pragma once
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 	/// <summary>
 	/// Trivial base class for template class chain

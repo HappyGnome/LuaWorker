@@ -27,7 +27,7 @@
 #include "LoanCard.h"
 //#include "SimpleValueR.h"
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 	/// <summary>
 	/// Wrapper for SortedDeck and factory for LoanCards linked to it.

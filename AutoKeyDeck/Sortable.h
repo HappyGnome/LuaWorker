@@ -23,7 +23,7 @@
 #include <functional>
 #include "Empty.h"
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 	/// <summary>
 	/// Chainable template class, adding a sort order via member keys.

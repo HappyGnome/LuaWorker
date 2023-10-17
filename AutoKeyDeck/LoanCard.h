@@ -27,7 +27,7 @@
 #include "SimpleValueR.h"
 #include "Empty.h"
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 	/// <summary>
 	/// Chainable template class with a linked home LoanDeck, to which instances can be returned

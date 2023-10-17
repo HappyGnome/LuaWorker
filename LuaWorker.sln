@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LuaReferenceSections", "Lua
 		Docs\LuaReferenceSections\LuaWorkerModule.md = Docs\LuaReferenceSections\LuaWorkerModule.md
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoKeyDeck", "AutoKeyDeck\AutoKeyDeck.vcxproj", "{9107DD88-B029-4DC5-BFF7-7D931F16615B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -60,6 +62,14 @@ Global
 		{F656E9AE-7909-4FFB-966F-E084B32797E1}.Release|x64.Build.0 = Release|x64
 		{F656E9AE-7909-4FFB-966F-E084B32797E1}.Release|x86.ActiveCfg = Release|Win32
 		{F656E9AE-7909-4FFB-966F-E084B32797E1}.Release|x86.Build.0 = Release|Win32
+		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Debug|x64.ActiveCfg = Debug|x64
+		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Debug|x64.Build.0 = Debug|x64
+		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Debug|x86.ActiveCfg = Debug|Win32
+		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Debug|x86.Build.0 = Debug|Win32
+		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Release|x64.ActiveCfg = Release|x64
+		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Release|x64.Build.0 = Release|x64
+		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Release|x86.ActiveCfg = Release|Win32
+		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

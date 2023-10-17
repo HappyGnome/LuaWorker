@@ -38,7 +38,7 @@ extern "C" {
 #include "lualib.h"
 }
 //using namespace std::chrono_literals;
-using namespace AutoKeyCollections;
+using namespace AutoKeyDeck;
 
 namespace LuaWorker
 {

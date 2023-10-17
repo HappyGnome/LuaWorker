@@ -24,7 +24,7 @@
 #include <vector>
 #include <map>
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 	/// <summary>
 	/// Template class to generate and recycle keys/tags

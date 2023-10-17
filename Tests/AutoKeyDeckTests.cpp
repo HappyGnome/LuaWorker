@@ -19,10 +19,10 @@
 #include <string>
 
 #include "CppUnitTest.h"
-#include "../LuaWorker/AutoKeyLoanDeck.h"
+#include "AutoKeyLoanDeck.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace AutoKeyCollections;
+using namespace AutoKeyDeck;
 
 namespace Tests
 {

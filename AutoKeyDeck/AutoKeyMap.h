@@ -27,7 +27,7 @@
 
 #include "AutoKey.h"
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 	/// <summary>
 	/// Simple template class to push and pop a collection of objects 

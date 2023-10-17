@@ -25,7 +25,7 @@
 #include "AutoKey.h"
 #include "Empty.h"
 
-namespace AutoKeyCollections
+namespace AutoKeyDeck
 {
 	/// <summary>
 	/// Chainable template class, holding a tag from an autokey. Automatically returning the key upon destruction.
