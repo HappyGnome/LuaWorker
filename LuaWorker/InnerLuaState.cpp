@@ -28,7 +28,7 @@ extern "C" {
 
 #include <chrono>
 
-#include "TaskResumeToken.h"
+#include "TaskExecPack.h"
 
 using namespace std::chrono_literals;
 using std::chrono::system_clock;
@@ -43,7 +43,7 @@ const char* InnerLuaState::cInLuaWorkerTableName = "InLuaWorker";
 // Private
 //----------------------
 
-bool InnerLuaState::HandleSuspendedTask(std::shared_ptr<Task> task, std::chrono::system_clock::time_point resumeAt)
+bool InnerLuaState::HandleSuspendedTask(TaskExecPack&& task, std::chrono::system_clock::time_point resumeAt)
 {
 	if (mLua == nullptr) return false;
 
@@ -60,7 +60,7 @@ bool InnerLuaState::HandleSuspendedTask(std::shared_ptr<Task> task, std::chrono:
 		return false;
 	}
 
-	T_SuspendedTaskCard card  = mResumableTasks.MakeCard(task,resumeAt);
+	T_SuspendedTaskCard card  = mResumableTasks.MakeCard(std::move(task),resumeAt);
 
 	lua_pushinteger(mLua, card.GetTag());
 
@@ -331,11 +331,9 @@ void InnerLuaState::Close()
 }
 
 //------
-bool InnerLuaState::ExecTask(std::shared_ptr<Task> task)
+void InnerLuaState::ExecTask(TaskExecPack&& task)
 {
 	if(mCancel) throw LuaCancellationException();
-
-	bool taskSuspended = false;
 
 	if (mLua != nullptr)
 	{
@@ -345,22 +343,15 @@ bool InnerLuaState::ExecTask(std::shared_ptr<Task> task)
 
 		mCurrentTaskYielded = false;
 
-		task->Exec(taskThread);
+		task.Exec(taskThread);
 
 		if (mCurrentTaskYielded)
 		{
-			taskSuspended = HandleSuspendedTask(task, mResumeCurrentTaskAt);
-		}
-
-		if (task->GetStatus() == TaskStatus::Suspended && !taskSuspended)
-		{
-			task->Cancel();  // Task was expecting to be resumed, but will not be
+			HandleSuspendedTask(std::move(task), mResumeCurrentTaskAt);
 		}
 
 		lua_settop(mLua, prevTop);
 	}
-
-	return taskSuspended;
 }
 
 //------

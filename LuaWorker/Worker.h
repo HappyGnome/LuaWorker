@@ -27,6 +27,7 @@
 #include <mutex> 
 
 #include "Task.h"
+#include "TaskExecPack.h"
 #include "LogSection.h"
 #include "InnerLuaState.h"
 #include "Cancelable.h"
@@ -57,7 +58,7 @@ namespace LuaWorker
 
 		std::thread mThread;
 
-		std::deque<std::shared_ptr<Task>> mTaskQueue;
+		std::deque<TaskExecPack> mTaskQueue;
 		std::mutex mTasksMtx;
 
 		std::condition_variable mTaskCancelCv;

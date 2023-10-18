@@ -210,7 +210,7 @@
     <ClInclude Include="TaskDoString.h" />
     <ClInclude Include="TaskLuaInterface.h" />
     <ClInclude Include="TaskDoSleep.h" />
-    <ClInclude Include="TaskResumeToken.h" />
+    <ClInclude Include="TaskExecPack.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="WorkerLuaInterface.h" />
   </ItemGroup>
@@ -223,6 +223,7 @@
     <ClCompile Include="LuaCancellationException.cpp" />
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="TaskDoFile.cpp" />
+    <ClCompile Include="TaskExecPack.cpp" />
     <ClCompile Include="TaskLuaInterface.cpp" />
     <ClCompile Include="TaskDoSleep.cpp" />
     <ClCompile Include="TaskDoString.cpp" />

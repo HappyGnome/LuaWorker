@@ -16,7 +16,10 @@
 *
 \*****************************************************************************/
 
+#include<functional>
+
 #include "Worker.h"
+#include "TaskExecPack.h"
 
 using namespace LuaWorker;
 
@@ -94,7 +97,7 @@ void Worker::ThreadMainLoop(InnerLuaState& lua)
 
 	try
 	{
-		std::shared_ptr<Task> currentTask;
+		std::optional<TaskExecPack> currentTask;
 
 		while (!mCancel)
 		{
@@ -104,7 +107,7 @@ void Worker::ThreadMainLoop(InnerLuaState& lua)
 
 				if (!mTaskQueue.empty())
 				{
-					currentTask = mTaskQueue.front();
+					currentTask = std::optional<TaskExecPack>(std::move(mTaskQueue.front()));
 					mTaskQueue.pop_front();
 					break;
 				}
@@ -113,31 +116,17 @@ void Worker::ThreadMainLoop(InnerLuaState& lua)
 			}
 
 			if (mCancel) break;
-			else if (currentTask == nullptr || currentTask->GetStatus() != TaskStatus::NotStarted) continue;
+			else if (!currentTask.has_value() || currentTask->GetStatus() != TaskStatus::NotStarted) continue;
 
-			try
+			if (!lua.IsOpen())
 			{
-				if (!lua.IsOpen())
-				{
-					mLog.Push(LogLevel::Error, "Lua not initialized.");
-					break;
-				}
-
-				//TaskResumeToken<int> resumeTok;
-				if (lua.ExecTask(currentTask))
-				{
-					// TODO save task token to resume later
-				}
-
-				if (currentTask->GetStatus() == TaskStatus::Error) mLog.Push(LogLevel::Error, currentTask->GetError());
-
-				currentTask = nullptr;
+				mLog.Push(LogLevel::Error, "Lua not initialized.");
+				break;
 			}
-			catch (const std::exception& ex)
-			{
-				mLog.Push(ex);
-				currentTask->SetError("Exeception occurred during execution");
-			}
+
+			//TaskResumeToken<int> resumeTok;
+			lua.ExecTask(std::move(currentTask.value()));
+
 		}
 	}
 	catch (const std::exception& ex)
@@ -170,7 +159,7 @@ void Worker::CancelAllTasks()
 
 	for (auto it = mTaskQueue.begin(); it != mTaskQueue.end(); ++it)
 	{
-		(*it)->Cancel();
+		(*it).Cancel();
 	}
 
 	mTaskQueue.clear();
@@ -236,6 +225,8 @@ WorkerStatus Worker::Stop()
 //------
 WorkerStatus Worker::AddTask(std::shared_ptr<Task> task)
 {	
+	TaskExecPack pack(task, LogSection(mLog));
+
 	{
 		std::unique_lock<std::mutex> lock(mTasksMtx);
 
@@ -245,7 +236,7 @@ WorkerStatus Worker::AddTask(std::shared_ptr<Task> task)
 			return mCurrentStatus;
 		}
 
-		mTaskQueue.push_back(task);
+		mTaskQueue.push_back(std::move(pack));
 	}
 	mTaskCancelCv.notify_all();
 

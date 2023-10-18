@@ -90,8 +90,8 @@
     <ClInclude Include="InnerLuaState.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
-    <ClInclude Include="TaskResumeToken.h">
-      <Filter>Header Files\General</Filter>
+    <ClInclude Include="TaskExecPack.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +133,9 @@
     </ClCompile>
     <ClCompile Include="InnerLuaState.cpp">
       <Filter>Source Files\LuaInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskExecPack.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

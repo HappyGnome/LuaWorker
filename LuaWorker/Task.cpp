@@ -244,7 +244,7 @@ void Task::Cancel()
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
-		mStatus = TaskStatus::Cancelled;
+		if (!IsFinal(mStatus)) mStatus = TaskStatus::Cancelled;
 	}
 	mResultStatusCv.notify_all();
 }
