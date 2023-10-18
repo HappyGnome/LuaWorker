@@ -59,37 +59,18 @@ namespace AutoKeyDeck
 		/// <typeparam name="...T_Args"></typeparam>
 		/// <param name="key">Sort key</param>
 		/// <param name="...args">Args for base class</param>
-		template<typename ...T_Args>
-		explicit Sortable(const T_OrderKey& key, T_Args&& ...args)
-			: T_Base(std::forward<T_Args>(args)...), mKey(key) {}
-
-		/// <summary>
-		/// Chainable constructor setting order key
-		/// </summary>
-		/// <typeparam name="...T_Args"></typeparam>
-		/// <param name="key">Sort key</param>
-		/// <param name="...args">Args for base class</param>
-		template<typename ...T_Args>
-		explicit Sortable(T_OrderKey&& key, T_Args&& ...args)
-			: T_Base(std::forward<T_Args>(args)...), mKey(std::move(key)) {}
-
+		template<typename T_O = T_OrderKey, typename ...T_Args>
+		explicit Sortable(T_O&& key, T_Args&& ...args)
+			: T_Base(std::forward<T_Args>(args)...), mKey(std::forward<T_O>(key)) {}
 
 		/// <summary>
 		/// (Re)assign sort key
 		/// </summary>
 		/// <param name="key"></param>
-		void SetSortKey(const T_OrderKey& key) 
+		template<typename T_O = T_OrderKey>
+		void SetSortKey(T_O&& key) 
 		{ 
-			mKey = key; 
-		}
-
-		/// <summary>
-		/// (Re)assign sort key
-		/// </summary>
-		/// <param name="key"></param>
-		void SetSortKey(T_OrderKey&& key) 
-		{ 
-			mKey = std::move(key); 
+			mKey = std::forward<T_O>(key);
 		}
 
 		/// <summary>

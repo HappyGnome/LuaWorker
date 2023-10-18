@@ -111,9 +111,9 @@ namespace AutoKeyDeck
 		/// <param name="out">Receives popped value</param>
 		/// <returns>True if card removed from deck</returns>
 		template <typename T_Threshold, class T_ThreshComp = T_Comp>
-		bool  PopIfLess(const T_Threshold& thresh, T_Card& out)
+		bool  PopIfLess(T_Threshold&& thresh, T_Card& out)
 		{
-			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(thresh, out);
+			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(std::forward<T_Threshold>(thresh), out);
 		}
 
 		/// <summary>
@@ -124,9 +124,9 @@ namespace AutoKeyDeck
 		/// <param name="thresh">Value to which the top card is compared</param>
 		/// <returns>True if card removed from deck</returns>
 		template <typename T_Threshold, class T_ThreshComp = T_Comp>
-		bool  PopIfLess(const T_Threshold& thresh)
+		bool  PopIfLess(T_Threshold&& thresh)
 		{
-			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(thresh);
+			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(std::forward<T_Threshold>(thresh));
 		}
 	};
 };

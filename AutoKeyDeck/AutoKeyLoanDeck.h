@@ -104,21 +104,10 @@ namespace AutoKeyDeck
 		/// <param name="value">Value held by new card</param>
 		/// <param name="key">Initial key used for ordering this card</param>
 		/// <returns>The new card</returns>
-		T_Card MakeCard(T_Value&& value, T_OrderKey&& key = T_OrderKey())
+		template<typename T_V, typename T_O = T_OrderKey>
+		T_Card MakeCard(T_V&& value, T_O&& key = T_O())
 		{
-			return T_Base::MakeCard(mAutoKey, std::move(value), std::move(key));
-		}
-
-		/// <summary>
-		/// Create a new card and return it (the card is not held by the deck).
-		/// Arguments copied.
-		/// </summary>
-		/// <param name="value">Value held by new card</param>
-		/// <param name="key">Initial key used for ordering this card</param>
-		/// <returns>The new card</returns>
-		T_Card MakeCard(const T_Value& value, const T_OrderKey& key = T_OrderKey())
-		{
-			return T_Base::MakeCard(mAutoKey, value, key);
+			return T_Base::MakeCard(mAutoKey, std::forward<T_V>(value), std::forward<T_O>(key));
 		}
 
 		/// <summary>
@@ -127,22 +116,11 @@ namespace AutoKeyDeck
 		/// </summary>
 		/// <param name="value">Value held by new card</param>
 		/// <param name="key">Initial key used for ordering this card</param>
-		void MakeAndKeep(T_Value&& value, T_OrderKey&& key = T_OrderKey())
+		template<typename T_V = T_Value, typename T_O = T_OrderKey>
+		void MakeAndKeep(T_V&& value, T_O&& key = T_O())
 		{
-			T_Base::MakeAndKeep(mAutoKey, std::move(value), std::move(key));
+			T_Base::MakeAndKeep(mAutoKey, std::forward<T_V>(value), std::forward<T_O>(key));
 		}
-
-		/// <summary>
-		/// Create a new card and add it to the deck.
-		/// Arguments copied.
-		/// </summary>
-		/// <param name="value">Value held by new card</param>
-		/// <param name="key">Initial key used for ordering this card</param>
-		void MakeAndKeep(const T_Value& value, const T_OrderKey& key = T_OrderKey())
-		{
-			T_Base::MakeAndKeep(mAutoKey, value, key);
-		}
-
 	};
 };
 #endif

@@ -52,7 +52,8 @@ namespace AutoKeyDeck
 		/// Add an item to the collection
 		/// </summary>
 		/// <param name="value">value to store</param>
-		void Push(T_Value&& value)
+		template<typename T_V = T_Value>
+		void Push(T_V&& value)
 		{
 			T_Comp less = T_Comp{};
 
@@ -60,12 +61,12 @@ namespace AutoKeyDeck
 			{
 				if (less(value, *it))
 				{
-					mDeck.insert(it, std::move(value));
+					mDeck.insert(it, std::forward<T_V>(value));
 					return;
 				}
 			}
 
-			mDeck.push_back(std::move(value));
+			mDeck.push_back(std::forward<T_V>(value));
 		}
 
 		/// <summary>
@@ -103,11 +104,12 @@ namespace AutoKeyDeck
 		/// <param name="out">Value popped</param>
 		/// <returns>True if value popped</returns>
 		template <typename T_Threshold, class T_ThreshComp = T_Comp>
-		bool PopIfLess(const T_Threshold& thresh, T_Value& out)
+		bool PopIfLess(T_Threshold&& thresh, T_Value& out)
 		{
 			T_ThreshComp less{};
 
-			if (mDeck.empty() || !less(mDeck.front(), thresh)) return false;
+			if (mDeck.empty() || !less(mDeck.front(), std::forward<T_Threshold>(thresh))) 
+				return false;
 			
 			return Pop(out);
 		}
@@ -120,11 +122,12 @@ namespace AutoKeyDeck
 		/// <param name="thresh">Cuttoff</param>
 		/// <returns>True if value popped</returns>
 		template <typename T_Threshold, class T_ThreshComp = T_Comp>
-		bool PopIfLess(const T_Threshold& thresh)
+		bool PopIfLess(T_Threshold&& thresh)
 		{
 			T_ThreshComp less{};
 
-			if (mDeck.empty() || !less(mDeck.front(), thresh)) return false;
+			if (mDeck.empty() || !less(mDeck.front(), std::forward<T_Threshold>(thresh))) 
+				return false;
 
 			return Pop();
 		}

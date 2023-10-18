@@ -60,7 +60,7 @@ bool InnerLuaState::HandleSuspendedTask(std::shared_ptr<Task> task, std::chrono:
 		return false;
 	}
 
-	T_SuspendedTaskCard card  = mResumableTasks.MakeCard(std::move(task),std::move(resumeAt)); // TODO why not copy?
+	T_SuspendedTaskCard card  = mResumableTasks.MakeCard(task,resumeAt);
 
 	lua_pushinteger(mLua, card.GetTag());
 

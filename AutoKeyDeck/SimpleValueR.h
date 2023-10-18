@@ -46,38 +46,22 @@ namespace AutoKeyDeck
 			: T_Base(), mValue() {}
 
 		/// <summary>
-		/// Constructor initializing wrapped value (copied).
+		/// Constructor initializing wrapped value
 		/// </summary>
 		/// <param name="value"></param>
-		explicit SimpleValueR(const T_Value& value)
-			: T_Base(), mValue(value) {}
+		template<typename T_V = T_Value>
+		explicit SimpleValueR(T_V&& value)
+			: T_Base(), mValue(std::forward<T_V>(value)) {}
 
 		/// <summary>
-		/// Constructor initializing wrapped value (moved).
-		/// </summary>
-		/// <param name="value"></param>
-		explicit SimpleValueR(T_Value&& value)
-			: T_Base(), mValue(std::move(value)) {}
-
-		/// <summary>
-		/// Chainable constructor, initializing wrapped value (copied)
+		/// Chainable constructor, initializing wrapped value
 		/// </summary>
 		/// <typeparam name="...T_Args"></typeparam>
 		/// <param name="value"></param>
 		/// <param name="...args"></param>
-		template<typename ...T_Args>
-		explicit SimpleValueR(const T_Value& value, T_Args&& ...args)
-			: T_Base(std::forward<T_Args>(args)...), mValue(value) {}
-
-		/// <summary>
-		/// Chainable constructor, initializing wrapped value (moved)
-		/// </summary>
-		/// <typeparam name="...T_Args"></typeparam>
-		/// <param name="value"></param>
-		/// <param name="...args"></param>
-		template<typename ...T_Args>
-		explicit SimpleValueR(T_Value&& value, T_Args&& ...args)
-			: T_Base(std::forward<T_Args>(args)...), mValue(std::move(value)) {}
+		template<typename T_V = T_Value, typename ...T_Args>
+		explicit SimpleValueR(T_V&& value, T_Args&& ...args)
+			: T_Base(std::forward<T_Args>(args)...), mValue(std::forward<T_V>(value)) {}
 
 
 		/// <summary>
