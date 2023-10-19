@@ -155,5 +155,25 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step2()", 1200ms, 1000ms), L"Step2");
 			Assert::IsTrue(lua.DoTestString("return Step3()", 2200ms, 2000ms), L"Step3");
 		}
+
+		TEST_METHOD(YieldingTasks1)
+		{
+			LuaTestState lua;
+
+			lua.DoTestFile("Common.lua");
+			lua.DoTestFile("YieldingTasks1.lua");
+
+			std::this_thread::sleep_for(0.5s);
+			Assert::IsTrue(lua.DoTestString("return Step1()", 200ms), L"Step1");
+			Assert::IsTrue(lua.DoTestString("return Step2()", 200ms), L"Step2");
+			Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
+			Assert::IsTrue(lua.DoTestString("return Step4()", 200ms), L"Step4");
+			std::this_thread::sleep_for(1.1s);
+			Assert::IsTrue(lua.DoTestString("return Step5()", 200ms), L"Step5");
+			std::this_thread::sleep_for(1.1s);
+			Assert::IsTrue(lua.DoTestString("return Step6()", 200ms), L"Step6");
+			std::this_thread::sleep_for(3.1s);
+			Assert::IsTrue(lua.DoTestString("return Step7()", 200ms), L"Step7");
+		}
 	};
 }

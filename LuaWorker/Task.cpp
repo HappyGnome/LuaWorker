@@ -128,7 +128,7 @@ void Task::WaitForResult(unsigned int waitForMillis)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
-		if (IsFinal(mStatus)) return;
+		if (IsFinal(mStatus) || mStatus == TaskStatus::Suspended) return; //TODO review
 
 		mResultStatusCv.wait_for(lock, sleepTill - system_clock::now());
 

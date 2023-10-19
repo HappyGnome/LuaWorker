@@ -116,7 +116,8 @@ int TaskLuaInterface::l_Task_Await(lua_State* pL)
 
 		pTask->WaitForResult(waitMillis);
 
-		if (pTask->GetStatus() == TaskStatus::Complete)
+		TaskStatus status = pTask->GetStatus();
+		if (status == TaskStatus::Complete || status == TaskStatus::Suspended)
 		{
 			lua_pushstring(pL, pTask->GetResult().c_str());
 			return 1;
