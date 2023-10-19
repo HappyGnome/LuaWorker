@@ -66,8 +66,7 @@ namespace Tests
 		{
 			SortedDeck<int> deck;
 
-			int res;
-			Assert::IsFalse(deck.Pop(res));
+			Assert::IsFalse(deck.Pop().has_value());
 
 		}
 
@@ -79,17 +78,19 @@ namespace Tests
 			deck.Push(45);
 			deck.Push(1);
 
-			int result;
-			Assert::IsTrue(deck.Pop(result));
-			Assert::AreEqual(result, 1);
+			std::optional<int> result = deck.Pop();
+			Assert::IsTrue(result.has_value());
+			Assert::AreEqual(result.value(), 1);
 
-			Assert::IsTrue(deck.Pop(result));
-			Assert::AreEqual(result, 43);
+			result = deck.Pop();
+			Assert::IsTrue(result.has_value());
+			Assert::AreEqual(result.value(), 43);
 
-			Assert::IsTrue(deck.Pop(result));
-			Assert::AreEqual(result, 45);
+			result = deck.Pop();
+			Assert::IsTrue(result.has_value());
+			Assert::AreEqual(result.value(), 45);
 
-			Assert::IsFalse(deck.Pop(result));
+			Assert::IsFalse(deck.Pop().has_value());
 		}
 
 		/*TEST_METHOD(ConditionalPop)

@@ -354,36 +354,35 @@ void InnerLuaState::ExecTask(TaskExecPack&& task)
 	}
 }
 
+void InnerLuaState::ResumeTask()
+{
+	if (mCancel) throw LuaCancellationException();
+
+	std::optional<T_SuspendedTaskCard> card(mResumableTasks.PopIfLess(std::chrono::system_clock::now()));
+
+	if (!card.has_value()) return;
+
+	lua_State* taskThread = GetTaskThread(card.value().GetTag());
+
+	if (taskThread == nullptr) return;
+
+	mCurrentTaskYielded = false;
+
+	card.value().GetValue().Resume(taskThread);
+
+	if (mCurrentTaskYielded)
+	{
+		card.value().SetSortKey(mResumeCurrentTaskAt);
+		T_SuspendedTaskCard::Return(std::move(card.value()));
+	}
+}
+
+
 //------
-// //TODO
-//bool InnerLuaState::ResumeTask(TaskResumeToken<int>& resumeToken)
-//{
-//	std::shared_ptr<Task> task = mResumableTasks.at(resumeToken.GetHandle());
-//
-//	if (task == nullptr) return false;
-//
-//	lua_State* taskThread = GetTaskThread(resumeToken.GetHandle());
-//
-//	if (taskThread == nullptr) return false;
-//
-//	mSuspendCurrentTaskFor = 0ms;
-//
-//	task->Resume(taskThread);
-//
-//	if (mSuspendCurrentTaskFor > 0ms
-//		&& task->GetStatus() == TaskStatus::Suspended
-//		&& lua_status(taskThread) == LUA_YIELD)
-//	{
-//		resumeToken.Reschedule(mSuspendCurrentTaskFor);
-//		return true;
-//	}
-//	else if (task->GetStatus() == TaskStatus::Suspended)
-//	{
-//		task->Cancel(); // Task was expecting to be resumed, but will not be
-//	}
-//
-//	return false;
-//}
+std::optional<std::chrono::system_clock::time_point> InnerLuaState::GetNextResume()
+{
+	return mResumableTasks.GetThreshold();
+}
 
 //------
 void InnerLuaState::Cancel()

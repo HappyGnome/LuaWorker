@@ -163,8 +163,13 @@ namespace LuaWorker
 		/// Resume task from a token
 		/// </summary>
 		/// <param name="resumeToken">Handle to task to return</param>
-		/// <returns>True if Task can be resumed again (pass resumeToken to the next call)</returns>
-		//bool ResumeTask(TaskResumeToken<int>& resumeToken);//TODO
+		void ResumeTask();
+
+		/// <summary>
+		/// Get time of next resumable task in queue
+		/// Call in worker thread only.
+		/// </summary>
+		std::optional<std::chrono::system_clock::time_point> GetNextResume();
 
 		/// <summary>
 		/// Raise cancel flag (ExecTask will throw a LuaCancellationException at next hook event)

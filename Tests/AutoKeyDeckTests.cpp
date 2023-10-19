@@ -33,72 +33,72 @@ namespace Tests
 		TEST_METHOD(EmptyDeck)
 		{
 			AutoKeyLoanDeck<int,int,int> deck;
-			decltype(deck)::CardType res;
 
-			Assert::IsFalse(deck.Pop(res));
+			Assert::IsFalse(deck.Pop().has_value());
 		}
 		
 		TEST_METHOD(Pop)
 		{
 			AutoKeyLoanDeck<int, int, int> deck;
 
-			decltype(deck)::CardType res;
+			std::optional<decltype(deck)::CardType> card;
 
 			deck.MakeAndKeep(12);
 
-			Assert::IsTrue(deck.Pop(res));
-			Assert::AreEqual(12, res.GetValue());
-			Assert::AreEqual(0, res.GetSortKey());
+			card = deck.Pop();
+			Assert::IsTrue(card.has_value());
+			Assert::AreEqual(12, card.value().GetValue());
+			Assert::AreEqual(0, card.value().GetSortKey());
 
-			Assert::IsFalse(deck.Pop(res));
+			Assert::IsFalse(deck.Pop().has_value());
 		}
 		
 		TEST_METHOD(Reorder)
 		{
 			AutoKeyLoanDeck<int, int, int> deck;
 
-			decltype(deck)::CardType res;
+			std::optional<decltype(deck)::CardType> card;
 
 			deck.MakeAndKeep(12, 1);
 			deck.MakeAndKeep(11, 0);
 
-			Assert::AreEqual(0, deck.GetThreshold());
+			Assert::AreEqual(0, deck.GetThreshold().value());
 
-			deck.Pop(res);
-			Assert::AreEqual(11, res.GetValue());
-			Assert::AreEqual(1, res.GetTag());
-			Assert::AreEqual(0, res.GetSortKey());
+			card = deck.Pop();
+			Assert::AreEqual(11, card.value().GetValue());
+			Assert::AreEqual(1, card.value().GetTag());
+			Assert::AreEqual(0, card.value().GetSortKey());
 
-			Assert::AreEqual(1, deck.GetThreshold());
+			Assert::AreEqual(1, deck.GetThreshold().value());
 
-			deck.Pop(res);
-			Assert::AreEqual(12, res.GetValue());
-			Assert::AreEqual(0, res.GetTag());
-			Assert::AreEqual(1, res.GetSortKey());
+			card = deck.Pop();
+			Assert::AreEqual(12, card.value().GetValue());
+			Assert::AreEqual(0, card.value().GetTag());
+			Assert::AreEqual(1, card.value().GetSortKey());
 
-			Assert::IsFalse(deck.Pop());
+			Assert::IsFalse(deck.Pop().has_value());
 		}
 
 		TEST_METHOD(ConditionalPop)
 		{
 			AutoKeyLoanDeck<char, int, int> deck;
 
-			decltype(deck)::CardType res;
+			std::optional<decltype(deck)::CardType> card;
 
 			deck.MakeAndKeep('b', 12);
 			deck.MakeAndKeep('a', 11);
 
 			
-			Assert::IsFalse(deck.PopIfLess(11));
-			Assert::IsFalse(deck.PopIfLess(11,res));
+			Assert::IsFalse(deck.PopIfLess(11).has_value());
 
-			Assert::IsTrue(deck.PopIfLess(12,res));
-			Assert::AreEqual('a', res.GetValue());
+			card = deck.PopIfLess(12);
+			Assert::IsTrue(card.has_value());
+			Assert::AreEqual('a', card.value().GetValue());
 
-			Assert::IsFalse(deck.PopIfLess(12));
+			Assert::IsFalse(deck.PopIfLess(12).has_value());
 
-			Assert::IsTrue(deck.Pop());
-			Assert::IsFalse(deck.Pop());
+			Assert::IsTrue(deck.Pop().has_value());
+			Assert::IsFalse(deck.Pop().has_value());
 		}
 
 		TEST_METHOD(CustomComp)
@@ -106,6 +106,7 @@ namespace Tests
 			AutoKeyLoanDeck<std::string, float, char, std::greater_equal<float>> deck;
 
 			decltype(deck)::CardType res;
+			std::optional<decltype(deck)::CardType> card;
 
 			res = deck.MakeCard(std::string("World"), 1.0f);
 			res.Return(std::move(res));
@@ -115,17 +116,17 @@ namespace Tests
 
 			res = decltype(res)();
 
-			deck.Pop(res);
-			Assert::AreEqual(std::string("Hello"), res.GetValue());
-			Assert::AreEqual(char(1), res.GetTag());
-			Assert::AreEqual(1.7f, res.GetSortKey());
+			card = deck.Pop();
+			Assert::AreEqual(std::string("Hello"), card.value().GetValue());
+			Assert::AreEqual(char(1), card.value().GetTag());
+			Assert::AreEqual(1.7f, card.value().GetSortKey());
 
-			deck.Pop(res);
-			Assert::AreEqual(std::string("World"), res.GetValue());
-			Assert::AreEqual(char(0), res.GetTag());
-			Assert::AreEqual(1.0f, res.GetSortKey());
+			card = deck.Pop();
+			Assert::AreEqual(std::string("World"), card.value().GetValue());
+			Assert::AreEqual(char(0), card.value().GetTag());
+			Assert::AreEqual(1.0f, card.value().GetSortKey());
 
-			Assert::IsFalse(deck.Pop());
+			Assert::IsFalse(deck.Pop().has_value());
 		}
 
 	};

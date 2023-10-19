@@ -84,20 +84,10 @@ namespace AutoKeyDeck
 		}
 
 		/// <summary>
-		/// Try to remove top card of the deck.
-		/// </summary>
-		/// <param name="out">Set to the card popped on success</param>
-		/// <returns>True if a card was removed from the deck</returns>
-		bool Pop(T_Card& out)
-		{
-			return mDeck->Pop(out);
-		}
-
-		/// <summary>
 		/// Try to remove top card of the deck
 		/// </summary>
-		/// <returns>True if a card was removed from the deck</returns>
-		bool Pop()
+		/// <returns>Popped value, or empty</returns>
+		std::optional<T_Card> Pop()
 		{
 			return mDeck->Pop();
 		}
@@ -108,23 +98,9 @@ namespace AutoKeyDeck
 		/// <typeparam name="T_Threshold"></typeparam>
 		/// <typeparam name="T_ThreshComp">Comparison class (see std::less)</typeparam>
 		/// <param name="thresh">Value to which the top card is compared</param>
-		/// <param name="out">Receives popped value</param>
-		/// <returns>True if card removed from deck</returns>
+		/// <returns>Popped value, or empty</returns>
 		template <typename T_Threshold, class T_ThreshComp = T_Comp>
-		bool  PopIfLess(T_Threshold&& thresh, T_Card& out)
-		{
-			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(std::forward<T_Threshold>(thresh), out);
-		}
-
-		/// <summary>
-		/// Conditionally pop the top card of the deck
-		/// </summary>
-		/// <typeparam name="T_Threshold"></typeparam>
-		/// <typeparam name="T_ThreshComp">Comparison class (see std::less)</typeparam>
-		/// <param name="thresh">Value to which the top card is compared</param>
-		/// <returns>True if card removed from deck</returns>
-		template <typename T_Threshold, class T_ThreshComp = T_Comp>
-		bool  PopIfLess(T_Threshold&& thresh)
+		std::optional<T_Card>  PopIfLess(T_Threshold&& thresh)
 		{
 			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(std::forward<T_Threshold>(thresh));
 		}
@@ -134,7 +110,7 @@ namespace AutoKeyDeck
 		/// </summary>
 		/// <returns></returns>
 		template <typename T_Threshold, class T_ThreshComp>
-		T_Threshold  GetThreshold()
+		std::optional<T_Threshold>  GetThreshold()
 		{
 			return mDeck->GetThreshold<T_Threshold, T_ThreshComp>();
 		}

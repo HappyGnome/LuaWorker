@@ -99,6 +99,11 @@ namespace LuaWorker
 		void ThreadMainLoop(InnerLuaState& lua);
 
 		/// <summary>
+		/// Resume tasks/wait for new tasks. Returns the next new task unless main loop should quit
+		/// </summary>
+		std::optional<TaskExecPack> RunCurrentTasks(InnerLuaState& lua);
+
+		/// <summary>
 		/// Cancel worker thread execution
 		/// </summary>
 		void Cancel();

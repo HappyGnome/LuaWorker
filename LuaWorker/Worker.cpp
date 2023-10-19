@@ -90,32 +90,56 @@ bool Worker::ThreadMainCloseLua(InnerLuaState& lua)
 	return false;
 }
 
+std::optional<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
+{
+	while (!mCancel)
+	{
+		{
+			std::unique_lock<std::mutex> lock(mTasksMtx);
+
+			if (!mTaskQueue.empty())
+			{
+				std::optional<TaskExecPack> newTaskOut = std::make_optional(std::move(mTaskQueue.front()));
+				mTaskQueue.pop_front();
+				return newTaskOut;
+			}
+		}
+
+		if (!lua.IsOpen())
+		{
+			mLog.Push(LogLevel::Error, "Lua not initialized.");
+			break;
+		}
+
+		lua.ResumeTask();
+
+		std::optional<std::chrono::system_clock::time_point> nextResume = lua.GetNextResume();
+
+		if (nextResume.has_value() && nextResume.value() > std::chrono::system_clock::now())
+		{
+			std::unique_lock<std::mutex> lock(mTasksMtx);
+			mTaskCancelCv.wait_until(lock, nextResume.value());
+		}
+	}
+
+	return std::optional<TaskExecPack>();
+}
+
 //------
 void Worker::ThreadMainLoop(InnerLuaState& lua)
 {
 
 	try
 	{
-		std::optional<TaskExecPack> currentTask;
 
 		while (!mCancel)
 		{
-			while (!mCancel)
-			{
-				std::unique_lock<std::mutex> lock(mTasksMtx);
-
-				if (!mTaskQueue.empty())
-				{
-					currentTask = std::optional<TaskExecPack>(std::move(mTaskQueue.front()));
-					mTaskQueue.pop_front();
-					break;
-				}
-
-				mTaskCancelCv.wait(lock);
-			}
+			std::optional<TaskExecPack> currentTask (RunCurrentTasks(lua));
+			
+			if (!currentTask.has_value()) break;
 
 			if (mCancel) break;
-			else if (!currentTask.has_value() || currentTask->GetStatus() != TaskStatus::NotStarted) continue;
+			else if (currentTask.value().GetStatus() != TaskStatus::NotStarted) continue;
 
 			if (!lua.IsOpen())
 			{

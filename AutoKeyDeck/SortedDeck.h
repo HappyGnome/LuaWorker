@@ -72,28 +72,17 @@ namespace AutoKeyDeck
 		/// <summary>
 		/// Remove first item (out parameter receives the value)
 		/// </summary>
-		/// <param name="out">set to value popped if 'true' returned</param>
-		/// <returns>True if and only if item found and removed</returns>
-		bool Pop(T_Value& out)
+		/// <returns>The popped value, or empty if none popped</returns>
+		std::optional<T_Value> Pop()
 		{
-			if (mDeck.empty()) return false;
+			if (mDeck.empty()) return std::optional<T_Value>();
 
-			out = std::move(mDeck.front());
+			std::optional<T_Value> out(std::move(mDeck.front()));
 			mDeck.pop_front();
 
-			return true;
+			return out;
 		}
 
-		/// <summary>
-		/// Remove first item 
-		/// </summary>
-		/// <returns>True if and only if item found and removed</returns>
-		bool Pop()
-		{
-			if (mDeck.empty()) return false;
-			mDeck.pop_front();
-			return true;
-		}
 
 		/// <summary>
 		/// Pop the first element of the deck, if it is less that a comparable value threshold
@@ -101,35 +90,19 @@ namespace AutoKeyDeck
 		/// <typeparam name="T_Threshold">Type of threshold</typeparam>
 		/// <typeparam name="T_ThreshComp">Class implementing () operator for comparison</typeparam>
 		/// <param name="thresh">Cuttoff</param>
-		/// <param name="out">Value popped</param>
-		/// <returns>True if value popped</returns>
+		/// <returns>The popped value, or empty if none popped</returns>
 		template <typename T_Threshold, class T_ThreshComp = T_Comp>
-		bool PopIfLess(T_Threshold&& thresh, T_Value& out)
+		std::optional<T_Value> PopIfLess(T_Threshold&& thresh)
 		{
 			T_ThreshComp less{};
 
 			if (mDeck.empty() || !less(mDeck.front(), std::forward<T_Threshold>(thresh))) 
-				return false;
+				return std::optional<T_Value>();
 			
-			return Pop(out);
-		}
+			std::optional<T_Value> out(std::move(mDeck.front()));
+			mDeck.pop_front();
 
-		/// <summary>
-		/// Pop the first element of the deck, if it is less that a comparable value threshold
-		/// </summary>
-		/// <typeparam name="T_Threshold">Type of threshold</typeparam>
-		/// <typeparam name="T_ThreshComp">Class implementing () operator for comparison</typeparam>
-		/// <param name="thresh">Cuttoff</param>
-		/// <returns>True if value popped</returns>
-		template <typename T_Threshold, class T_ThreshComp = T_Comp>
-		bool PopIfLess(T_Threshold&& thresh)
-		{
-			T_ThreshComp less{};
-
-			if (mDeck.empty() || !less(mDeck.front(), std::forward<T_Threshold>(thresh))) 
-				return false;
-
-			return Pop();
+			return out;
 		}
 
 		/// <summary>
@@ -139,13 +112,13 @@ namespace AutoKeyDeck
 		/// <typeparam name="T_ThreshComp">Class implementing () operator, mapping T_Value to T_Threshold</typeparam>
 		/// <returns>Threshold value of top value</returns>
 		template <typename T_Threshold, class T_ThreshComp>
-		T_Threshold GetThreshold()
+		std::optional<T_Threshold> GetThreshold()
 		{
-			if (mDeck.empty()) return T_Threshold();
+			if (mDeck.empty()) return std::optional<T_Threshold>();
 
 			T_ThreshComp comp{};
 
-			return comp(mDeck.front());
+			return std::make_optional<T_Threshold>(comp(mDeck.front()));
 
 		}
 	};

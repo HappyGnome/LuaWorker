@@ -123,13 +123,13 @@ namespace AutoKeyDeck
 		}
 
 		template <typename T_Threshold, class T_ThreshComp>
-		T_Threshold  GetThreshold() = delete;
+		std::optional<T_Threshold>  GetThreshold() = delete;
 
 		/// <summary>
 		/// Get order key of top card
 		/// </summary>
 		/// <returns></returns>
-		T_OrderKey  GetThreshold()
+		std::optional<T_OrderKey>  GetThreshold()
 		{
 			return T_Base::template GetThreshold<T_OrderKey, Internal::AutoKeyLoanCard_SortOrder<T_Value, T_OrderKey, T_Comp>>();
 		}
