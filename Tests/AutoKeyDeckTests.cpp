@@ -62,10 +62,14 @@ namespace Tests
 			deck.MakeAndKeep(12, 1);
 			deck.MakeAndKeep(11, 0);
 
+			Assert::AreEqual(0, deck.GetThreshold());
+
 			deck.Pop(res);
 			Assert::AreEqual(11, res.GetValue());
 			Assert::AreEqual(1, res.GetTag());
 			Assert::AreEqual(0, res.GetSortKey());
+
+			Assert::AreEqual(1, deck.GetThreshold());
 
 			deck.Pop(res);
 			Assert::AreEqual(12, res.GetValue());

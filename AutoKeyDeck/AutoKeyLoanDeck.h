@@ -121,6 +121,18 @@ namespace AutoKeyDeck
 		{
 			T_Base::MakeAndKeep(mAutoKey, std::forward<T_V>(value), std::forward<T_O>(key));
 		}
+
+		template <typename T_Threshold, class T_ThreshComp>
+		T_Threshold  GetThreshold() = delete;
+
+		/// <summary>
+		/// Get order key of top card
+		/// </summary>
+		/// <returns></returns>
+		T_OrderKey  GetThreshold()
+		{
+			return T_Base::template GetThreshold<T_OrderKey, Internal::AutoKeyLoanCard_SortOrder<T_Value, T_OrderKey, T_Comp>>();
+		}
 	};
 };
 #endif

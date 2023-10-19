@@ -65,7 +65,6 @@ namespace AutoKeyDeck
 			card.mHomeDeck->Push(std::move(card));
 		}
 
-
 		//-------------------------------
 		// Public methods
 		//-------------------------------

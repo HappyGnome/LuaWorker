@@ -131,6 +131,23 @@ namespace AutoKeyDeck
 
 			return Pop();
 		}
+
+		/// <summary>
+		/// Get value above which PopIfLess would return an item
+		/// </summary>
+		/// <typeparam name="T_Threshold">Type of threshold</typeparam>
+		/// <typeparam name="T_ThreshComp">Class implementing () operator, mapping T_Value to T_Threshold</typeparam>
+		/// <returns>Threshold value of top value</returns>
+		template <typename T_Threshold, class T_ThreshComp>
+		T_Threshold GetThreshold()
+		{
+			if (mDeck.empty()) return T_Threshold();
+
+			T_ThreshComp comp{};
+
+			return comp(mDeck.front());
+
+		}
 	};
 };
 #endif

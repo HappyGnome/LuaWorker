@@ -106,7 +106,7 @@ namespace LuaWorker
 		/// <summary>
 		/// Set all pending tasks to a Cancelled state
 		/// </summary>
-		void CancelAllTasks();
+		//void CancelAllTasks();
 
 	public:
 

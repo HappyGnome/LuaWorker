@@ -74,7 +74,6 @@ bool Worker::ThreadMainCloseLua(InnerLuaState& lua)
 	try
 	{
 		lua.Close();
-		//TODO cancel queued resumes
 
 		{
 			std::unique_lock<std::mutex> lock(mLuaCancelMtx);
@@ -124,9 +123,7 @@ void Worker::ThreadMainLoop(InnerLuaState& lua)
 				break;
 			}
 
-			//TaskResumeToken<int> resumeTok;
 			lua.ExecTask(std::move(currentTask.value()));
-
 		}
 	}
 	catch (const std::exception& ex)
@@ -142,7 +139,7 @@ void Worker::Cancel()
 	mCancel = true;
 	if (mCurrentStatus != WorkerStatus::Error) mCurrentStatus = WorkerStatus::Cancelled;
 
-	CancelAllTasks();
+	//CancelAllTasks();
 
 	mTaskCancelCv.notify_all();
 
@@ -153,17 +150,17 @@ void Worker::Cancel()
 }
 
 //------
-void Worker::CancelAllTasks()
-{
-	std::unique_lock<std::mutex> lock(mTasksMtx);
-
-	for (auto it = mTaskQueue.begin(); it != mTaskQueue.end(); ++it)
-	{
-		(*it).Cancel();
-	}
-
-	mTaskQueue.clear();
-}
+//void Worker::CancelAllTasks()
+//{
+//	std::unique_lock<std::mutex> lock(mTasksMtx);
+//
+//	for (auto it = mTaskQueue.begin(); it != mTaskQueue.end(); ++it)
+//	{
+//		(*it).Cancel();
+//	}
+//
+//	mTaskQueue.clear();
+//}
 
 
 //-------------------------------

@@ -106,6 +106,16 @@ namespace AutoKeyDeck
 				T_Comp less{};
 				return less(a.mKey, b);
 			}
+
+			/// <summary>
+			/// Get sort key
+			/// </summary>
+			/// <param name="a"></param>
+			/// <returns></returns>
+			T_OrderKey operator()(const Sortable& a)
+			{
+				return a.mKey;
+			}
 		};
 		
 	};

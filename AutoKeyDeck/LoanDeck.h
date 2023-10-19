@@ -128,6 +128,16 @@ namespace AutoKeyDeck
 		{
 			return mDeck->PopIfLess<T_Threshold, T_ThreshComp>(std::forward<T_Threshold>(thresh));
 		}
+
+		/// <summary>
+		/// Get order key of top card
+		/// </summary>
+		/// <returns></returns>
+		template <typename T_Threshold, class T_ThreshComp>
+		T_Threshold  GetThreshold()
+		{
+			return mDeck->GetThreshold<T_Threshold, T_ThreshComp>();
+		}
 	};
 };
 #endif

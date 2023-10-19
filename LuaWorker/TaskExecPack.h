@@ -37,8 +37,17 @@ namespace LuaWorker
 
 	public:
 
-		TaskExecPack(const std::shared_ptr<Task>& task, LogSection &&log);
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="task"></param>
+		/// <param name="log"></param>
+		explicit TaskExecPack(const std::shared_ptr<Task>& task, LogSection &&log);
 
+		/// <summary>
+		/// Move constructor
+		/// </summary>
+		/// <param name=""></param>
 		TaskExecPack(TaskExecPack&&) = default;
 
 		/// <summary>
@@ -53,8 +62,16 @@ namespace LuaWorker
 		/// <param name=""></param>
 		TaskExecPack& operator=(const TaskExecPack&) = delete;
 
+		/// <summary>
+		/// Move assignment
+		/// </summary>
+		/// <param name=""></param>
+		/// <returns></returns>
 		TaskExecPack& operator=(TaskExecPack&&) = default;
 
+		/// <summary>
+		/// Destructor
+		/// </summary>
 		~TaskExecPack();
 
 
