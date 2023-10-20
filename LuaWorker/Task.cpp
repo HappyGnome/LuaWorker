@@ -35,6 +35,7 @@ void Task::SetResult(const std::string& newResult)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
+		mUnreadResult = true;
 		mResult = newResult;
 	}
 }
@@ -112,7 +113,7 @@ std::string Task::GetResult()
 
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
-
+		mUnreadResult = false;
 		return mResult;
 	}
 }
@@ -128,9 +129,9 @@ void Task::WaitForResult(unsigned int waitForMillis)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
-		if (IsFinal(mStatus) || mStatus == TaskStatus::Suspended) return; //TODO review
+		if (IsFinal(mStatus) || mUnreadResult) return;
 
-		mResultStatusCv.wait_for(lock, sleepTill - system_clock::now());
+		mResultStatusCv.wait_until(lock, sleepTill);
 
 	}
 }
@@ -145,7 +146,7 @@ TaskStatus Task::GetStatus()
 
 
 //------
-Task::Task() : mStatus(TaskStatus::NotStarted) {}
+Task::Task() : mStatus(TaskStatus::NotStarted), mUnreadResult(false) {}
 
 //------
 void Task::Exec(lua_State* pL)

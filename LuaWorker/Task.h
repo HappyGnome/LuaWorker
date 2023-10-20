@@ -65,6 +65,8 @@ namespace LuaWorker
 		std::mutex mResultStatusMtx;
 		std::condition_variable mResultStatusCv;
 
+		bool mUnreadResult;
+
 		//-------------------------------
 		// Private methods
 		//-------------------------------

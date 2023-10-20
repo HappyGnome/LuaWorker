@@ -164,7 +164,7 @@ namespace Tests
 			lua.DoTestFile("YieldingTasks1.lua");
 
 			std::this_thread::sleep_for(0.5s);
-			Assert::IsTrue(lua.DoTestString("return Step1()", 200ms), L"Step1");
+			Assert::IsTrue(lua.DoTestString("return Step1()", 500ms), L"Step1");
 			Assert::IsTrue(lua.DoTestString("return Step2()", 200ms), L"Step2");
 			Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
 			Assert::IsTrue(lua.DoTestString("return Step4()", 200ms), L"Step4");

@@ -94,14 +94,28 @@ std::optional<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
 {
 	while (!mCancel)
 	{
+		std::optional<std::chrono::system_clock::time_point> nextResume = lua.GetNextResume();
+
 		{
 			std::unique_lock<std::mutex> lock(mTasksMtx);
-
-			if (!mTaskQueue.empty())
+			while (!mCancel)
 			{
-				std::optional<TaskExecPack> newTaskOut = std::make_optional(std::move(mTaskQueue.front()));
-				mTaskQueue.pop_front();
-				return newTaskOut;
+				if (!mTaskQueue.empty())
+				{
+					std::optional<TaskExecPack> newTaskOut = std::make_optional(std::move(mTaskQueue.front()));
+					mTaskQueue.pop_front();
+					return newTaskOut;
+				}
+
+				if (!nextResume.has_value())
+				{
+					mTaskCancelCv.wait(lock);
+				}
+				else if (nextResume.value() > std::chrono::system_clock::now())
+				{
+					mTaskCancelCv.wait_until(lock, nextResume.value());
+				}
+				else break; // Tasks to resume
 			}
 		}
 
@@ -112,14 +126,6 @@ std::optional<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
 		}
 
 		lua.ResumeTask();
-
-		std::optional<std::chrono::system_clock::time_point> nextResume = lua.GetNextResume();
-
-		if (nextResume.has_value() && nextResume.value() > std::chrono::system_clock::now())
-		{
-			std::unique_lock<std::mutex> lock(mTasksMtx);
-			mTaskCancelCv.wait_until(lock, nextResume.value());
-		}
 	}
 
 	return std::optional<TaskExecPack>();

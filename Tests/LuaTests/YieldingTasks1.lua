@@ -16,7 +16,7 @@
 * 
 ]]--*****************************************************************************
 
-initstr = [[gStr = ""
+initStr = [[gStr = ""
 
 YieldingFunc = function(ch)
 	for i = 1,5 do
@@ -26,26 +26,27 @@ YieldingFunc = function(ch)
 	return true
 end]]
 
-Step1 = function()
-	w = LuaWorker.Create()
+w = LuaWorker.Create()
+w:Start()
 
-	w:DoString(initStr)
+Step1 = function()
+	w:DoString(initStr):Await(500)
 
 	RaiseFirstWorkerError(w)
 	
-	return true
+	return w:Status() == LuaWorker.WorkerStatus.Processing
 end 
 
 Step2 = function()
 
-	w:DoString("return [[YieldingFunc('a')]]")
+	w:DoString("return YieldingFunc('a')")
 
 	RaiseFirstWorkerError(w)
 	return true
 end 
 
 Step3 = function()
-	w:DoString("return [[YieldingFunc('b')]]")
+	w:DoString("return YieldingFunc('b')")
 
 	RaiseFirstWorkerError(w)
 	return true
@@ -54,24 +55,28 @@ end
 Step4 = function()
 	T = w:DoString("return gStr") 
 	res = T:Await(5000) 
-	error(res) -- TODO
+	RaiseFirstWorkerError(w)
 	return res== "ab"
 end 
 
 --After 1s
 Step5 = function()
 	T = w:DoString("return gStr") 
-	return T:Await(500) == "abab"
+	res = T:Await(5000)
+	RaiseFirstWorkerError(w)
+	return res == "abab"
 end 
 
 --After 1s more
 Step6 = function()
 	T = w:DoString("return gStr") 
+	RaiseFirstWorkerError(w)
 	return T:Await(500) == "ababab"
 end 
 
 --After 3s more
 Step7 = function()
 	T = w:DoString("return gStr") 
+	RaiseFirstWorkerError(w)
 	return T:Await(500) == "ababababab"
 end 
