@@ -45,9 +45,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Worker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -93,12 +90,21 @@
     <ClInclude Include="TaskExecPack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OneShotTask.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Task.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TypedTaskExecPack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CoTaskExecPack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Worker.cpp">
@@ -135,6 +141,27 @@
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
     <ClCompile Include="TaskExecPack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Task.cpp">
+      <Filter>Source Files\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="OneShotTask.cpp">
+      <Filter>Source Files\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="CoTask.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="CoTask.cpp">
+      <Filter>Source Files\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="OneShotTaskExecPack.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OneShotTaskExecPack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CoTaskExecPack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

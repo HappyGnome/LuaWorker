@@ -111,5 +111,8 @@
     <None Include="LuaTests\TaskInfiniteLoop_FileTask.lua">
       <Filter>LuaTests\DoFileFiles</Filter>
     </None>
+    <None Include="LuaTests\YieldingInNonCoroutine.lua">
+      <Filter>LuaTests</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -18,8 +18,15 @@
 
 #include<functional>
 
+#include "TaskExecPack.h"
+#include "LogSection.h"
+#include "InnerLuaState.h"
 #include "Worker.h"
 #include "TaskExecPack.h"
+#include "OneShotTaskExecPack.h"
+#include "CoTaskExecPack.h"
+#include "OneShotTask.h"
+#include "CoTask.h"
 
 using namespace LuaWorker;
 
@@ -90,7 +97,7 @@ bool Worker::ThreadMainCloseLua(InnerLuaState& lua)
 	return false;
 }
 
-std::optional<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
+std::unique_ptr<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
 {
 	while (!mCancel)
 	{
@@ -102,7 +109,7 @@ std::optional<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
 			{
 				if (!mTaskQueue.empty())
 				{
-					std::optional<TaskExecPack> newTaskOut = std::make_optional(std::move(mTaskQueue.front()));
+					std::unique_ptr<TaskExecPack> newTaskOut(std::move(mTaskQueue.front()));
 					mTaskQueue.pop_front();
 					return newTaskOut;
 				}
@@ -119,6 +126,8 @@ std::optional<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
 			}
 		}
 
+		if (mCancel) break;
+
 		if (!lua.IsOpen())
 		{
 			mLog.Push(LogLevel::Error, "Lua not initialized.");
@@ -128,24 +137,22 @@ std::optional<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
 		lua.ResumeTask();
 	}
 
-	return std::optional<TaskExecPack>();
+	return nullptr;
 }
 
 //------
 void Worker::ThreadMainLoop(InnerLuaState& lua)
 {
-
 	try
 	{
-
 		while (!mCancel)
 		{
-			std::optional<TaskExecPack> currentTask (RunCurrentTasks(lua));
+			std::unique_ptr<TaskExecPack> currentTask (RunCurrentTasks(lua));
 			
-			if (!currentTask.has_value()) break;
+			if (currentTask == nullptr) break;
 
 			if (mCancel) break;
-			else if (currentTask.value().GetStatus() != TaskStatus::NotStarted) continue;
+			else if (currentTask->GetStatus() != TaskStatus::NotStarted) continue;
 
 			if (!lua.IsOpen())
 			{
@@ -153,7 +160,7 @@ void Worker::ThreadMainLoop(InnerLuaState& lua)
 				break;
 			}
 
-			lua.ExecTask(std::move(currentTask.value()));
+			TaskExecPack::VisitLuaState(std::move(currentTask), &lua);
 		}
 	}
 	catch (const std::exception& ex)
@@ -250,9 +257,30 @@ WorkerStatus Worker::Stop()
 }
 
 //------
-WorkerStatus Worker::AddTask(std::shared_ptr<Task> task)
+WorkerStatus Worker::AddTask(std::shared_ptr<OneShotTask> task)
 {	
-	TaskExecPack pack(task, LogSection(mLog));
+	std::unique_ptr<OneShotTaskExecPack> pack = std::make_unique<OneShotTaskExecPack>(task, LogSection(mLog));
+
+	{
+		std::unique_lock<std::mutex> lock(mTasksMtx);
+
+		if (mCancel)
+		{
+			task->Cancel();
+			return mCurrentStatus;
+		}
+
+		mTaskQueue.push_back(std::move(pack));
+	}
+	mTaskCancelCv.notify_all();
+
+	return mCurrentStatus;
+}
+
+//------
+WorkerStatus Worker::AddTask(std::shared_ptr<CoTask> task)
+{
+	std::unique_ptr<CoTaskExecPack> pack = std::make_unique<CoTaskExecPack>(task, LogSection(mLog));
 
 	{
 		std::unique_lock<std::mutex> lock(mTasksMtx);

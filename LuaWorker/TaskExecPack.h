@@ -24,25 +24,36 @@
 
 #include "Task.h"
 #include "LogSection.h"
+//#include "TaskPackAcceptor.h"
+#include "InnerLuaState.h"
 
 namespace LuaWorker
 {
-	
-	class TaskExecPack {
-	private:
-		
-		std::shared_ptr<Task> mTask;
+	class TaskPackAcceptor;
 
-		LogSection mLog;
+	class TaskExecPack
+	{
+	protected:
+
+		/// <summary>
+		/// Pass this instance to appropriate acceptor of a given LuaState using move semantics.
+		/// May invalidate the lvalue instance used to call it
+		/// </summary>
+		/// <param name="pLua"></param>
+		virtual void CastAndExec(std::unique_ptr<TaskExecPack>&& thisAsBase, InnerLuaState* pLua) = 0;
 
 	public:
 
 		/// <summary>
-		/// Constructor
+		/// Pass ExecPack to appropriate handler in an TaskPackAcceptor
 		/// </summary>
-		/// <param name="task"></param>
-		/// <param name="log"></param>
-		explicit TaskExecPack(const std::shared_ptr<Task>& task, LogSection &&log);
+		/// <param name="visitor"></param>
+		static void VisitLuaState(std::unique_ptr<TaskExecPack>&& visitor, InnerLuaState* pLua);
+
+		/// <summary>
+		/// Default constructor
+		/// </summary>
+		TaskExecPack() = default;
 
 		/// <summary>
 		/// Move constructor
@@ -72,34 +83,20 @@ namespace LuaWorker
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~TaskExecPack();
-
-
-		/// <summary>
-		/// Execute this task on a given lua state
-		/// </summary>
-		/// <param name="pL">Lua state</param>
-		void Exec(lua_State* pL);
-
-		/// <summary>
-		/// Resume execution of this task on the given lua state.
-		/// Is this is not the same state previously passed to Exec, behaviour is undefined.
-		/// </summary>
-		/// <param name="pL">Lua state</param>
-		void Resume(lua_State* pL);
+		~TaskExecPack() = default;
 
 		/// <summary>
 		/// Get execution status of this Task
 		/// </summary>
 		/// <returns>Current status</returns>
-		TaskStatus GetStatus();
+		virtual TaskStatus GetStatus() = 0;
 
 		/// <summary>
 		/// Permanently cancel execution and any pending tasks
 		/// </summary>
-		void Cancel();
+		virtual void Cancel() = 0;
 
 	};
-}
 
+}
 #endif

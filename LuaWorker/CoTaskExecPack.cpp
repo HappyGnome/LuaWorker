@@ -16,14 +16,42 @@
 *
 \*****************************************************************************/
 
-#include <memory>
-
-#include "TaskExecPack.h"
+#include "CoTask.h"
+#include "CoTaskExecPack.h"
 
 using namespace LuaWorker;
 
-
-void TaskExecPack::VisitLuaState(std::unique_ptr<TaskExecPack>&& visitor, InnerLuaState* pLua)
+void CoTaskExecPack::Exec(lua_State* pL)
 {
-	visitor->CastAndExec(std::move(visitor),pLua); // May move from visitor 
+	if (mTask == nullptr) return;
+
+	try
+	{
+		mTask->Exec(pL);
+		if (mTask->GetStatus() == TaskStatus::Error)
+			mLog.Push(LogLevel::Error, mTask->GetError());
+	}
+	catch (const std::exception& ex)
+	{
+		mLog.Push(ex);
+		mTask->SetError("Exeception occurred during execution");
+	}
 }
+
+void CoTaskExecPack::Resume(lua_State* pL)
+{
+	if (mTask == nullptr) return;
+
+	try
+	{
+		mTask->Resume(pL);
+		if (mTask->GetStatus() == TaskStatus::Error)
+			mLog.Push(LogLevel::Error, mTask->GetError());
+	}
+	catch (const std::exception& ex)
+	{
+		mLog.Push(ex);
+		mTask->SetError("Exeception occurred during execution");
+	}
+}
+

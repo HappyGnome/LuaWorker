@@ -28,7 +28,9 @@ extern "C" {
 
 #include <chrono>
 
-#include "TaskExecPack.h"
+//#include "TaskExecPack.h"
+#include "OneShotTaskExecPack.h"
+#include "CoTaskExecPack.h"
 
 using namespace std::chrono_literals;
 using std::chrono::system_clock;
@@ -43,7 +45,7 @@ const char* InnerLuaState::cInLuaWorkerTableName = "InLuaWorker";
 // Private
 //----------------------
 
-bool InnerLuaState::HandleSuspendedTask(TaskExecPack&& task, std::chrono::system_clock::time_point resumeAt)
+bool InnerLuaState::HandleSuspendedTask(std::unique_ptr<CoTaskExecPack>&& task, std::chrono::system_clock::time_point resumeAt)
 {
 	if (mLua == nullptr) return false;
 
@@ -190,6 +192,13 @@ int InnerLuaState::l_YieldFor(lua_State* pL)
 
 	if (pState != nullptr)
 	{
+		if (!pState->mCurrentTaskCanYield)
+		{
+			lua_pushstring(pL, "Cannot yield here.");
+			lua_error(pL);
+			return 0;
+		}
+
 		if (!lua_isnumber(pL, -1)) {
 			lua_pushstring(pL, "YieldFor expects parameters (<number>,...<results>)");
 			lua_error(pL);
@@ -207,7 +216,10 @@ int InnerLuaState::l_YieldFor(lua_State* pL)
 		pState -> mCurrentTaskYielded = true;
 
 		lua_pop(pL,1); // pop delay
-		return lua_yield(pL, lua_gettop(pL)); //Yield remaining parameters to resume
+		int resultCount = 0;
+		if (lua_isstring(pL, -1)) resultCount = 1;//TODO allow multiple
+
+		return lua_yield(pL, resultCount); //Yield remaining parameters to resume
 	}
 	return 0;
 }
@@ -249,14 +261,16 @@ InnerLuaState::InnerLuaState(LogSection&& log)
 	mLua(nullptr), 
 	mResumableTasks(),
 	mResumeCurrentTaskAt(),
-	mCurrentTaskYielded(){}
+	mCurrentTaskYielded(),
+	mCurrentTaskCanYield(){}
 InnerLuaState::InnerLuaState(const LogSection& log) 
 	: mLog(log), 
 	mCancel(false), 
 	mLua(nullptr), 
 	mResumableTasks(),
 	mResumeCurrentTaskAt(),
-	mCurrentTaskYielded() {}
+	mCurrentTaskYielded(),
+	mCurrentTaskCanYield(){}
 
 //------
 InnerLuaState::~InnerLuaState()
@@ -331,21 +345,38 @@ void InnerLuaState::Close()
 }
 
 //------
-void InnerLuaState::ExecTask(TaskExecPack&& task)
+void InnerLuaState::ExecTask(std::unique_ptr<OneShotTaskExecPack>&& task)
 {
 	if(mCancel) throw LuaCancellationException();
 
-	if (mLua != nullptr)
+	if (mLua != nullptr && task != nullptr)
+	{
+		int prevTop = lua_gettop(mLua);
+
+		mCurrentTaskCanYield = false; // Block yields via InLuaWorker
+
+		task->Exec(mLua);
+
+		lua_settop(mLua, prevTop);
+	}
+}
+
+void InnerLuaState::ExecTask(std::unique_ptr < CoTaskExecPack>&& task)
+{
+	if (mCancel) throw LuaCancellationException();
+
+	if (mLua != nullptr && task != nullptr)
 	{
 		int prevTop = lua_gettop(mLua);
 
 		lua_State* taskThread = lua_newthread(mLua);
 
 		mCurrentTaskYielded = false;
+		mCurrentTaskCanYield = true;
 
-		task.Exec(taskThread);
+		task->Exec(taskThread);
 
-		if (mCurrentTaskYielded)
+		if (mCurrentTaskYielded && lua_status(taskThread) == LUA_YIELD)
 		{
 			HandleSuspendedTask(std::move(task), mResumeCurrentTaskAt);
 		}
@@ -368,7 +399,7 @@ void InnerLuaState::ResumeTask()
 
 	mCurrentTaskYielded = false;
 
-	card.value().GetValue().Resume(taskThread);
+	card.value().GetValue()->Resume(taskThread);
 
 	if (mCurrentTaskYielded)
 	{

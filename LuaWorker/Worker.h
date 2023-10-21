@@ -26,10 +26,9 @@
 //#include <deque> 
 #include <mutex> 
 
-#include "Task.h"
-#include "TaskExecPack.h"
+//#include "TaskExecPack.h"
 #include "LogSection.h"
-#include "InnerLuaState.h"
+//#include "InnerLuaState.h"
 #include "Cancelable.h"
 
 extern "C" {
@@ -41,6 +40,11 @@ extern "C" {
 
 namespace LuaWorker
 {
+	class CoTask;
+	class OneShotTask;
+	class TaskExecPack;
+	class InnerLuaState;
+
 	enum class WorkerStatus {
 		NotStarted,
 		Starting,
@@ -58,7 +62,7 @@ namespace LuaWorker
 
 		std::thread mThread;
 
-		std::deque<TaskExecPack> mTaskQueue;
+		std::deque<std::unique_ptr<TaskExecPack>> mTaskQueue;
 		std::mutex mTasksMtx;
 
 		std::condition_variable mTaskCancelCv;
@@ -101,7 +105,7 @@ namespace LuaWorker
 		/// <summary>
 		/// Resume tasks/wait for new tasks. Returns the next new task unless main loop should quit
 		/// </summary>
-		std::optional<TaskExecPack> RunCurrentTasks(InnerLuaState& lua);
+		std::unique_ptr<TaskExecPack> RunCurrentTasks(InnerLuaState& lua);
 
 		/// <summary>
 		/// Cancel worker thread execution
@@ -153,7 +157,9 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="task">Task to queue</param>
 		/// <returns>Current worker status</returns>
-		WorkerStatus AddTask(std::shared_ptr<Task> task);
+		WorkerStatus AddTask(std::shared_ptr<OneShotTask> task);
+
+		WorkerStatus AddTask(std::shared_ptr<CoTask> task);
 
 		/// <summary>
 		/// Get log output for reading this worker's logs

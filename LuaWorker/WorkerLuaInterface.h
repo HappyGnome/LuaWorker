@@ -155,6 +155,16 @@ namespace LuaWorker
 		static int l_Worker_DoSleep(lua_State* pL);
 
 		/// <summary>
+		/// Add starting a coroutine to the worker queue.
+		/// 
+		/// Lua syntax:
+		///		local task = worker:DoCoroutine("functionToCall","arg1","arg2",...)
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		/// <returns>Number of items pushed to the stack</returns>
+		static int l_Worker_DoCoRoutine(lua_State* pL);
+
+		/// <summary>
 		/// Start worker thread
 		/// 
 		/// Lua syntax:

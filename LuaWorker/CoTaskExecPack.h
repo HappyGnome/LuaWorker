@@ -16,14 +16,39 @@
 *
 \*****************************************************************************/
 
+#ifndef _CO_TASK_EXEC_PACK_H_
+#define _CO_TASK_EXEC_PACK_H_
+#pragma once
+
 #include <memory>
 
-#include "TaskExecPack.h"
+#include "LogSection.h"
+#include "TypedTaskExecPack.h"
+#include "CoTask.h"
 
-using namespace LuaWorker;
+//#include "TaskPackAcceptor.h"
 
-
-void TaskExecPack::VisitLuaState(std::unique_ptr<TaskExecPack>&& visitor, InnerLuaState* pLua)
+namespace LuaWorker
 {
-	visitor->CastAndExec(std::move(visitor),pLua); // May move from visitor 
+	class CoTaskExecPack : public TypedTaskExecPack<CoTask, CoTaskExecPack> {
+
+	public:
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		using TypedTaskExecPack::TypedTaskExecPack;
+
+
+		/// <summary>
+		/// Execute this task on a given lua state
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		void Exec(lua_State* pL);
+
+		void Resume(lua_State* pL);
+
+	};
 }
+
+#endif

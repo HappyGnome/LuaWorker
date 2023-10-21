@@ -18,12 +18,23 @@
 
 #include <memory>
 
-#include "TaskExecPack.h"
+#include "OneShotTaskExecPack.h"
 
 using namespace LuaWorker;
 
-
-void TaskExecPack::VisitLuaState(std::unique_ptr<TaskExecPack>&& visitor, InnerLuaState* pLua)
+void OneShotTaskExecPack::Exec(lua_State* pL)
 {
-	visitor->CastAndExec(std::move(visitor),pLua); // May move from visitor 
+	if (mTask == nullptr) return;
+
+	try
+	{
+		mTask->Exec(pL);
+		if(mTask->GetStatus() == TaskStatus::Error) 
+			mLog.Push(LogLevel::Error, mTask->GetError());
+	}
+	catch (const std::exception& ex)
+	{
+		mLog.Push(ex);
+		mTask->SetError("Exeception occurred during execution");
+	}
 }

@@ -27,7 +27,9 @@
 #include "AutoKeyLoanDeck.h"
 
 #include "LogSection.h"
-#include "TaskExecPack.h"
+//#include "OneShotTaskExecPack.h"
+//#include "CoTaskExecPack.h"
+//#include "TaskPackAcceptor.h"
 
 extern "C" {
 #include "lua.h"
@@ -37,15 +39,17 @@ extern "C" {
 
 namespace LuaWorker
 {
+	class OneShotTaskExecPack;
+	class CoTaskExecPack;
 
 	/// <summary>
 	/// Manages lua state in worker thread
 	/// </summary>
-	class InnerLuaState : public Cancelable
+	class InnerLuaState : public Cancelable//, public TaskPackAcceptor
 	{
 	private:
 
-		typedef AutoKeyDeck::AutoKeyLoanDeck<TaskExecPack,std::chrono::system_clock::time_point,int> T_SuspendedTaskDeck;
+		typedef AutoKeyDeck::AutoKeyLoanDeck<std::unique_ptr<CoTaskExecPack>,std::chrono::system_clock::time_point,int> T_SuspendedTaskDeck;
 		typedef T_SuspendedTaskDeck::CardType T_SuspendedTaskCard;
 
 		/// <summary>
@@ -80,6 +84,7 @@ namespace LuaWorker
 
 		std::chrono::system_clock::time_point mResumeCurrentTaskAt;
 		bool mCurrentTaskYielded;
+		bool mCurrentTaskCanYield;
 
 		//---------------------
 		// Private methods
@@ -92,7 +97,7 @@ namespace LuaWorker
 		/// <param name="task">Task to push</param>
 		/// <param name="resumeAt">Target resume time for this task</param>
 		/// </summary>
-		bool HandleSuspendedTask(TaskExecPack&& task, std::chrono::system_clock::time_point resumeAt);
+		bool HandleSuspendedTask(std::unique_ptr<CoTaskExecPack>&& task, std::chrono::system_clock::time_point resumeAt);
 
 		lua_State* GetTaskThread(int taskHandle);
 
@@ -157,7 +162,15 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="task">Task to execute</param>
 		/// <param name="resumeToken">Resume token output</param>
-		void ExecTask(TaskExecPack&& task);
+		void ExecTask(std::unique_ptr <OneShotTaskExecPack>&& task);
+
+		/// <summary>
+		/// Exec task in lua state. 
+		/// Call in worker thread only.
+		/// </summary>
+		/// <param name="task">Task to execute</param>
+		/// <param name="resumeToken">Resume token output</param>
+		void ExecTask(std::unique_ptr <CoTaskExecPack>&& task);
 
 		/// <summary>
 		/// Resume task from a token

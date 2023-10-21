@@ -67,18 +67,6 @@ namespace LuaWorker
 
 		bool mUnreadResult;
 
-		//-------------------------------
-		// Private methods
-		//-------------------------------
-
-		/// <summary>
-		/// Set the result of this task
-		/// </summary>
-		/// <param name="newResult">Value of the result to set</param>
-		void SetResult(const std::string& newResult);
-
-
-
 	protected:
 
 		//-------------------------------
@@ -86,20 +74,16 @@ namespace LuaWorker
 		//-------------------------------
 
 		/// <summary>
-		/// Do the work for this task, as implemented in derived classes.
-		/// Called on the worker lua state.
+		/// Set the result of this task
 		/// </summary>
-		/// <param name="pL">Lua state</param>
-		/// <returns> Result of the task</returns>
-		virtual std::string DoExec(lua_State* pL) = 0;
+		/// <param name="newResult">Value of the result to set</param>
+		void SetResult(const std::string& newResult, bool yielded);
 
 		/// <summary>
-		/// Resume execution of this task on the given lua state, 
-		///		passing any 
-		/// Is this is not the same state previously passed to Exec, behaviour is undefined.
+		/// Try to set the task to a running status.
 		/// </summary>
-		/// <param name="pL">Lua state</param>
-		virtual std::string DoResume(lua_State* pL);
+		/// <param name="newResult">False if the current statuis does not support starting the task</param>
+		bool TrySetRunning(TaskStatus expected = TaskStatus::NotStarted);
 
 		/// <summary>
 		/// Block until specified time has elapsed (or task cancelled)
@@ -127,19 +111,6 @@ namespace LuaWorker
 		/// Default constructor
 		/// </summary>
 		Task();
-
-		/// <summary>
-		/// Execute this task on a given lua state
-		/// </summary>
-		/// <param name="pL">Lua state</param>
-		void Exec(lua_State* pL);
-
-		/// <summary>
-		/// Resume execution of this task on the given lua state.
-		/// Is this is not the same state previously passed to Exec, behaviour is undefined.
-		/// </summary>
-		/// <param name="pL">Lua state</param>
-		void Resume(lua_State* pL);
 
 		/// <summary>
 		/// Get result of this task

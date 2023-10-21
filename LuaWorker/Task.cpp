@@ -25,11 +25,12 @@ using std::chrono::system_clock;
 
 using namespace LuaWorker;
 
+
 //-------------------------------
-// Private methods
+// Protected methods
 //-------------------------------
 
-void Task::SetResult(const std::string& newResult)
+void Task::SetResult(const std::string& newResult, bool yielded)
 {
 
 	{
@@ -37,41 +38,31 @@ void Task::SetResult(const std::string& newResult)
 
 		mUnreadResult = true;
 		mResult = newResult;
+
+		if (mStatus != TaskStatus::Error)
+		{
+			if (yielded)
+			{
+				mStatus = TaskStatus::Suspended;
+			}
+			else mStatus = TaskStatus::Complete;
+		}
 	}
+
+	mResultStatusCv.notify_all();
 }
 
-//-------------------------------
-// Protected methods
-//-------------------------------
-
-/// <summary>
-/// Resume execution of this task on the given lua state, 
-///		passing any 
-/// Is this is not the same state previously passed to Exec, behaviour is undefined.
-/// </summary>
-/// <param name="pL">Lua state</param>
-std::string Task::DoResume(lua_State* pL)
+bool Task::TrySetRunning(TaskStatus expected)
 {
-	int execResult = lua_resume(pL, 0);
-
-	if (execResult != 0)
 	{
-		std::string luaError = "No Error Message!";
-		if (lua_type(pL, -1) == LUA_TSTRING)
-		{
-			luaError = lua_tostring(pL, -1);
-		}
+		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
-		SetError("Error resuming task: " + luaError);
+		if (mStatus != expected) return false;
+
+		mStatus = TaskStatus::Running;
 	}
-
-	std::string ret = "";
-
-	if (lua_type(pL, -1) == LUA_TSTRING) ret = lua_tostring(pL, -1);
-
-	lua_settop(pL, 0);
-
-	return ret;
+	mResultStatusCv.notify_all();
+	return true;
 }
 
 
@@ -148,74 +139,7 @@ TaskStatus Task::GetStatus()
 //------
 Task::Task() : mStatus(TaskStatus::NotStarted), mUnreadResult(false) {}
 
-//------
-void Task::Exec(lua_State* pL)
-{
-	if (pL == nullptr) return;
 
-	{
-		std::unique_lock<std::mutex> lock(mResultStatusMtx);
-
-		if (mStatus != TaskStatus::NotStarted) return;
-
-		mStatus = TaskStatus::Running;
-	}
-
-	mResultStatusCv.notify_all();
-	SetResult(this -> DoExec(pL));
-
-	bool yielded = lua_status(pL) == LUA_YIELD;
-
-	{
-		std::unique_lock<std::mutex> lock(mResultStatusMtx);
-
-		if (mStatus != TaskStatus::Error)
-		{
-			if (yielded)
-			{
-				mStatus = TaskStatus::Suspended;
-			}
-			else mStatus = TaskStatus::Complete;
-		}
-	}
-
-	mResultStatusCv.notify_all();
-}
-
-//------
-void Task::Resume(lua_State* pL)
-{
-	if (pL == nullptr || lua_status(pL) != LUA_YIELD) return;
-
-	{
-		std::unique_lock<std::mutex> lock(mResultStatusMtx);
-
-		if (mStatus != TaskStatus::Suspended) return;
-
-		mStatus = TaskStatus::Running;
-	}
-
-	mResultStatusCv.notify_all();
-
-	SetResult(this->DoResume(pL));
-
-	bool yielded = lua_status(pL) == LUA_YIELD;
-
-	{
-		std::unique_lock<std::mutex> lock(mResultStatusMtx);
-
-		if (mStatus != TaskStatus::Error)
-		{
-			if (yielded)
-			{
-				mStatus = TaskStatus::Suspended;
-			}
-			else mStatus = TaskStatus::Complete;
-		}
-	}
-
-	mResultStatusCv.notify_all();
-}
 
 //------
 void Task::SetError(const std::string& errMsg)

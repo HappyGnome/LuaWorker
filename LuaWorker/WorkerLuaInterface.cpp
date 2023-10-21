@@ -20,6 +20,8 @@
 #include "TaskDoFile.h"
 #include "TaskDoString.h"
 #include "TaskDoSleep.h"
+#include "OneShotTask.h"
+#include "CoTask.h"
 
 using namespace LuaWorker;
 using namespace AutoKeyDeck;
@@ -94,6 +96,9 @@ int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 	lua_pushcclosure(pL, l_Worker_DoSleep, 1);
 	lua_setfield(pL, -2, "DoSleep");
 	lua_pushinteger(pL, key);
+	lua_pushcclosure(pL, l_Worker_DoCoRoutine, 1);
+	lua_setfield(pL, -2, "DoCoroutine");
+	lua_pushinteger(pL, key);
 	lua_pushcclosure(pL, l_Worker_Start, 1);
 	lua_setfield(pL, -2, "Start");
 	lua_pushinteger(pL, key);
@@ -136,7 +141,7 @@ int WorkerLuaInterface::l_Worker_DoString(lua_State* pL)
 		{
 			std::string str = lua_tostring(pL, -1);
 
-			std::shared_ptr<Task> newItem(new TaskDoString(str));
+			std::shared_ptr<OneShotTask> newItem(new TaskDoString(str));
 			pWorker->AddTask(newItem);
 
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -156,7 +161,7 @@ int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 		{
 			std::string str = lua_tostring(pL, -1);
 
-			std::shared_ptr<Task> newItem(new TaskDoFile(str));
+			std::shared_ptr<OneShotTask> newItem(new TaskDoFile(str));
 			pWorker->AddTask(newItem);
 			
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -176,11 +181,39 @@ int WorkerLuaInterface::l_Worker_DoSleep(lua_State* pL)
 		{
 			unsigned int millis = std::max(0,(int)lua_tointeger(pL, -1));
 
-			std::shared_ptr<Task> newItem(new TaskDoSleep(millis));
+			std::shared_ptr<OneShotTask> newItem(new TaskDoSleep(millis));
 			pWorker->AddTask(newItem);
 
 			return TaskLuaInterface::l_PushTask(pL, newItem);
 		}
+	}
+
+	return 0;
+}
+
+int WorkerLuaInterface::l_Worker_DoCoRoutine(lua_State* pL)
+{
+	std::shared_ptr<Worker> pWorker = l_PopWorker(pL);
+
+	if (pWorker != nullptr)
+	{		
+		int N = lua_gettop(pL); // TODO get more args
+
+		if (!lua_isstring(pL, -1)) return 0;
+
+		std::vector<std::string> argStrings;
+		std::string funcStr = lua_tostring(pL, -1);		
+
+		/*for (int i = -N + 1; i < 0; i++)
+		{
+			if (!lua_isstring(pL, i)) break;
+			argStrings.push_back(lua_tostring(pL, i));
+		}*/
+
+		std::shared_ptr<CoTask> newItem(new CoTask(funcStr, argStrings));
+		pWorker->AddTask(newItem);
+
+		return TaskLuaInterface::l_PushTask(pL, newItem);
 	}
 
 	return 0;

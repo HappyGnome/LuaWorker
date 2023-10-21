@@ -22,7 +22,7 @@
 
 #include<string>
 
-#include "Task.h"
+#include "OneShotTask.h"
 
 extern "C" {
 #include "lua.h"
@@ -35,7 +35,7 @@ namespace LuaWorker
 	/// <summary>
 	/// Implementation of Task that executes a lua file
 	/// </summary>
-	class TaskDoFile : public Task
+	class TaskDoFile : public OneShotTask
 	{
 	private:
 

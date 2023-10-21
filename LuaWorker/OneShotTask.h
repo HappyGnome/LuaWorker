@@ -16,47 +16,52 @@
 *
 \*****************************************************************************/
 
-#ifndef _TASK_SLEEP_H_
-#define _TASK_SLEEP_H_
+#ifndef _SINGLE_TASK_H_
+#define _SINGLE_TASK_H_
 #pragma once
 
-#include<chrono>
+#include <string>
 
-#include "OneShotTask.h"
+#include "Cancelable.h"
+#include "Task.h"
 
 extern "C" {
 #include "lua.h"
 	//#include "lauxlib.h"
 	//#include "lualib.h"
 }
+//using namespace std::chrono_literals;
 
 namespace LuaWorker
 {
+
 	/// <summary>
-	/// Implementation of Task that sleeps for a minimum amount of time
+	/// Base class for simple (non-coroutine-based) tasks for LuaWorker to execute
 	/// </summary>
-	class TaskDoSleep : public OneShotTask
+	class OneShotTask : public Task
 	{
-	private:
-
-		unsigned int mSleepForMs;
-
 	protected:
 
+		//-------------------------------
+		// Protected methods
+		//-------------------------------
+
 		/// <summary>
-		/// Do the lua work for this task
+		/// Do the work for this task, as implemented in derived classes.
+		/// Called on the worker lua state.
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		/// <returns> Result of the task</returns>
-		std::string DoExec(lua_State* pL) override;
+		virtual std::string DoExec(lua_State* pL) = 0;
 
 	public:
 
 		/// <summary>
-		/// Constructor
+		/// Execute this task on a given lua state
 		/// </summary>
-		/// <param name="sleepForMs">Time to sleep for</param>
-		explicit TaskDoSleep(unsigned int sleepForMs);
+		/// <param name="pL">Lua state</param>
+		void Exec(lua_State* pL);
+
 	};
-};
+}
 #endif

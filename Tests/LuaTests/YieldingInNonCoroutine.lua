@@ -21,9 +21,9 @@ initStr = [[gStr = ""
 YieldingFunc = function(ch)
 	for i = 1,5 do
 		gStr = gStr .. ch
-		InLuaWorker.YieldFor(gStr,10000)
+		InLuaWorker.YieldFor(true,1000)
 	end
-	return gStr
+	return true
 end]]
 
 w = LuaWorker.Create()
@@ -39,57 +39,8 @@ end
 
 Step2 = function()
 
-	T1 = w:DoCoroutine("function() YieldingFunc('a') end")
+	w:DoString("return YieldingFunc('a')"):Await(500)
 
-	RaiseFirstWorkerError(w)
+	RaiseFirstWorkerError(w) -- Should be an error "Cannot yield here"
 	return true
-end 
-
-Step3 = function()
-	T2 = w:DoCoroutine("function() YieldingFunc('b') end")
-
-	RaiseFirstWorkerError(w)
-	return true
-end 
-
-Step4 = function()
-	res = T1:Await(50000) 
-	RaiseFirstWorkerError(w)
-	if res == "a" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
-Step5 = function()
-	res = T2:Await(50000) 
-	RaiseFirstWorkerError(w)
-	if res== "ab" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
---After 1s more
-Step6 = function()
-	res = T1:Await(50000) 
-	RaiseFirstWorkerError(w)
-	if res== "aba" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
---After 3s more
-Step7 = function()
-	res = T2:Await(50000) 
-	RaiseFirstWorkerError(w)
-	if res== "aba" then 
-		return true
-	else
-		error(res)
-	end
 end 

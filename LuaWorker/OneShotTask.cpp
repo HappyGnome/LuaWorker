@@ -16,14 +16,16 @@
 *
 \*****************************************************************************/
 
-#include <memory>
-
-#include "TaskExecPack.h"
+#include "OneShotTask.h"
 
 using namespace LuaWorker;
 
 
-void TaskExecPack::VisitLuaState(std::unique_ptr<TaskExecPack>&& visitor, InnerLuaState* pLua)
+//------
+void OneShotTask::Exec(lua_State* pL)
 {
-	visitor->CastAndExec(std::move(visitor),pLua); // May move from visitor 
+	if (pL == nullptr || !TrySetRunning()) return;
+
+	SetResult(this->DoExec(pL), lua_status(pL) == LUA_YIELD);
+
 }
