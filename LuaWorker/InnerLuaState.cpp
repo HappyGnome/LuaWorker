@@ -217,7 +217,7 @@ int InnerLuaState::l_YieldFor(lua_State* pL)
 
 		lua_pop(pL,1); // pop delay
 		int resultCount = 0;
-		if (lua_isstring(pL, -1)) resultCount = 1;//TODO allow multiple
+		if (lua_isstring(pL, -1)) resultCount = 1;
 
 		return lua_yield(pL, resultCount); //Yield remaining parameters to resume
 	}

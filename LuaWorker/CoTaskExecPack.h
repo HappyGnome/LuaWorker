@@ -30,6 +30,9 @@
 
 namespace LuaWorker
 {
+	/// <summary>
+	/// Exec pack for a coroutine class
+	/// </summary>
 	class CoTaskExecPack : public TypedTaskExecPack<CoTask, CoTaskExecPack> {
 
 	public:
@@ -46,6 +49,10 @@ namespace LuaWorker
 		/// <param name="pL">Lua state</param>
 		void Exec(lua_State* pL);
 
+		/// <summary>
+		/// Resume yielded task 
+		/// </summary>
+		/// <param name="pL">The thread on which Exec was previously called</param>
 		void Resume(lua_State* pL);
 
 	};

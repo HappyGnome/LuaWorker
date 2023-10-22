@@ -193,22 +193,23 @@ int WorkerLuaInterface::l_Worker_DoSleep(lua_State* pL)
 
 int WorkerLuaInterface::l_Worker_DoCoRoutine(lua_State* pL)
 {
+
 	std::shared_ptr<Worker> pWorker = l_PopWorker(pL);
 
 	if (pWorker != nullptr)
 	{		
-		int N = lua_gettop(pL); // TODO get more args
+		int N = lua_gettop(pL) - 1;
 
-		if (!lua_isstring(pL, -1)) return 0;
+		if (!lua_isstring(pL, -N)) return 0;
 
 		std::vector<std::string> argStrings;
-		std::string funcStr = lua_tostring(pL, -1);		
+		std::string funcStr = lua_tostring(pL, -N);		
 
-		/*for (int i = -N + 1; i < 0; i++)
+		for (int i = -N + 1; i < 0; i++)
 		{
 			if (!lua_isstring(pL, i)) break;
 			argStrings.push_back(lua_tostring(pL, i));
-		}*/
+		}
 
 		std::shared_ptr<CoTask> newItem(new CoTask(funcStr, argStrings));
 		pWorker->AddTask(newItem);

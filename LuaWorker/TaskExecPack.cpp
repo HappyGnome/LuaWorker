@@ -23,7 +23,7 @@
 using namespace LuaWorker;
 
 
-void TaskExecPack::VisitLuaState(std::unique_ptr<TaskExecPack>&& visitor, InnerLuaState* pLua)
+void TaskExecPack::VisitLuaState(std::unique_ptr<TaskExecPack>&& visitor, TaskPackAcceptor* pLua)
 {
 	visitor->CastAndExec(std::move(visitor),pLua); // May move from visitor 
 }

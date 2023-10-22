@@ -122,7 +122,8 @@ namespace LuaWorker
 		/// Block until task has executed (or reaches a final state) 
 		/// </summary>
 		/// <param name="waitForMillis">Max time to wait</param>
-		void WaitForResult(unsigned int waitForMillis);
+		/// <returns>True if tasks is complete, or newly suspended</returns>
+		bool WaitForResult(unsigned int waitForMillis);
 
 		/// <summary>
 		/// Get execution status of this Task

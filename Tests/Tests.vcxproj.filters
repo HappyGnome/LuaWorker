@@ -114,5 +114,8 @@
     <None Include="LuaTests\YieldingInNonCoroutine.lua">
       <Filter>LuaTests</Filter>
     </None>
+    <None Include="LuaTests\ErrorInCoroutine.lua">
+      <Filter>LuaTests</Filter>
+    </None>
   </ItemGroup>
 </Project>

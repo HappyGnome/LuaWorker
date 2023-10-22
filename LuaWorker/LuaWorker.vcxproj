@@ -219,7 +219,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CoTask.cpp" />
-    <ClCompile Include="CoTask.h" />
+    <ClInclude Include="CoTask.h" />
     <ClCompile Include="CoTaskExecPack.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="InnerLuaState.cpp" />
@@ -229,13 +229,16 @@
     <ClCompile Include="LuaCancellationException.cpp" />
     <ClCompile Include="OneShotTask.cpp" />
     <ClCompile Include="OneShotTaskExecPack.cpp" />
-    <ClCompile Include="OneShotTaskExecPack.h" />
+    <ClInclude Include="OneShotTaskExecPack.h" />
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="TaskDoFile.cpp" />
     <ClCompile Include="TaskExecPack.cpp" />
     <ClCompile Include="TaskLuaInterface.cpp" />
     <ClCompile Include="TaskDoSleep.cpp" />
     <ClCompile Include="TaskDoString.cpp" />
+    <ClInclude Include="TaskPackAcceptor.h">
+      <FileType>CppHeader</FileType>
+    </ClInclude>
     <ClCompile Include="Worker.cpp" />
     <ClCompile Include="WorkerLuaInterface.cpp" />
   </ItemGroup>

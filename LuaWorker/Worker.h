@@ -26,10 +26,12 @@
 //#include <deque> 
 #include <mutex> 
 
-//#include "TaskExecPack.h"
+#include "TaskExecPack.h"
 #include "LogSection.h"
-//#include "InnerLuaState.h"
+#include "InnerLuaState.h"
 #include "Cancelable.h"
+#include "CoTask.h"
+#include "OneShotTask.h"
 
 extern "C" {
 //#include "lua.h"
@@ -40,10 +42,6 @@ extern "C" {
 
 namespace LuaWorker
 {
-	class CoTask;
-	class OneShotTask;
-	class TaskExecPack;
-	class InnerLuaState;
 
 	enum class WorkerStatus {
 		NotStarted,
@@ -159,6 +157,11 @@ namespace LuaWorker
 		/// <returns>Current worker status</returns>
 		WorkerStatus AddTask(std::shared_ptr<OneShotTask> task);
 
+		/// <summary>
+		/// Queue coroutine task for worker thread
+		/// </summary>
+		/// <param name="task">Task to queue</param>
+		/// <returns>Current worker status</returns>
 		WorkerStatus AddTask(std::shared_ptr<CoTask> task);
 
 		/// <summary>

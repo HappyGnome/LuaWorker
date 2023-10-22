@@ -29,7 +29,7 @@
 #include "LogSection.h"
 //#include "OneShotTaskExecPack.h"
 //#include "CoTaskExecPack.h"
-//#include "TaskPackAcceptor.h"
+#include "TaskPackAcceptor.h"
 
 extern "C" {
 #include "lua.h"
@@ -39,13 +39,11 @@ extern "C" {
 
 namespace LuaWorker
 {
-	class OneShotTaskExecPack;
-	class CoTaskExecPack;
 
 	/// <summary>
 	/// Manages lua state in worker thread
 	/// </summary>
-	class InnerLuaState : public Cancelable//, public TaskPackAcceptor
+	class InnerLuaState : public Cancelable, public TaskPackAcceptor
 	{
 	private:
 

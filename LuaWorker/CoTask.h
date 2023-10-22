@@ -37,23 +37,36 @@ extern "C" {
 
 namespace LuaWorker
 {
-
+	/// <summary>
+	/// Task to start a coroutine on the worker thread
+	/// </summary>
 	class CoTask : public Task
 	{
 	private:
 		std::string mExecString;
 
 		/// <summary>
-		/// Do the work for this task, as implemented in derived classes.
+		/// Make initial resume call to start the coroutine
 		/// Called on the worker lua state.
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		/// <returns> Result of the task</returns>
 		std::string DoExec(lua_State* pL);
 
+		/// <summary>
+		/// Resume execution of the passed thread
+		/// </summary>
+		/// <param name="pL"></param>
+		/// <param name="argC"></param>
+		/// <returns></returns>
 		std::string DoResume(lua_State* pL, int argC);
 	public:
 
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="funcString"></param>
+		/// <param name="argStrings"></param>
 		explicit CoTask(const std::string& funcString, const std::vector<std::string> &argStrings);
 
 		/// <summary>

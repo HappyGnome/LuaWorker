@@ -22,6 +22,7 @@ YieldingFunc = function(ch)
 	for i = 1,5 do
 		gStr = gStr .. ch
 		InLuaWorker.YieldFor(gStr,1000)
+		error("Test Failure")
 	end
 	return gStr
 end]]
@@ -72,50 +73,14 @@ Step5 = function()
 	end
 end 
 
-Step6_1 = function()
-	
-	return T1:Status() == LuaWorker.TaskStatus.Suspended
-
-end 
-
-Step6_2 = function()
+Step6 = function()
 
 	res = T1:Await(1100) 
-	RaiseFirstWorkerError(w)
-	if res == "aba" then 
-		return true
-	else
-		error(res)
-	end
+	return T1:Status() == LuaWorker.TaskStatus.Error
 end 
 
 Step7 = function()
-	res = T2:Await(1100) 
-	RaiseFirstWorkerError(w)
-	if res == "abab" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
---After 4s
-Step8 = function()
-	T = w:DoString("return gStr")
-	res = T:Await(200) 
 
 	RaiseFirstWorkerError(w)
-	if res == "ababababab" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
-Step9 = function()
-	return T1:Status() == LuaWorker.TaskStatus.Complete
-end 
-
-Step10 = function()
-	return T2:Status() == LuaWorker.TaskStatus.Complete
+	return true
 end 

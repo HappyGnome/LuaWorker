@@ -289,6 +289,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </CopyFileToFolders>
+    <None Include="LuaTests\ErrorInCoroutine.lua" />
     <None Include="LuaTests\TaskDoFile_FileTask.lua">
       <FileType>Document</FileType>
     </None>

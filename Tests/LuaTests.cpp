@@ -176,16 +176,36 @@ namespace Tests
 			lua.DoTestFile("YieldingTasks1.lua");
 
 			std::this_thread::sleep_for(0.5s);
-			Assert::IsTrue(lua.DoTestString("return Step1()", 50000ms), L"Step1");
-			Assert::IsTrue(lua.DoTestString("return Step2()", 20000ms), L"Step2");
-			Assert::IsTrue(lua.DoTestString("return Step3()", 20000ms), L"Step3");
-			Assert::IsTrue(lua.DoTestString("return Step4()", 20000ms), L"Step4");
-			//std::this_thread::sleep_for(1.1s);
-			Assert::IsTrue(lua.DoTestString("return Step5()", 20000ms), L"Step5");
-			//std::this_thread::sleep_for(1.1s);
-			Assert::IsTrue(lua.DoTestString("return Step6()", 20000ms), L"Step6");
-			//std::this_thread::sleep_for(3.1s);
-			Assert::IsTrue(lua.DoTestString("return Step7()", 20000ms), L"Step7");
+			Assert::IsTrue(lua.DoTestString("return Step1()", 500ms), L"Step1");
+			Assert::IsTrue(lua.DoTestString("return Step2()", 200ms), L"Step2");
+			Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
+			Assert::IsTrue(lua.DoTestString("return Step4()", 200ms), L"Step4");
+			Assert::IsTrue(lua.DoTestString("return Step5()", 200ms), L"Step5");
+			Assert::IsTrue(lua.DoTestString("return Step6_1()",200ms), L"Step6.1");
+			Assert::IsTrue(lua.DoTestString("return Step6_2()", 1200ms, 800ms), L"Step6.2");
+			Assert::IsTrue(lua.DoTestString("return Step7()", 200ms), L"Step7");
+			std::this_thread::sleep_for(4.1s);
+			Assert::IsTrue(lua.DoTestString("return Step8()", 200ms), L"Step8");
+			Assert::IsTrue(lua.DoTestString("return Step9()", 200ms), L"Step9");
+			Assert::IsTrue(lua.DoTestString("return Step10()", 200ms), L"Step10");
 		}
+
+		TEST_METHOD(ErrorInCoroutine)
+		{
+			LuaTestState lua;
+
+			lua.DoTestFile("Common.lua");
+			lua.DoTestFile("ErrorInCoroutine.lua");
+
+			std::this_thread::sleep_for(0.5s);
+			Assert::IsTrue(lua.DoTestString("return Step1()", 500ms), L"Step1");
+			Assert::IsTrue(lua.DoTestString("return Step2()", 200ms), L"Step2");
+			Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
+			Assert::IsTrue(lua.DoTestString("return Step4()", 200ms), L"Step4");
+			Assert::IsTrue(lua.DoTestString("return Step5()", 200ms), L"Step5");
+			Assert::IsTrue(lua.DoTestString("return Step6()", 1200ms), L"Step6");
+			Assert::IsFalse(lua.DoTestString("return Step7()", 200ms), L"Step7");
+		}
+		
 	};
 }

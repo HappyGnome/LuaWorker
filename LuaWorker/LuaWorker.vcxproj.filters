@@ -43,6 +43,12 @@
     <Filter Include="Header Files\General">
       <UniqueIdentifier>{4b2a271a-4273-443b-9697-df75237efd88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\TaskExecPack">
+      <UniqueIdentifier>{f31f09a5-090c-45ee-936b-9c907947a57d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TaskExecPack">
+      <UniqueIdentifier>{0880fb1e-afc8-4e90-909e-e73a86c84e69}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Worker.h">
@@ -87,20 +93,29 @@
     <ClInclude Include="InnerLuaState.h">
       <Filter>Header Files\LuaInterface</Filter>
     </ClInclude>
-    <ClInclude Include="TaskExecPack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OneShotTask.h">
       <Filter>Header Files\Tasks</Filter>
     </ClInclude>
     <ClInclude Include="Task.h">
       <Filter>Header Files\Tasks</Filter>
     </ClInclude>
-    <ClInclude Include="TypedTaskExecPack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CoTaskExecPack.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\TaskExecPack</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskExecPack.h">
+      <Filter>Header Files\TaskExecPack</Filter>
+    </ClInclude>
+    <ClInclude Include="TypedTaskExecPack.h">
+      <Filter>Header Files\TaskExecPack</Filter>
+    </ClInclude>
+    <ClInclude Include="CoTask.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="OneShotTaskExecPack.h">
+      <Filter>Header Files\TaskExecPack</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskPackAcceptor.h">
+      <Filter>Header Files\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -140,29 +155,23 @@
     <ClCompile Include="InnerLuaState.cpp">
       <Filter>Source Files\LuaInterface</Filter>
     </ClCompile>
-    <ClCompile Include="TaskExecPack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Task.cpp">
       <Filter>Source Files\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="OneShotTask.cpp">
       <Filter>Source Files\Tasks</Filter>
     </ClCompile>
-    <ClCompile Include="CoTask.h">
-      <Filter>Header Files\Tasks</Filter>
-    </ClCompile>
     <ClCompile Include="CoTask.cpp">
       <Filter>Source Files\Tasks</Filter>
     </ClCompile>
-    <ClCompile Include="OneShotTaskExecPack.h">
-      <Filter>Header Files</Filter>
+    <ClCompile Include="CoTaskExecPack.cpp">
+      <Filter>Source Files\TaskExecPack</Filter>
     </ClCompile>
     <ClCompile Include="OneShotTaskExecPack.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\TaskExecPack</Filter>
     </ClCompile>
-    <ClCompile Include="CoTaskExecPack.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="TaskExecPack.cpp">
+      <Filter>Source Files\TaskExecPack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -24,13 +24,10 @@
 
 #include "Task.h"
 #include "LogSection.h"
-//#include "TaskPackAcceptor.h"
-#include "InnerLuaState.h"
+#include "TaskPackAcceptor.h"
 
 namespace LuaWorker
 {
-	class TaskPackAcceptor;
-
 	class TaskExecPack
 	{
 	protected:
@@ -40,7 +37,7 @@ namespace LuaWorker
 		/// May invalidate the lvalue instance used to call it
 		/// </summary>
 		/// <param name="pLua"></param>
-		virtual void CastAndExec(std::unique_ptr<TaskExecPack>&& thisAsBase, InnerLuaState* pLua) = 0;
+		virtual void CastAndExec(std::unique_ptr<TaskExecPack>&& thisAsBase, TaskPackAcceptor* pLua) = 0;
 
 	public:
 
@@ -48,7 +45,7 @@ namespace LuaWorker
 		/// Pass ExecPack to appropriate handler in an TaskPackAcceptor
 		/// </summary>
 		/// <param name="visitor"></param>
-		static void VisitLuaState(std::unique_ptr<TaskExecPack>&& visitor, InnerLuaState* pLua);
+		static void VisitLuaState(std::unique_ptr<TaskExecPack>&& visitor, TaskPackAcceptor* pLua);
 
 		/// <summary>
 		/// Default constructor

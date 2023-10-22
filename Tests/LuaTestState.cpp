@@ -77,7 +77,6 @@ LuaTestState::~LuaTestState()
 
 }
 
-
 bool LuaTestState::DoTestFile(const char* filepath)
 {
 	if (mLua == nullptr) return false;

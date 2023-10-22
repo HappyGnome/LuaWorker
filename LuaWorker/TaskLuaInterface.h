@@ -62,11 +62,12 @@ namespace LuaWorker
 		// Lua Constants
 		//-------------------------------
 		static const int
-			TaskStatus_NotStarted	= 0,
-			TaskStatus_Running		= 1,
-			TaskStatus_Complete		= 2,
-			TaskStatus_Cancelled	= 3,
-			TaskStatus_Error		= 4;
+			TaskStatus_NotStarted = 0,
+			TaskStatus_Running = 1,
+			TaskStatus_Complete = 2,
+			TaskStatus_Cancelled = 3,
+			TaskStatus_Error = 4,
+			TaskStatus_Suspended = 5;
 
 		/// <summary>
 		/// Push task handle to the top of the lua stack and keep shared_ptr

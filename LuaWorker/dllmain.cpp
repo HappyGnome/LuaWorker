@@ -50,6 +50,8 @@ extern "C"  int luaopen_LuaWorker(lua_State* pL) {
         lua_setfield(pL, -2, "Running");
             lua_pushnumber(pL, TaskLuaInterface::TaskStatus_Error);
         lua_setfield(pL, -2, "Error");
+            lua_pushnumber(pL, TaskLuaInterface::TaskStatus_Suspended);
+        lua_setfield(pL, -2, "Suspended");
     lua_setfield(pL, -2, "TaskStatus");
 
     //Worker Status

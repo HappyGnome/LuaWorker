@@ -114,10 +114,7 @@ int TaskLuaInterface::l_Task_Await(lua_State* pL)
 		
 		long waitMillis = (long)lua_tointeger(pL, -1);
 
-		pTask->WaitForResult(waitMillis);
-
-		TaskStatus status = pTask->GetStatus();
-		if (status == TaskStatus::Complete || status == TaskStatus::Suspended)
+		if(pTask->WaitForResult(waitMillis))
 		{
 			lua_pushstring(pL, pTask->GetResult().c_str());
 			return 1;
@@ -144,6 +141,7 @@ int TaskLuaInterface::l_Task_Status(lua_State* pL)
 		case TaskStatus::Complete: statusInt = TaskStatus_Complete; break;
 		case TaskStatus::Running: statusInt = TaskStatus_Running; break;
 		case TaskStatus::Error: statusInt = TaskStatus_Error; break;
+		case TaskStatus::Suspended: statusInt = TaskStatus_Suspended; break;
 		default: statusInt = TaskStatus_NotStarted; break;
 		}
 

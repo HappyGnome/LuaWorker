@@ -16,40 +16,39 @@
 *
 \*****************************************************************************/
 
-#ifndef _ONE_SHOT_TASK_EXEC_PACK_H_
-#define _ONE_SHOT_TASK_EXEC_PACK_H_
+#ifndef _TASK_PACK_ACCEPTOR_H_
+#define _TASK_PACK_ACCEPTOR_H_
 #pragma once
 
-#include <memory>
-
-
-#include "LogSection.h"
-#include "TypedTaskExecPack.h"
-#include "OneShotTask.h"
-//#include "TaskPackAcceptor.h"
+#include <memory> 
 
 namespace LuaWorker
 {
+	class OneShotTaskExecPack;
+	class CoTaskExecPack;
 
 	/// <summary>
-	/// Exec pack for a simple non-coroutine class
+	/// Intereface for executing type of task exec pack 
 	/// </summary>
-	class OneShotTaskExecPack : public TypedTaskExecPack<OneShotTask, OneShotTaskExecPack > {
+	class TaskPackAcceptor
+	{
 
 	public:
+		/// <summary>
+		/// Exec task in lua state. 
+		/// Call in worker thread only.
+		/// </summary>
+		/// <param name="task">Task to execute</param>
+		/// <param name="resumeToken">Resume token output</param>
+		virtual void ExecTask(std::unique_ptr <OneShotTaskExecPack>&& task) = 0;
 
 		/// <summary>
-		/// Constructor
+		/// Exec task in lua state. 
+		/// Call in worker thread only.
 		/// </summary>
-		using TypedTaskExecPack::TypedTaskExecPack;
-
-
-		/// <summary>
-		/// Execute this task on a given lua state
-		/// </summary>
-		/// <param name="pL">Lua state</param>
-		void Exec(lua_State* pL);
-
+		/// <param name="task">Task to execute</param>
+		/// <param name="resumeToken">Resume token output</param>
+		virtual void ExecTask(std::unique_ptr <CoTaskExecPack>&& task) = 0;
 	};
 }
 

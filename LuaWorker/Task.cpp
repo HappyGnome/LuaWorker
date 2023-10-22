@@ -110,7 +110,7 @@ std::string Task::GetResult()
 }
 
 //------
-void Task::WaitForResult(unsigned int waitForMillis)
+bool Task::WaitForResult(unsigned int waitForMillis)
 {
 	if (waitForMillis <= 0) waitForMillis = 1;
 
@@ -120,11 +120,12 @@ void Task::WaitForResult(unsigned int waitForMillis)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
-		if (IsFinal(mStatus) || mUnreadResult) return;
+		if (IsFinal(mStatus) || mUnreadResult) return true;
 
 		mResultStatusCv.wait_until(lock, sleepTill);
 
 	}
+	return false;
 }
 
 //------

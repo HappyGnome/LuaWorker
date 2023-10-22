@@ -28,13 +28,22 @@
 
 namespace LuaWorker
 {
-
+	/// <summary>
+	/// TaskExecPack managing a task instance, which can be passed to TaskPackAcceptor
+	/// </summary>
+	/// <typeparam name="T_Task"></typeparam>
+	/// <typeparam name="T_Class"></typeparam>
 	template<typename T_Task, class T_Class>
 	class TypedTaskExecPack : public TaskExecPack
 	{
 	protected:
 
-		virtual void CastAndExec(std::unique_ptr<TaskExecPack>&& thisAsBase, InnerLuaState* pLua) final
+		/// <summary>
+		/// Cast a unique instance pointer to its derived type, calling the appropriate handler of the acceptor
+		/// </summary>
+		/// <param name="thisAsBase"></param>
+		/// <param name="pLua"></param>
+		virtual void CastAndExec(std::unique_ptr<TaskExecPack>&& thisAsBase, TaskPackAcceptor* pLua) final
 		{
 			if (pLua == nullptr || thisAsBase.get() != this) return;
 
@@ -100,20 +109,6 @@ namespace LuaWorker
 				// Suppress exception in destructor
 			}
 		}
-
-
-		/*/// <summary>
-		/// Execute this task on a given lua state
-		/// </summary>
-		/// <param name="pL">Lua state</param>
-		void Exec(lua_State* pL);
-
-		/// <summary>
-		/// Resume execution of this task on the given lua state.
-		/// Is this is not the same state previously passed to Exec, behaviour is undefined.
-		/// </summary>
-		/// <param name="pL">Lua state</param>
-		void Resume(lua_State* pL);*/
 
 		/// <summary>
 		/// Get execution status of this Task
