@@ -192,6 +192,8 @@ int InnerLuaState::l_YieldFor(lua_State* pL)
 
 	if (pState != nullptr)
 	{
+		int argC = lua_gettop(pL);
+
 		if (!pState->mCurrentTaskCanYield)
 		{
 			lua_pushstring(pL, "Cannot yield here.");
@@ -199,12 +201,12 @@ int InnerLuaState::l_YieldFor(lua_State* pL)
 			return 0;
 		}
 
-		if (!lua_isnumber(pL, -1)) {
+		if (!lua_isnumber(pL, -argC)) {
 			lua_pushstring(pL, "YieldFor expects parameters (<number>,...<results>)");
 			lua_error(pL);
 			return 0;
 		}
-		lua_Integer millis = lua_tointeger(pL, -1);
+		lua_Integer millis = lua_tointeger(pL, -argC);
 		if (millis <= 0)
 		{
 			lua_pushstring(pL, "YieldFor delay must be positive");
@@ -215,9 +217,12 @@ int InnerLuaState::l_YieldFor(lua_State* pL)
 		pState -> mResumeCurrentTaskAt = system_clock::now() + (millis * 1ms);
 		pState -> mCurrentTaskYielded = true;
 
-		lua_pop(pL,1); // pop delay
 		int resultCount = 0;
-		if (lua_isstring(pL, -1)) resultCount = 1;
+		if (argC > 1 && lua_isstring(pL, 2))
+		{
+			lua_settop(pL, 2);
+			resultCount = 1;
+		}
 
 		return lua_yield(pL, resultCount); //Yield remaining parameters to resume
 	}
@@ -405,6 +410,10 @@ void InnerLuaState::ResumeTask()
 	{
 		card.value().SetSortKey(mResumeCurrentTaskAt);
 		T_SuspendedTaskCard::Return(std::move(card.value()));
+	}
+	else
+	{
+		RemoveTaskThread(card.value().GetTag());
 	}
 }
 

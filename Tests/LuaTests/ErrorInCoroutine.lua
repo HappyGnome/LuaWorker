@@ -21,8 +21,8 @@ initStr = [[gStr = ""
 YieldingFunc = function(ch)
 	for i = 1,5 do
 		gStr = gStr .. ch
-		InLuaWorker.YieldFor(gStr,1000)
-		error("Test Failure")
+		InLuaWorker.YieldFor(1000,gStr)
+		error("Testing Failure")
 	end
 	return gStr
 end]]
@@ -47,14 +47,7 @@ Step2 = function()
 end 
 
 Step3 = function()
-	T2 = w:DoCoroutine("YieldingFunc","'b'")
-
-	RaiseFirstWorkerError(w)
-	return true
-end 
-
-Step4 = function()
-	res = T1:Await(1000) 
+	res = T1:Await(200) 
 	RaiseFirstWorkerError(w)
 	if res == "a" then 
 		return true
@@ -63,23 +56,13 @@ Step4 = function()
 	end
 end 
 
-Step5 = function()
-	res = T2:Await(1000) 
-	RaiseFirstWorkerError(w)
-	if res == "ab" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
-Step6 = function()
+Step4 = function()
 
 	res = T1:Await(1100) 
 	return T1:Status() == LuaWorker.TaskStatus.Error
 end 
 
-Step7 = function()
+Step5 = function()
 
 	RaiseFirstWorkerError(w)
 	return true

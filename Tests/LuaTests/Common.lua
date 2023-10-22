@@ -24,7 +24,7 @@ require('LuaWorker')
 RaiseFirstWorkerError = function(worker)
 	while (true) do
 		local s, l = worker:PopLogLine()
-		if s == nil then break end
+		if l == nil then break end
 		if l == LuaWorker.LogLevel.Error then
 			error(s)
 		end

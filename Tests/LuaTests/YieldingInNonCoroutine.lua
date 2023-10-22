@@ -21,7 +21,7 @@ initStr = [[gStr = ""
 YieldingFunc = function(ch)
 	for i = 1,5 do
 		gStr = gStr .. ch
-		InLuaWorker.YieldFor(true,1000)
+		InLuaWorker.YieldFor(1000,true)
 	end
 	return true
 end]]
@@ -39,7 +39,13 @@ end
 
 Step2 = function()
 
-	w:DoString("return YieldingFunc('a')"):Await(500)
+	T = w:DoString("return YieldingFunc('a')")
+	
+	res = T:Await(1000)
+	return T:Status()  == LuaWorker.TaskStatus.Error and res == nil
+end 
+
+Step3 = function()
 
 	RaiseFirstWorkerError(w) -- Should be an error "Cannot yield here"
 	return true

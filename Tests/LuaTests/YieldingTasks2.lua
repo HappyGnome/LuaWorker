@@ -18,10 +18,10 @@
 
 initStr = [[gStr = ""
 
-YieldingFunc = function(ch)
+YieldingFunc = function(ch, delay)
 	for i = 1,5 do
 		gStr = gStr .. ch
-		InLuaWorker.YieldFor(1000,gStr)
+		InLuaWorker.YieldFor(delay,gStr)
 	end
 	return gStr
 end]]
@@ -39,83 +39,28 @@ end
 
 Step2 = function()
 
-	T1 = w:DoCoroutine("function() YieldingFunc('a') end")
+	T1 = w:DoCoroutine("YieldingFunc","'a'","1000")
 
 	RaiseFirstWorkerError(w)
 	return true
 end 
 
 Step3 = function()
-	T2 = w:DoCoroutine("YieldingFunc","'b'")
+	T2 = w:DoCoroutine("YieldingFunc","'b'","150")
 
 	RaiseFirstWorkerError(w)
 	return true
 end 
 
+--After 5s
 Step4 = function()
-	res = T1:Await(1000) 
-	RaiseFirstWorkerError(w)
-	if res == "a" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
-Step5 = function()
-	res = T2:Await(1000) 
-	RaiseFirstWorkerError(w)
-	if res == "ab" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
-Step6_1 = function()
-	
-	return T1:Status() == LuaWorker.TaskStatus.Suspended
-
-end 
-
-Step6_2 = function()
-
-	res = T1:Await(1100) 
-	RaiseFirstWorkerError(w)
-	if res == "aba" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
-Step7 = function()
-	res = T2:Await(1100) 
-	RaiseFirstWorkerError(w)
-	if res == "abab" then 
-		return true
-	else
-		error(res)
-	end
-end 
-
---After 4s
-Step8 = function()
 	T = w:DoString("return gStr")
 	res = T:Await(200) 
 
 	RaiseFirstWorkerError(w)
-	if res == "ababababab" then 
+	if res == "abbbbbaaaa" then 
 		return true
 	else
 		error(res)
 	end
-end 
-
-Step9 = function()
-	return T1:Status() == LuaWorker.TaskStatus.Complete
-end 
-
-Step10 = function()
-	return T2:Status() == LuaWorker.TaskStatus.Complete
 end 

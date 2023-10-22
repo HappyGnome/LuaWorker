@@ -57,3 +57,23 @@ Sleep worker thread for at least the specified time.
 ```
 InLuaWorker.Sleep(1000)
 ```
+
+### YieldFor
+```
+InLuaWorker.YieldFor( millis , result )
+```
+Yield this coroutine and resume after at least the specified delay. Set a result in the task that launched the coroutine.
+Calling this outside of a task created with DoCoroutine is an error.
+
+**Arguments** : 
+\#  |Type		| Description				
+----|-----------|------------------------------
+1	| Integer	| Milliseconds to wait after yielding to resume worker thread
+2	| String	| Result to return to awaited task
+
+**Returns** : Nothing
+
+**Examples**
+```
+InLuaWorker.YieldFor(1000, "IntermediateResult")
+```

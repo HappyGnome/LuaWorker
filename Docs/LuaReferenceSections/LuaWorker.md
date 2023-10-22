@@ -2,6 +2,29 @@
 
 ## Methods
 
+### DoCoroutine
+```
+worker:DoCoroutine( function,args... )
+```
+
+Queue a task for this worker. The task starts a coroutine, which can yield to be resumed after a delay
+
+**Arguments** :
+\#  |Type		| Description
+----|-----------|-----------
+1	| String	| When executed in the worker thread, results in a lua function
+2+  | String	| When executed in the worker thread, each results in an argument for the function
+
+**Returns** :
+\#  |Type					| Description
+----|-----------------------|-----------
+1	| [LuaTask](LuaTask.md)	| Task queued
+
+**Examples**
+```
+task = worker:DoCoroutine("YieldingFunc","'a'","1000")
+```
+
 ### DoFile
 ```
 worker:DoFile( path )

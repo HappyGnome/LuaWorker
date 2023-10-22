@@ -120,6 +120,7 @@ bool Task::WaitForResult(unsigned int waitForMillis)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
+		if (mStatus == TaskStatus::Error) return false;
 		if (IsFinal(mStatus) || mUnreadResult) return true;
 
 		mResultStatusCv.wait_until(lock, sleepTill);

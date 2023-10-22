@@ -301,6 +301,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </None>
     <None Include="LuaTests\YieldingInNonCoroutine.lua" />
+    <None Include="LuaTests\YieldingTasks2.lua" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LuaTests\TaskInfiniteCCalls_FileTask.lua">
