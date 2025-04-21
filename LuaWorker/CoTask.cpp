@@ -78,8 +78,8 @@ std::string CoTask::DoExec(lua_State* pL)
 
 /// <summary>
 /// Resume execution of this task on the given lua state, 
-///		passing any 
-/// Is this is not the same state previously passed to Exec, behaviour is undefined.
+///		passing any arguments already on the stack.
+/// If this is not the same state previously passed to Exec, behaviour is undefined.
 /// </summary>
 /// <param name="pL">Lua state</param>
 std::string CoTask::DoResume(lua_State* pL, int argC)
