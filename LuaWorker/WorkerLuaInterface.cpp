@@ -114,6 +114,14 @@ int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 	return 1;
 }
 
+int WorkerLuaInterface::l_LuaWorker_Version(lua_State* pL)
+{
+	lua_pushinteger(pL, LuaWorkerVersion_Major); 
+	lua_pushinteger(pL, LuaWorkerVersion_Minor); 
+	lua_pushinteger(pL, LuaWorkerVersion_Patch); 
+	return 3;
+}
+
 //-------------------------------
 // Static Lua-callable methods 
 // (Worker Object)

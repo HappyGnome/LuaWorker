@@ -96,6 +96,11 @@ namespace LuaWorker
 			LogLevel_Warn = 1,
 			LogLevel_Error = 2;
 
+		static const int
+			LuaWorkerVersion_Major = 1,
+			LuaWorkerVersion_Minor = 1,
+			LuaWorkerVersion_Patch = 0;
+
 		//-------------------------------
 		// Static Lua-callable methods 
 		// (Library level)
@@ -110,6 +115,15 @@ namespace LuaWorker
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
 		static int l_Worker_Create(lua_State* pL);
+
+		/// <summary>
+		/// Get major, minor and patch numbers of this library
+		///
+		/// Lua syntax:
+		///		local maj,min,patch = LuaWorker.Version()
+		/// </summary>
+		static int l_LuaWorker_Version(lua_State* pL);
+
 
 		//-------------------------------
 		// Static Lua-callable methods 

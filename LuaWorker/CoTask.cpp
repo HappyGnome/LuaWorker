@@ -41,7 +41,6 @@ CoTask::CoTask(const std::string& funcString, const std::vector<std::string>& ar
 	}
 }
 
-
 //-------------------------------
 // Protected methods
 //-------------------------------

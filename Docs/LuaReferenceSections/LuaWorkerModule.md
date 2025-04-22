@@ -60,3 +60,23 @@ Create a new [worker](LuaWorker.md) instance.
 ```
 worker = LuaWorker.Create()
 ```
+
+### Version
+```
+LuaWorker.Version()
+```
+Return semantic version of LuaWorker DLL
+
+**Returns** :
+
+\#  |Type                       | Description
+----|---------------------------|-----------
+1	|Integer					| Major version
+2	|Integer					| Minor version
+3	|Integer					| Patch version
+
+**Examples**
+```
+maj,min,pat = LuaWorker.Version()
+```
+

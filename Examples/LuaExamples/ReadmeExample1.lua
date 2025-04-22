@@ -20,6 +20,9 @@ package.cpath = package.cpath..";".."LuaWorker.dll;"
 
 require('LuaWorker')
 
+local majV,minV,patchV = LuaWorker.Version()
+print ("LuaWorker Version: " .. majV .. "." .. minV .. "." .. patchV)
+
 -- Create worker
 local worker = LuaWorker.Create()			
 
