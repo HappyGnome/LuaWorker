@@ -205,6 +205,7 @@
     <ClInclude Include="LogSection.h" />
     <ClInclude Include="LogStack.h" />
     <ClInclude Include="LogItem.h" />
+    <ClInclude Include="LuaArgBundle.h" />
     <ClInclude Include="LuaCancellationException.h" />
     <ClInclude Include="OneShotTask.h" />
     <ClInclude Include="Task.h" />

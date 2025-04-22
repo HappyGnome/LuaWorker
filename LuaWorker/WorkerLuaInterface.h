@@ -97,8 +97,8 @@ namespace LuaWorker
 			LogLevel_Error = 2;
 
 		static const int
-			LuaWorkerVersion_Major = 1,
-			LuaWorkerVersion_Minor = 1,
+			LuaWorkerVersion_Major = 2,
+			LuaWorkerVersion_Minor = 0,
 			LuaWorkerVersion_Patch = 0;
 
 		//-------------------------------
