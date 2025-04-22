@@ -65,7 +65,7 @@ worker = LuaWorker.Create()
 ```
 LuaWorker.Version()
 ```
-Return semantic version of LuaWorker DLL
+Return semantic version of the LuaWorker library.
 
 **Returns** :
 
