@@ -31,14 +31,10 @@ extern "C" {
 
 using namespace LuaWorker;
 
-CoTask::CoTask(const std::string& funcString, const std::vector<std::string>& argStrings)
+CoTask::CoTask(const std::string& funcString, std::unique_ptr<LuaArgBundle> &&argBundle) :mFuncArgs(std::move(argBundle))
 {
-	mExecString = "return " + funcString;
+	mFuncString = "return " + funcString;
 
-	for (const std::string& it : argStrings)
-	{
-		mExecString += "," + it;
-	}
 }
 
 //-------------------------------
@@ -48,7 +44,7 @@ CoTask::CoTask(const std::string& funcString, const std::vector<std::string>& ar
 std::string CoTask::DoExec(lua_State* pL)
 {
 	int prevTop = lua_gettop(pL);
-	int execResult = luaL_dostring(pL, mExecString.c_str());
+	int execResult = luaL_dostring(pL, mFuncString.c_str());
 
 	if (execResult != 0)
 	{
@@ -59,6 +55,11 @@ std::string CoTask::DoExec(lua_State* pL)
 		}
 
 		SetError("Error in lua string: " + luaError);
+	}
+
+	if (mFuncArgs != nullptr) 
+	{
+		mFuncArgs->Unpack(pL);
 	}
 
 	std::string ret = "";

@@ -210,16 +210,13 @@ int WorkerLuaInterface::l_Worker_DoCoRoutine(lua_State* pL)
 
 		if (!lua_isstring(pL, -N)) return 0;
 
-		std::vector<std::string> argStrings;
 		std::string funcStr = lua_tostring(pL, -N);		
 
-		for (int i = -N + 1; i < 0; i++)
-		{
-			if (!lua_isstring(pL, i)) break;
-			argStrings.push_back(lua_tostring(pL, i));
-		}
+		std::unique_ptr<LuaArgBundle> argBundle = nullptr;
+		
+		if (N > 1) argBundle = std::make_unique<LuaArgBundle>(pL, N - 1);
 
-		std::shared_ptr<CoTask> newItem(new CoTask(funcStr, argStrings));
+		std::shared_ptr<CoTask> newItem(new CoTask(funcStr, std::move(argBundle)));
 		pWorker->AddTask(newItem);
 
 		return TaskLuaInterface::l_PushTask(pL, newItem);

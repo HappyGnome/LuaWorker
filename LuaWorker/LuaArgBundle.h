@@ -25,6 +25,7 @@
 //#include <deque> 
 #include<vector>
 #include<memory>
+#include<cassert>
 
 extern "C" {
 #include "lua.h"
@@ -58,13 +59,9 @@ namespace LuaWorker
 		lua_Number mValue;
 	public:
 		
-		LuaArgNum(lua_Number val) : mValue(val) {}
+		LuaArgNum(lua_Number val);
 
-		int Unpack(lua_State* pL) const
-		{
-			lua_pushnumber(pL, mValue);
-			return 1;
-		}
+		int Unpack(lua_State* pL) const;
 	};
 
 	/// <summary>
@@ -76,14 +73,27 @@ namespace LuaWorker
 		int mValue;
 	public:
 		
-		LuaArgBool(int val) : mValue(val) {}
+		LuaArgBool(int val);
 
-		int Unpack(lua_State* pL) const
-		{
-			lua_pushboolean(pL, mValue);
-			return 1;
-		}
+		int Unpack(lua_State* pL) const;
 	};
+
+	///// <summary>
+	///// Stack reconstruction step that pops values from the stack
+	///// </summary>
+	//class LuaArgPop : public LuaArgUnpackStep
+	//{
+	//public:
+	//	
+	//	LuaArgPop() {}
+
+	//	int Unpack(lua_State* pL) const
+	//	{
+	//		lua_pop(pL, 1);
+	//		return -1;
+	//	}
+	//};
+
 
 	/// <summary>
 	/// Stack reconstruction step that pushes a nil onto the lua stack
@@ -92,11 +102,7 @@ namespace LuaWorker
 	{
 	public:
 		
-		int Unpack(lua_State* pL) const
-		{
-			lua_pushnil(pL);
-			return 1;
-		}
+		int Unpack(lua_State* pL) const;
 	};
 
 	/// <summary>
@@ -114,39 +120,11 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="val"></param>
 		/// <param name="len"></param>
-		LuaArgStr(const char* val, size_t len) :mLen(len)
-		{
-			if (len > 0)
-			{
-				mValue = new char[len];
-				strcpy_s(mValue, len, val);
-			}
-			else
-			{
-				mValue = nullptr;
-			}
-		}
+		LuaArgStr(const char* val, size_t len);
 
-		~LuaArgStr() 
-		{
-			if (mValue != nullptr)
-			{
-				delete[] mValue;
-			}
-		}
-
-		int Unpack(lua_State* pL) const
-		{
-			if (mValue != nullptr)
-			{
-				lua_pushlstring(pL, mValue, mLen);
-			}
-			else
-			{
-				lua_pushnil(pL);
-			}
-			return 1;
-		}
+		~LuaArgStr();
+		
+		int Unpack(lua_State* pL) const;
 	};
 
 	/// <summary>
@@ -157,18 +135,14 @@ namespace LuaWorker
 	private:
 		int mNArr, mNRec;
 	public:
-		LuaArgStartTable(int narr, int nrec) :mNArr(narr), mNRec(nrec) {}
+		LuaArgStartTable(int narr, int nrec);
 
 		/// <summary>
 		/// Non-pre-allocating constructor
 		/// </summary>
-		LuaArgStartTable() :mNArr(0), mNRec(0) {}
+		LuaArgStartTable();
 
-		int Unpack(lua_State* pL) const
-		{
-			lua_createtable(pL, mNArr, mNRec);
-			return 1;
-		}
+		int Unpack(lua_State* pL) const;
 	};
 
 	/// <summary>
@@ -177,11 +151,7 @@ namespace LuaWorker
 	class LuaArgSetTable: public LuaArgUnpackStep
 	{	
 	public:
-		int Unpack(lua_State* pL) const
-		{
-			lua_rawset(pL,-3);
-			return -2;
-		}
+		int Unpack(lua_State* pL) const;
 	};
 
 
@@ -198,6 +168,14 @@ namespace LuaWorker
 	private:
 		std::vector<std::unique_ptr<LuaArgUnpackStep>> mArgs;
 
+		/// <summary>
+		/// Assumes top of the stack is a table
+		/// Add instructions to mArgs to recreate that table (when executed in reverse order).
+		/// After execution, the table is popped.
+		/// </summary>
+		/// <param name="pL"></param>
+		void BundleTable(lua_State* pL);
+
 	public:
 
 		/// <summary>
@@ -206,131 +184,14 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="pL"></param>
 		/// <param name="height"></param>
-		LuaArgBundle(lua_State* pL, int height)
-		{
-			// TODO add table recursion limit
-			int heightDelta = 0;
-			int tableDepth = 0;
-			bool newTable = false;
-
-			std::unique_ptr<LuaArgUnpackStep> stepToAddValue;
-			std::unique_ptr<LuaArgUnpackStep> stepToAddKey;
-			
-			while (heightDelta < height)
-			{
-				int luaType = lua_type(pL, -1);
-
-				switch (luaType)
-				{
-				case LUA_TNUMBER:
-					stepToAddValue =std::make_unique<LuaArgNum>(lua_tonumber(pL,-1)); 
-					break;
-				case LUA_TBOOLEAN:
-					stepToAddValue= std::make_unique<LuaArgBool>(lua_toboolean(pL,-1)); 
-					break;
-				case LUA_TSTRING:
-					size_t len;
-					const char* str = lua_tolstring(pL, -1, &len);
-					stepToAddValue = std::make_unique<LuaArgStr>(str,len); 
-					break;
-
-				case LUA_TTABLE:
-					lua_pushnil(pL);// to get first key
-					tableDepth++;
-					heightDelta--;
-					newTable = true;
-
-				default: 
-					stepToAddValue = std::make_unique<LuaArgNil>(); 
-					break;
-				}
-
-				if (tableDepth <= 0 && !newTable)
-				{
-					heightDelta++;
-					lua_pop(pL,1);
-
-					mArgs.push_back(stepToAddValue);
-					continue;
-				}
-
-				// Top of stack is now nil (if newTable), or the key corresponding to value in stepToAdd
-
-				if (!newTable) // Get the key
-				{
-					bool validKey = true; // All cases but default are success
-					luaType = lua_type(pL, -2);
-
-					switch (luaType)
-					{
-					case LUA_TNUMBER:
-						stepToAddKey = std::make_unique<LuaArgNum>(lua_tonumber(pL, -2));
-						break;
-					case LUA_TBOOLEAN:
-						stepToAddKey = std::make_unique<LuaArgBool>(lua_toboolean(pL, -2));
-						break;
-					case LUA_TSTRING:
-						size_t len;
-						const char* str = lua_tolstring(pL, -2, &len);
-						stepToAddKey = std::make_unique<LuaArgStr>(str, len);
-						break;
-					default:
-						validKey = false;
-						break;
-					}
-
-					lua_pop(pL, 1); //pop the value only
-					heightDelta++;
-
-					if (validKey)
-					{
-						//Execution order is reversed on unpack: SetTable called with Value-Key-Table on stack.
-						mArgs.push_back(std::make_unique<LuaArgSetTable>());
-						mArgs.push_back(stepToAddValue);
-						mArgs.push_back(stepToAddKey);
-					}
-
-				}
-
-				newTable = false; // for next loop
-
-				// Try to pop next key/value from the table
-					
-				if (lua_next(pL, -2) > 0)
-				{	
-					heightDelta --; // key popped then key and value added to stack
-					continue; // pack & pop value, read the key next pass 
-				}
-				else
-				{
-
-					lua_pop(pL, 1); //pop the table
-					heightDelta+=2; // key & table popped
-					tableDepth--;
-
-					//End of table (or empty table) - recall execution order is reversed
-					mArgs.push_back(std::make_unique<LuaArgStartTable>()); // TODO: Can we get narr and nrec here?
-				}
-				//TODO: The above is not quite right for nested tables (may need to call next on the parent table too, once child table is read)
-
-			}
-		}
+		LuaArgBundle(lua_State* pL, int height);
 
 		/// <summary>
 		/// Reconstruct stored data onto the stack in the given lua state
 		/// </summary>
 		/// <param name="pL"></param>
 		/// <returns>Change in stack height</returns>
-		int Unpack(lua_State* pL)
-		{
-			int height = 0;
-
-			for (auto it = mArgs.crbegin(); it != mArgs.crend(); ++it)
-			{
-				height += it->Unpack(pL);
-			}
-			return height;
-		}
+		int Unpack(lua_State* pL);
 	};
 }
 

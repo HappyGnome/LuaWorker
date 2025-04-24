@@ -227,6 +227,7 @@
     <ClCompile Include="LogItem.cpp" />
     <ClCompile Include="LogSection.cpp" />
     <ClCompile Include="LogStack.cpp" />
+    <ClCompile Include="LuaArgBundle.cpp" />
     <ClCompile Include="LuaCancellationException.cpp" />
     <ClCompile Include="OneShotTask.cpp" />
     <ClCompile Include="OneShotTaskExecPack.cpp" />

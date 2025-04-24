@@ -27,6 +27,7 @@
 #include <string>
 
 #include "Task.h"
+#include "LuaArgBundle.h"
 
 extern "C" {
 #include "lua.h"
@@ -43,7 +44,9 @@ namespace LuaWorker
 	class CoTask : public Task
 	{
 	private:
-		std::string mExecString;
+		std::string mFuncString;
+
+		std::unique_ptr<LuaArgBundle> mFuncArgs;
 
 		/// <summary>
 		/// Make initial resume call to start the coroutine
@@ -67,7 +70,7 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="funcString"></param>
 		/// <param name="argStrings"></param>
-		explicit CoTask(const std::string& funcString, const std::vector<std::string> &argStrings);
+		explicit CoTask(const std::string& funcString, std::unique_ptr<LuaArgBundle> &&argBundle);
 
 		/// <summary>
 		/// Execute this task on a given lua state

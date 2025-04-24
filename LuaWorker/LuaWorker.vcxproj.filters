@@ -176,6 +176,9 @@
     <ClCompile Include="TaskExecPack.cpp">
       <Filter>Source Files\TaskExecPack</Filter>
     </ClCompile>
+    <ClCompile Include="LuaArgBundle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">

@@ -22,7 +22,6 @@
 #include "LogSection.h"
 #include "InnerLuaState.h"
 #include "Worker.h"
-#include "TaskExecPack.h"
 #include "OneShotTaskExecPack.h"
 #include "CoTaskExecPack.h"
 #include "OneShotTask.h"
