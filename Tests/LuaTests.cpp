@@ -222,6 +222,22 @@ namespace Tests
 			std::this_thread::sleep_for(0.5s);
 			Assert::IsFalse(lua.DoTestString("return Step5()", 200ms), L"Step5");
 		}
+
+		TEST_METHOD(ArgBundle1)
+		{
+			LuaTestState lua;
+
+			lua.DoTestFile("Common.lua");
+			lua.DoTestFile("ArgBundle1.lua");
+
+			std::this_thread::sleep_for(0.5s);
+			Assert::IsTrue(lua.DoTestString("return Step1()", 500ms), L"Step1");
+			Assert::IsTrue(lua.DoTestString("return Step2()", 200ms), L"Step2");
+			Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
+			Assert::IsTrue(lua.DoTestString("return Step4()", 1200ms), L"Step4");
+			Assert::IsFalse(lua.DoTestString("return Step5()", 200ms), L"Step5");
+		}
+
 		
 	};
 }

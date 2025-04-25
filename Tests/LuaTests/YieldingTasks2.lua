@@ -39,14 +39,14 @@ end
 
 Step2 = function()
 
-	T1 = w:DoCoroutine("YieldingFunc","'a'","1000")
+	T1 = w:DoCoroutine("YieldingFunc","a","1000")
 
 	RaiseFirstWorkerError(w)
 	return true
 end 
 
 Step3 = function()
-	T2 = w:DoCoroutine("YieldingFunc","'b'","150")
+	T2 = w:DoCoroutine("YieldingFunc","b","150")
 
 	RaiseFirstWorkerError(w)
 	return true

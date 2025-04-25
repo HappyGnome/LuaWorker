@@ -119,7 +119,7 @@ namespace LuaWorker
 		/// Makes a copy of a raw string value. The string may contain nulls throughout. 
 		/// </summary>
 		/// <param name="val"></param>
-		/// <param name="len"></param>
+		/// <param name="len">Length of the string (excluding null terminator)</param>
 		LuaArgStr(const char* val, size_t len);
 
 		~LuaArgStr();

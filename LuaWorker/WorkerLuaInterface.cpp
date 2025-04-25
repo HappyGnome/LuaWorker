@@ -214,7 +214,7 @@ int WorkerLuaInterface::l_Worker_DoCoRoutine(lua_State* pL)
 
 		std::unique_ptr<LuaArgBundle> argBundle = nullptr;
 		
-		if (N > 1) argBundle = std::make_unique<LuaArgBundle>(pL, N - 1);
+		if (N > 1) argBundle.reset(new LuaArgBundle(pL, N - 1));
 
 		std::shared_ptr<CoTask> newItem(new CoTask(funcStr, std::move(argBundle)));
 		pWorker->AddTask(newItem);

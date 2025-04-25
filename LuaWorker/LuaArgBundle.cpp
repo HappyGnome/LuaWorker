@@ -51,15 +51,8 @@ int LuaArgNil::Unpack(lua_State* pL) const
 
 LuaArgStr::LuaArgStr(const char* val, size_t len) :mLen(len)
 {
-	if (len > 0)
-	{
-		mValue = new char[len];
-		strcpy_s(mValue, len, val);
-	}
-	else
-	{
-		mValue = nullptr;
-	}
+	mValue = new char[len+1];
+	strcpy_s(mValue, len+1, val);
 }
 
 LuaArgStr::~LuaArgStr() 
@@ -129,14 +122,14 @@ void LuaArgBundle::BundleTable(lua_State* pL)
 			switch (lua_type(pL, -1))
 			{
 			case LUA_TNUMBER:
-				stepToAddKey = std::make_unique<LuaArgNum>(lua_tonumber(pL, -1));
+				stepToAddKey.reset(new LuaArgNum(lua_tonumber(pL, -1)));
 				break;
 			case LUA_TBOOLEAN:
-				stepToAddKey = std::make_unique<LuaArgBool>(lua_toboolean(pL, -1));
+				stepToAddKey.reset(new LuaArgBool(lua_toboolean(pL, -1)));
 				break;
 			case LUA_TSTRING:
 				str = lua_tolstring(pL, -1, &len);
-				stepToAddKey = std::make_unique<LuaArgStr>(str, len);
+				stepToAddKey.reset(new LuaArgStr(str, len));
 				break;
 			default:
 				assert(false); // skipKey should have been set, and instructions to create the corresponding value not added if this key is invalid. 
@@ -174,14 +167,14 @@ void LuaArgBundle::BundleTable(lua_State* pL)
 		switch (lua_type(pL,-1)) // value type
 		{
 		case LUA_TNUMBER:
-			stepToAddValue =std::make_unique<LuaArgNum>(lua_tonumber(pL,-1)); 
+			stepToAddValue.reset(new LuaArgNum(lua_tonumber(pL,-1))); 
 			break;
 		case LUA_TBOOLEAN:
-			stepToAddValue= std::make_unique<LuaArgBool>(lua_toboolean(pL,-1)); 
+			stepToAddValue.reset(new LuaArgBool(lua_toboolean(pL,-1))); 
 			break;
 		case LUA_TSTRING:
 			str = lua_tolstring(pL, -1, &len);
-			stepToAddValue = std::make_unique<LuaArgStr>(str,len); 
+			stepToAddValue.reset(new LuaArgStr(str,len)); 
 			break;
 
 		case LUA_TTABLE:
@@ -190,7 +183,7 @@ void LuaArgBundle::BundleTable(lua_State* pL)
 			skipKey = true;
 			continue;
 		default: 
-			stepToAddValue = std::make_unique<LuaArgNil>(); 
+			stepToAddValue.reset(new LuaArgNil()); 
 			break;
 		}
 
@@ -216,14 +209,14 @@ LuaArgBundle::LuaArgBundle(lua_State* pL, int height)
 		switch (luaType)
 		{
 		case LUA_TNUMBER:
-			stepToAddValue =std::make_unique<LuaArgNum>(lua_tonumber(pL,-1)); 
+			stepToAddValue.reset(new LuaArgNum(lua_tonumber(pL,-1))); 
 			break;
 		case LUA_TBOOLEAN:
-			stepToAddValue= std::make_unique<LuaArgBool>(lua_toboolean(pL,-1)); 
+			stepToAddValue.reset(new LuaArgBool(lua_toboolean(pL,-1))); 
 			break;
 		case LUA_TSTRING:
 			str = lua_tolstring(pL, -1, &len);
-			stepToAddValue = std::make_unique<LuaArgStr>(str,len); 
+			stepToAddValue.reset(new LuaArgStr(str,len)); 
 			break;
 
 		case LUA_TTABLE:
@@ -232,7 +225,7 @@ LuaArgBundle::LuaArgBundle(lua_State* pL, int height)
 			continue;
 
 		default: 
-			stepToAddValue = std::make_unique<LuaArgNil>(); 
+			stepToAddValue.reset(new LuaArgNil()); 
 			break;
 		}
 
