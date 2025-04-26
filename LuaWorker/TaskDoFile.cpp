@@ -28,9 +28,12 @@ using namespace LuaWorker;
 
 TaskDoFile::TaskDoFile(std::string FilePath) : mFilePath(FilePath) {}
 
-std::string TaskDoFile::DoExec(lua_State* pL) 
+LuaArgBundle TaskDoFile::DoExec(lua_State* pL) 
 {
+	int prevTop = lua_gettop(pL);
 	int execResult = luaL_dofile(pL, mFilePath.c_str());
+
+	int resC = 0;
 
 	if (execResult != 0)
 	{
@@ -42,14 +45,16 @@ std::string TaskDoFile::DoExec(lua_State* pL)
 
 		SetError("Error in file " + mFilePath + ": " + luaError);
 	}
+	else
+	{
+		resC = lua_gettop(pL) - prevTop;
+	}
 	
-	std::string ret = "";
-
-	if (lua_type(pL, -1) == LUA_TSTRING) ret = lua_tostring(pL, -1);
+	LuaArgBundle results(pL, resC);
 
 	lua_settop(pL, 0);
 
-	return ret;
+	return results;
 }
 
 

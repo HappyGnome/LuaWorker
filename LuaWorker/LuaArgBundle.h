@@ -184,7 +184,14 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="pL"></param>
 		/// <param name="height"></param>
-		LuaArgBundle(lua_State* pL, int height);
+		explicit LuaArgBundle(lua_State* pL, int height);
+
+		/// <summary>
+		/// Initialize an empty arg bundle
+		/// </summary>
+		LuaArgBundle();
+
+
 
 		/// <summary>
 		/// Reconstruct stored data onto the stack in the given lua state

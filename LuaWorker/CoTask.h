@@ -53,16 +53,16 @@ namespace LuaWorker
 		/// Called on the worker lua state.
 		/// </summary>
 		/// <param name="pL">Lua state</param>
-		/// <returns> Result of the task</returns>
-		std::string DoExec(lua_State* pL);
+		/// <returns>THe number of result values on the lua stack</returns>
+		LuaArgBundle DoExec(lua_State* pL);
 
 		/// <summary>
 		/// Resume execution of the passed thread
 		/// </summary>
 		/// <param name="pL"></param>
 		/// <param name="argC"></param>
-		/// <returns></returns>
-		std::string DoResume(lua_State* pL, int argC);
+		/// <returns>Number of result values on the lua stack</returns>
+		LuaArgBundle DoResume(lua_State* pL, int argC);
 	public:
 
 		/// <summary>

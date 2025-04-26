@@ -51,8 +51,8 @@ namespace LuaWorker
 		/// Called on the worker lua state.
 		/// </summary>
 		/// <param name="pL">Lua state</param>
-		/// <returns> Result of the task</returns>
-		virtual std::string DoExec(lua_State* pL) = 0;
+		/// <returns> Bundled results</returns>
+		virtual LuaArgBundle DoExec(lua_State* pL) = 0;
 
 	public:
 

@@ -52,7 +52,7 @@ int LuaArgNil::Unpack(lua_State* pL) const
 LuaArgStr::LuaArgStr(const char* val, size_t len) :mLen(len)
 {
 	mValue = new char[len+1];
-	strcpy_s(mValue, len+1, val);
+	memcpy_s(mValue, len+1, val,len+1);
 }
 
 LuaArgStr::~LuaArgStr() 
@@ -133,6 +133,7 @@ void LuaArgBundle::BundleTable(lua_State* pL)
 				break;
 			default:
 				assert(false); // skipKey should have been set, and instructions to create the corresponding value not added if this key is invalid. 
+				stepToAddKey = nullptr; // Prevent C26800 in the std::move below
 			}
 			
 			mArgs.push_back(std::move(stepToAddKey));
@@ -191,6 +192,11 @@ void LuaArgBundle::BundleTable(lua_State* pL)
 		lua_pop(pL, 1); // Pop the value
 	}
 }
+
+/// <summary>
+/// Default constructor
+/// </summary>
+LuaArgBundle::LuaArgBundle(){}
 
 LuaArgBundle::LuaArgBundle(lua_State* pL, int height)
 {

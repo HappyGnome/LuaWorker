@@ -30,14 +30,13 @@ using namespace LuaWorker;
 // Protected methods
 //-------------------------------
 
-void Task::SetResult(const std::string& newResult, bool yielded)
+void Task::SetResult(LuaArgBundle&& results, bool yielded)
 {
-
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
 		mUnreadResult = true;
-		mResult = newResult;
+		mResult = std::move(results);
 
 		if (mStatus != TaskStatus::Error)
 		{
@@ -99,13 +98,13 @@ bool Task::IsFinal(TaskStatus status)
 // Public methods
 //-------------------------------
 
-std::string Task::GetResult()
+int Task::GetResult(lua_State *pL)
 {
 
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 		mUnreadResult = false;
-		return mResult;
+		return mResult.Unpack(pL);
 	}
 }
 

@@ -41,9 +41,8 @@ CoTask::CoTask(const std::string& funcString, std::unique_ptr<LuaArgBundle> &&ar
 // Protected methods
 //-------------------------------
 
-std::string CoTask::DoExec(lua_State* pL)
+LuaArgBundle CoTask::DoExec(lua_State* pL)
 {
-	int prevTop = lua_gettop(pL);
 	int execResult = luaL_dostring(pL, mFuncString.c_str());
 
 	if (execResult != 0)
@@ -57,23 +56,24 @@ std::string CoTask::DoExec(lua_State* pL)
 		SetError("Error in lua string: " + luaError);
 	}
 
+	int argC = 0;
+
 	if (mFuncArgs != nullptr) 
 	{
-		mFuncArgs->Unpack(pL);
+		argC = mFuncArgs->Unpack(pL);
 	}
 
-	std::string ret = "";
+	LuaArgBundle result;
 
-	if (lua_gettop(pL) <= prevTop || !lua_isfunction(pL, prevTop + 1))
+	if (!lua_isfunction(pL, -argC - 1))
 	{
 		SetError("Invalid coroutine construction.");
+		lua_settop(pL, 0);
 
 	}
-	else ret = DoResume(pL, lua_gettop(pL) - prevTop - 1);
+	else result = DoResume(pL, argC);
 
-	lua_settop(pL, prevTop);
-
-	return ret;
+	return  result;
 }
 
 /// <summary>
@@ -82,9 +82,13 @@ std::string CoTask::DoExec(lua_State* pL)
 /// If this is not the same state previously passed to Exec, behaviour is undefined.
 /// </summary>
 /// <param name="pL">Lua state</param>
-std::string CoTask::DoResume(lua_State* pL, int argC)
+LuaArgBundle CoTask::DoResume(lua_State* pL, int argC)
 {
-	int execResult = lua_resume(pL, argC);
+	int prevTop = lua_gettop(pL) - argC - 1; // Top of stack sans function and its arguments. TODO test pushing more than argC before calling this
+
+	int execResult = lua_resume(pL, argC);	
+	
+	LuaArgBundle results;
 
 	if (execResult != 0 && execResult != LUA_YIELD)
 	{
@@ -95,15 +99,17 @@ std::string CoTask::DoResume(lua_State* pL, int argC)
 		}
 
 		SetError("Error resuming task: " + luaError);
+
 	}
-
-	std::string ret = "";
-
-	if (lua_type(pL, -1) == LUA_TSTRING) ret = lua_tostring(pL, -1);
-
+	else
+	{
+		int resC = lua_gettop(pL) - prevTop;
+		results = LuaArgBundle(pL, resC);
+	}
+		
 	lua_settop(pL, 0);
 
-	return ret;
+	return results;
 }
 
 //-------------------------------
@@ -115,9 +121,9 @@ void CoTask::Exec(lua_State* pL)
 {
 	if (pL == nullptr || !TrySetRunning()) return;
 
-	std::string res = this->DoExec(pL);
+	LuaArgBundle results = this->DoExec(pL);
 
-	SetResult(res, lua_status(pL) == LUA_YIELD);
+	SetResult(std::move(results), lua_status(pL) == LUA_YIELD);
 
 }
 
@@ -126,7 +132,7 @@ void CoTask::Resume(lua_State* pL)
 {
 	if (pL == nullptr || lua_status(pL) != LUA_YIELD || !TrySetRunning(TaskStatus::Suspended)) return;
 
-	std::string res = this->DoResume(pL, 0);
-	SetResult(res , lua_status(pL) == LUA_YIELD);
+	LuaArgBundle results = this->DoResume(pL, 0);
+	SetResult(std::move(results), lua_status(pL) == LUA_YIELD);
 
 }

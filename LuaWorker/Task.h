@@ -27,6 +27,7 @@
 #include <string>
 
 #include "Cancelable.h"
+#include "LuaArgBundle.h"
 
 extern "C" {
 #include "lua.h"
@@ -59,7 +60,7 @@ namespace LuaWorker
 
 		TaskStatus mStatus;
 
-		std::string mResult;
+		LuaArgBundle mResult;
 		std::string mError;
 
 		std::mutex mResultStatusMtx;
@@ -74,10 +75,10 @@ namespace LuaWorker
 		//-------------------------------
 
 		/// <summary>
-		/// Set the result of this task
+		/// Set the result of this task. 
 		/// </summary>
-		/// <param name="newResult">Value of the result to set</param>
-		void SetResult(const std::string& newResult, bool yielded);
+		/// <param name="results">result bundle</param>
+		void SetResult(LuaArgBundle&& results, bool yielded);
 
 		/// <summary>
 		/// Try to set the task to a running status.
@@ -113,10 +114,10 @@ namespace LuaWorker
 		Task();
 
 		/// <summary>
-		/// Get result of this task
+		/// Push result of this task onto the given lua stack and return the number of items pushed
 		/// </summary>
 		/// <returns>Task result</returns>
-		std::string GetResult();
+		int GetResult(lua_State *pL);
 
 		/// <summary>
 		/// Block until task has executed (or reaches a final state) 

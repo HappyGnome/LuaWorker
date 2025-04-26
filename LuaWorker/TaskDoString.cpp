@@ -28,8 +28,10 @@ using namespace LuaWorker;
 
 TaskDoString::TaskDoString(std::string execString) : mExecString(execString) {}
 
-std::string TaskDoString::DoExec(lua_State* pL)
+LuaArgBundle TaskDoString::DoExec(lua_State* pL)
 {
+	int resC = 0;
+	int prevTop = lua_gettop(pL);
 	int execResult = luaL_dostring(pL, mExecString.c_str());
 
 	if (execResult != 0)
@@ -42,14 +44,16 @@ std::string TaskDoString::DoExec(lua_State* pL)
 
 		SetError("Error in lua string: " + luaError);
 	}
+	else
+	{
+		resC = lua_gettop(pL) - prevTop;
+	}
 
-	std::string ret = "";
-
-	if (lua_type(pL, -1) == LUA_TSTRING) ret = lua_tostring(pL, -1);
+	LuaArgBundle result(pL, resC);
 
 	lua_settop(pL, 0);
 
-	return ret;
+	return result;
 }
 
 

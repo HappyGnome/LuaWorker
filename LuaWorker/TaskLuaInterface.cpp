@@ -116,8 +116,7 @@ int TaskLuaInterface::l_Task_Await(lua_State* pL)
 
 		if(pTask->WaitForResult(waitMillis))
 		{
-			lua_pushstring(pL, pTask->GetResult().c_str());
-			return 1;
+			return pTask->GetResult(pL);
 		}
 
 	}

@@ -48,7 +48,7 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		/// <returns> Result of the task</returns>
-		std::string DoExec(lua_State* pL) override;
+		LuaArgBundle DoExec(lua_State* pL) override;
 
 	public:
 

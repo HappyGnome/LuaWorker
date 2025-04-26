@@ -20,18 +20,21 @@
 initStr = [[
 
 
-Echo = function(ch, ...)
+Echo = function(n,...)
 
 	local s = ""
-	for k,v in ipairs(arg) do
-		if type(v) == 'boolean' then
-			if v then
-				v = "true"
-			else
-				v= "false"
+	for k = 1,n do
+		local v = arg[k]
+		if v~= nil then
+			if type(v) == 'boolean' then
+				if v then
+					v = "true"
+				else
+					v= "false"
+				end
 			end
+			s = s .. k .. v
 		end
-		s = s .. k .. v
 	end	
 
 	return s
@@ -50,7 +53,7 @@ end
 
 Step2 = function()
 
-	T1 = w:DoCoroutine("Echo","a",1000)
+	T1 = w:DoCoroutine("Echo",2,"a",1000)
 
 	res = T1:Await(100)
 	
@@ -65,7 +68,7 @@ end
 
 Step3 = function()
 
-	T1 = w:DoCoroutine("Echo","",1000)
+	T1 = w:DoCoroutine("Echo",2,"",1000)
 
 	res = T1:Await(100)
 	
@@ -80,7 +83,7 @@ end
 
 Step4 = function()
 
-	T1 = w:DoCoroutine("Echo",10,"",nil,1000)
+	T1 = w:DoCoroutine("Echo",4,10,"",nil,1000)
 
 	res = T1:Await(100)
 	
@@ -95,7 +98,7 @@ end
 
 Step5 = function()
 
-	T1 = w:DoCoroutine("Echo",10,"\0Hello\0",nil,1000)
+	T1 = w:DoCoroutine("Echo",4,10,"\0Hello\0",nil,1000)
 
 	res = T1:Await(100)
 	
@@ -109,9 +112,9 @@ Step5 = function()
 end 
 
 
-Step5 = function()
+Step6 = function()
 
-	T1 = w:DoCoroutine("Echo",true,"\n",nil,1000.645)
+	T1 = w:DoCoroutine("Echo",4,true,"\n",nil,1000.645)
 
 	res = T1:Await(100)
 	

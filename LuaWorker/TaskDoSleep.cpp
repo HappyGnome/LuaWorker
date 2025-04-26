@@ -28,10 +28,10 @@ using namespace LuaWorker;
 
 TaskDoSleep::TaskDoSleep(unsigned int sleepForMs) : mSleepForMs(sleepForMs) {}
 
-std::string TaskDoSleep::DoExec(lua_State* pL)
+LuaArgBundle TaskDoSleep::DoExec(lua_State* pL)
 {
 	
 	SleepFor(mSleepForMs);
 
-	return "";
+	return LuaArgBundle();
 }
