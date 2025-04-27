@@ -28,11 +28,11 @@ end
 Step2 = function()
 	T = w:DoFile(RootDir .. "\\TaskDoFile_FileTask.lua")
 
-	local res = T:Await(500)
+	local res ,t = T:Await(500)
 
 	RaiseFirstWorkerError(w)
 
-	return (T:Status() == LuaWorker.TaskStatus.Complete) and (res == "File Run")
+	return (T:Status() == LuaWorker.TaskStatus.Complete) and (res == "File Run") and DeepMatch(t,{1,{2,{3}}})
 end 
 
 Step3 = function()
@@ -49,3 +49,28 @@ Step4 = function()
 	RaiseFirstWorkerError(w)
 	return (T:Status() == LuaWorker.TaskStatus.Complete) and (T2:Status() == LuaWorker.TaskStatus.Complete) and (res == MyString)
 end
+
+Step5 = function()
+	T3 = w:DoFile({maxTableDepth = 1},RootDir .. "\\TaskDoFile_FileTask.lua")
+
+	local res ,t = T3:Await(500)
+
+	RaiseFirstWorkerError(w)
+
+	return (T3:Status() == LuaWorker.TaskStatus.Complete) and (res == "File Run") and DeepMatch(t,{1})
+end 
+
+Step6 = function()
+	T4 = w:DoFile({maxTableDepth = 2},RootDir .. "\\TaskDoFile_FileTask.lua")
+
+	local res ,t = T4:Await(500)
+
+	RaiseFirstWorkerError(w)
+
+	if (T4:Status() == LuaWorker.TaskStatus.Complete) and (res == "File Run") and DeepMatch(t,{1,{2}}) then
+		return true
+	else
+		error(obj2str(t))
+	end
+end 
+

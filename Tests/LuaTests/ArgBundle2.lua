@@ -44,6 +44,12 @@ Reflect = function(...)
 	arg["n"] = nil
 	return arg
 end
+
+ArgC = function(...)
+
+	return #arg
+end
+
 ]]
 
 w = LuaWorker.Create()
@@ -184,11 +190,11 @@ Step9 = function()
 	end
 end 
 
-Step10 = function()
+Step10 = function() -- Output truncation test
 
 	local toSend = {{"Hello"},{1}, nil, true, {false}}
 	
-	T1 = w:DoCoroutine("Reflect",unpack(toSend))
+	T1 = w:DoCoroutine({maxTableDepth = 2},"Reflect",unpack(toSend))
 
 	res = T1:Await(100)
 	
@@ -202,3 +208,54 @@ Step10 = function()
 	end
 end 
 
+Step11 = function() -- Output truncation test
+
+	local toSend = {{"Hello"},{1}, nil, true, {false}}
+	
+	T1 = w:DoCoroutine({maxTableDepth = 1},"Reflect",unpack(toSend))
+
+	res = T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+	
+	local ok, str = DeepMatch(toSend,res)
+	if  ok then
+		return true
+	else
+		error("Mismatch at " .. str .. " :: " .. obj2str(res))
+	end
+end 
+
+Step12 = function() -- Input truncation test
+
+	local toSend = {{"Hello"},{1}, true, {false}}
+	
+	T1 = w:DoCoroutine({maxTableDepth = 1},"ArgC",unpack(toSend))
+
+	res = T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+	
+	if  res == #toSend then
+		return true
+	else
+		error("Res " .. res .. " Expected " .. #toSend)
+	end
+end 
+
+Step13 = function() -- Input truncation test
+
+	local toSend = {{"Hello"},{1}, true, {false}}
+	
+	T1 = w:DoCoroutine({maxTableDepth = 0},"ArgC",unpack(toSend))
+
+	res = T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+	
+	if  res == #toSend then
+		return true
+	else
+		error("Res " .. res .. " Must not match " .. #toSend)
+	end
+end 

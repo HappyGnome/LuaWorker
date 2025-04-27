@@ -18,6 +18,8 @@
 
 MyString = "Hello From Task"
 
+GetNestedTable = "return {1,{2,{3}}}, 99"
+
 w = LuaWorker.Create()
 w:Start()
 
@@ -43,3 +45,68 @@ Step3 = function()
 		return true
 	end
 end
+
+Step3 = function()
+	T = w:DoString(GetNestedTable)
+
+	local t1,t2 = T:Await(500)
+
+	RaiseFirstWorkerError(w)
+
+	if t2 ~= 99 then
+		error("t2: " .. t2)
+	elseif  not DeepMatch(t1,{1,{2,{3}}}) then
+		error (obj2str(t1))
+	end
+
+	return true
+end 
+
+Step4 = function()
+	T = w:DoString({maxTableDepth = 0},GetNestedTable)
+
+	local t1,t2 = T:Await(500)
+
+	RaiseFirstWorkerError(w)
+
+	if t2 ~= 99 then
+		error("t2: " .. t2)
+	elseif  not DeepMatch(t1,nil) then
+		error (obj2str(t1))
+	end
+
+	return true
+end 
+
+Step5 = function()
+	T = w:DoString({maxTableDepth = 1},GetNestedTable)
+
+	local t1,t2 = T:Await(500)
+
+	RaiseFirstWorkerError(w)
+
+	if t2 ~= 99 then
+		error("t2: " .. t2)
+	elseif  not DeepMatch(t1,{1}) then
+		error (obj2str(t1))
+	end
+
+	return true
+end 
+
+Step6 = function()
+	T = w:DoString({maxTableDepth = 2},GetNestedTable)
+
+	local t1,t2 = T:Await(500)
+
+	RaiseFirstWorkerError(w)
+
+	if t2 ~= 99 then
+		error("t2: " .. t2)
+	elseif  not DeepMatch(t1,{1, {2}}) then
+		error (obj2str(t1))
+	end
+
+	return true
+end 
+

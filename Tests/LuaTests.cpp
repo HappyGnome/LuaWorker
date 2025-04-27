@@ -84,6 +84,9 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step1()"), L"Step1");
 			Assert::IsTrue(lua.DoTestString("return Step2()"), L"Step2");
 			Assert::IsTrue(lua.DoTestString("return Step3()", 500ms), L"Step3");
+			Assert::IsTrue(lua.DoTestString("return Step4()", 500ms), L"Step4");
+			Assert::IsTrue(lua.DoTestString("return Step5()", 500ms), L"Step5");
+			Assert::IsTrue(lua.DoTestString("return Step6()", 500ms), L"Step6");
 		}
 
 		TEST_METHOD(TaskDoFile)
@@ -98,6 +101,8 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step2()", 500ms), L"Step2");
 			Assert::IsTrue(lua.DoTestString("return Step3()", 500ms), L"Step3");
 			Assert::IsTrue(lua.DoTestString("return Step4()", 500ms), L"Step4");
+			Assert::IsTrue(lua.DoTestString("return Step5()", 500ms), L"Step5");
+			Assert::IsTrue(lua.DoTestString("return Step6()", 500ms), L"Step6");
 		}
 
 		TEST_METHOD(TaskInfiniteLoop)
@@ -261,6 +266,9 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step8()", 200ms), L"Step8");
 			Assert::IsTrue(lua.DoTestString("return Step9()", 200ms), L"Step9");
 			Assert::IsTrue(lua.DoTestString("return Step10()", 200ms), L"Step10");
+			Assert::IsFalse(lua.DoTestString("return Step11()", 200ms), L"Step11");
+			Assert::IsTrue(lua.DoTestString("return Step12()", 200ms), L"Step12");
+			Assert::IsFalse(lua.DoTestString("return Step13()", 200ms), L"Step13");
 		}
 
 		// Arg bundles of nested tables

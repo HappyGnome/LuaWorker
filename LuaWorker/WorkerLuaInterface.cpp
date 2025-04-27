@@ -173,18 +173,16 @@ int WorkerLuaInterface::l_Worker_DoString(lua_State* pL)
 	if (pWorker != nullptr)
 	{
 		TaskConfig tc;
-		int argIdx = 1;
 
-		if (lua_istable(pL, argIdx))
+		if (lua_istable(pL, -2))
 		{
-			tc = ReadTaskConfigTable(pL, argIdx);
-			argIdx++;
+			tc = ReadTaskConfigTable(pL, -2);
 
 		}
 
-		if (lua_isstring(pL, argIdx))
+		if (lua_isstring(pL, -1))
 		{
-			std::string str = lua_tostring(pL, argIdx);
+			std::string str = lua_tostring(pL, -1);
 
 			std::shared_ptr<OneShotTask> newItem(new TaskDoString(str, std::move(tc)));
 			pWorker->AddTask(newItem);
@@ -204,18 +202,16 @@ int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 	{
 
 		TaskConfig tc;
-		int argIdx = 1;
 
-		if (lua_istable(pL, argIdx))
+		if (lua_istable(pL, -2))
 		{
-			tc = ReadTaskConfigTable(pL, argIdx);
-			argIdx++;
+			tc = ReadTaskConfigTable(pL, -2);
 
 		}
 
-		if (lua_isstring(pL, argIdx))
+		if (lua_isstring(pL, -1))
 		{
-			std::string str = lua_tostring(pL, argIdx);
+			std::string str = lua_tostring(pL,  -1);
 
 			std::shared_ptr<OneShotTask> newItem(new TaskDoFile(str, std::move(tc)));
 			pWorker->AddTask(newItem);
