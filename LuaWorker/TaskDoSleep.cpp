@@ -26,7 +26,7 @@ extern "C" {
 
 using namespace LuaWorker;
 
-TaskDoSleep::TaskDoSleep(unsigned int sleepForMs) : mSleepForMs(sleepForMs) {}
+TaskDoSleep::TaskDoSleep(unsigned int sleepForMs, TaskConfig&& config) :OneShotTask(std::move(config)), mSleepForMs(sleepForMs) {}
 
 LuaArgBundle TaskDoSleep::DoExec(lua_State* pL)
 {

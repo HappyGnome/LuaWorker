@@ -31,3 +31,63 @@ RaiseFirstWorkerError = function(worker)
 	end
 end
 ----------------------------------------
+
+
+DeepMatch = function(t,s,maxDepth)
+	if type(maxDepth) ~= 'number' then maxDepth = 10 end
+	if maxDepth <= 0  then return false end
+
+	if type(t) ~= type(s) then return false, type(s) end
+
+	if type(s) == 'boolean' and s ~= t then 
+		if (s) then
+			return false,"true"
+		else
+			return false, "false"
+		end
+	end
+
+	if type(t) ~= 'table' then return s == t, s end
+
+	for k,v in pairs(t) do
+		local ok, str = DeepMatch(v,s[k], maxDepth -1) 
+		if not ok then return false, k .. "/" .. str end
+	end
+
+	for k,v in pairs(s) do
+		
+		local ok, str = DeepMatch(v,t[k], maxDepth - 1) 
+		if not ok then return false, k .. ":" .. str	end
+	end
+
+	return true
+end
+
+------------------------------------
+--[[
+Basic recursive Lua serializer
+(serializeable values are strings, numbers, or tables containing serializeable values)
+--]]
+obj2str = function(obj, maxDepth)
+	if type(maxDepth) ~= 'number' then maxDepth = 10 end
+	if maxDepth <= 0 then return "..." end
+    if obj == nil then
+        return 'nil'
+    end
+    local msg = ''
+    local t = type(obj)
+    if t == 'table' then
+        msg = msg .. '{'
+        for k, v in pairs(obj) do
+            msg = msg .. k .. ':' .. obj2str(v,maxDepth -1) .. ', '
+        end
+        msg = msg .. '}'
+    elseif t == 'string' then
+        msg = msg .. "\"" .. obj .. "\""
+    elseif t == 'number' or t == 'boolean' then
+        msg = msg .. tostring(obj)
+    elseif t then
+        msg = msg .. t
+    end
+    return msg
+end

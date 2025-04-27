@@ -209,6 +209,7 @@
     <ClInclude Include="LuaCancellationException.h" />
     <ClInclude Include="OneShotTask.h" />
     <ClInclude Include="Task.h" />
+    <ClInclude Include="TaskConfig.h" />
     <ClInclude Include="TaskDoFile.h" />
     <ClInclude Include="TaskDoString.h" />
     <ClInclude Include="TaskLuaInterface.h" />

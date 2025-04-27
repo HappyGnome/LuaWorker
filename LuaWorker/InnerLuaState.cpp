@@ -201,7 +201,7 @@ int InnerLuaState::l_YieldFor(lua_State* pL)
 			return 0;
 		}
 
-		if (!lua_isnumber(pL, -argC)) {
+		if (argC < 1 || !lua_isnumber(pL, -argC)) {
 			lua_pushstring(pL, "YieldFor expects parameters (<number>,...<results>)");
 			lua_error(pL);
 			return 0;
@@ -217,14 +217,7 @@ int InnerLuaState::l_YieldFor(lua_State* pL)
 		pState -> mResumeCurrentTaskAt = system_clock::now() + (millis * 1ms);
 		pState -> mCurrentTaskYielded = true;
 
-		int resultCount = 0;
-		if (argC > 1 && lua_isstring(pL, 2))
-		{
-			lua_settop(pL, 2);
-			resultCount = 1;
-		}
-
-		return lua_yield(pL, resultCount); //Yield remaining parameters to resume
+		return lua_yield(pL, argC-1); //Yield remaining parameters to resume
 	}
 	return 0;
 }

@@ -61,8 +61,9 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="pL"></param>
 		/// <param name="argC"></param>
+		/// <param name = "funcCall">1 or 0. 1 Indicates that the function running on this coroutine is on the stack after the arguments</param>
 		/// <returns>Number of result values on the lua stack</returns>
-		LuaArgBundle DoResume(lua_State* pL, int argC);
+		LuaArgBundle DoResume(lua_State* pL, int argC, int funcCall = 0);
 	public:
 
 		/// <summary>
@@ -70,7 +71,7 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="funcString"></param>
 		/// <param name="argStrings"></param>
-		explicit CoTask(const std::string& funcString, std::unique_ptr<LuaArgBundle> &&argBundle);
+		explicit CoTask(const std::string& funcString, std::unique_ptr<LuaArgBundle> &&argBundle, TaskConfig&& config);
 
 		/// <summary>
 		/// Execute this task on a given lua state

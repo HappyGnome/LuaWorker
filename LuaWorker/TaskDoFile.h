@@ -56,7 +56,7 @@ namespace LuaWorker
 		/// Constructor
 		/// </summary>
 		/// <param name="filePath">Filepath to run when this task executes</param>
-		explicit TaskDoFile(std::string filePath);
+		explicit TaskDoFile(std::string filePath, TaskConfig&& config);
 	};
 };
 #endif

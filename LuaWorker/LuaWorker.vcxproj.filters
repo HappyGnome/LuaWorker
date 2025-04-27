@@ -49,6 +49,9 @@
     <Filter Include="Source Files\TaskExecPack">
       <UniqueIdentifier>{0880fb1e-afc8-4e90-909e-e73a86c84e69}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Tasks\Config">
+      <UniqueIdentifier>{f9090e8c-7c25-495a-b6a8-d4b0ca227904}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Worker.h">
@@ -119,6 +122,9 @@
     </ClInclude>
     <ClInclude Include="LuaArgBundle.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskConfig.h">
+      <Filter>Header Files\Tasks\Config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

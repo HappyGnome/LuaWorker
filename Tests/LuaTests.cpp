@@ -223,6 +223,7 @@ namespace Tests
 			Assert::IsFalse(lua.DoTestString("return Step5()", 200ms), L"Step5");
 		}
 
+		// Arg bundle without tables
 		TEST_METHOD(ArgBundle1)
 		{
 			LuaTestState lua;
@@ -231,13 +232,57 @@ namespace Tests
 			lua.DoTestFile("ArgBundle1.lua");
 
 			std::this_thread::sleep_for(0.5s);
-			Assert::IsTrue(lua.DoTestString("return Step1()", 10500ms), L"Step1");
-			Assert::IsTrue(lua.DoTestString("return Step2()", 10200ms), L"Step2");
-			Assert::IsTrue(lua.DoTestString("return Step3()", 10200ms), L"Step3");
-			Assert::IsTrue(lua.DoTestString("return Step4()", 101200ms), L"Step4");
-			Assert::IsTrue(lua.DoTestString("return Step5()", 10200ms), L"Step5");
-			Assert::IsTrue(lua.DoTestString("return Step6()", 10200ms), L"Step6");
+			Assert::IsTrue(lua.DoTestString("return Step1()", 500ms), L"Step1");
+			Assert::IsTrue(lua.DoTestString("return Step2()", 200ms), L"Step2");
+			Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
+			Assert::IsTrue(lua.DoTestString("return Step4()", 1200ms), L"Step4");
+			Assert::IsTrue(lua.DoTestString("return Step5()", 200ms), L"Step5");
+			Assert::IsTrue(lua.DoTestString("return Step6()", 200ms), L"Step6");
+			Assert::IsTrue(lua.DoTestString("return Step7()", 200ms), L"Step7");
+			Assert::IsTrue(lua.DoTestString("return Step8()", 200ms), L"Step8");
 		}
+
+		// Arg bundles with simple tables
+		TEST_METHOD(ArgBundle2)
+		{
+			LuaTestState lua;
+
+			lua.DoTestFile("Common.lua");
+			lua.DoTestFile("ArgBundle2.lua");
+
+			std::this_thread::sleep_for(0.5s);
+			Assert::IsTrue(lua.DoTestString("return Step1()", 500ms), L"Step1");
+			Assert::IsTrue(lua.DoTestString("return Step2()", 200ms), L"Step2");
+			Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
+			Assert::IsTrue(lua.DoTestString("return Step4()", 1200ms), L"Step4");
+			Assert::IsTrue(lua.DoTestString("return Step5()", 200ms), L"Step5");
+			Assert::IsTrue(lua.DoTestString("return Step6()", 200ms), L"Step6");
+			Assert::IsTrue(lua.DoTestString("return Step7()", 200ms), L"Step7");
+			Assert::IsTrue(lua.DoTestString("return Step8()", 200ms), L"Step8");
+			Assert::IsTrue(lua.DoTestString("return Step9()", 200ms), L"Step9");
+			Assert::IsTrue(lua.DoTestString("return Step10()", 200ms), L"Step10");
+		}
+
+		// Arg bundles of nested tables
+		//TEST_METHOD(ArgBundle3)
+		//{
+		//	LuaTestState lua;
+
+		//	lua.DoTestFile("Common.lua");
+		//	lua.DoTestFile("ArgBundle3.lua");
+
+		//	std::this_thread::sleep_for(0.5s);
+		//	Assert::IsTrue(lua.DoTestString("return Step1()", 500ms), L"Step1");
+		//	Assert::IsTrue(lua.DoTestString("return Step2()", 200ms), L"Step2");
+		//	Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
+		//	Assert::IsTrue(lua.DoTestString("return Step4()", 1200ms), L"Step4");
+		//	Assert::IsTrue(lua.DoTestString("return Step5()", 200ms), L"Step5");
+		//	Assert::IsTrue(lua.DoTestString("return Step6()", 200ms), L"Step6");
+		//	Assert::IsTrue(lua.DoTestString("return Step7()", 200ms), L"Step7");
+		//	Assert::IsTrue(lua.DoTestString("return Step8()", 200ms), L"Step8");
+		//}
+
+
 
 		
 	};

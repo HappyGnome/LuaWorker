@@ -54,6 +54,11 @@ namespace LuaWorker
 		/// <returns> Bundled results</returns>
 		virtual LuaArgBundle DoExec(lua_State* pL) = 0;
 
+		/// <summary>
+		/// Construct with config
+		/// </summary>
+		/// <param name="config"></param>
+		OneShotTask(TaskConfig&& config);
 	public:
 
 		/// <summary>

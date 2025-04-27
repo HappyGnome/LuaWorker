@@ -31,7 +31,7 @@ extern "C" {
 
 using namespace LuaWorker;
 
-CoTask::CoTask(const std::string& funcString, std::unique_ptr<LuaArgBundle> &&argBundle) :mFuncArgs(std::move(argBundle))
+CoTask::CoTask(const std::string& funcString, std::unique_ptr<LuaArgBundle> &&argBundle,  TaskConfig&& config) :Task(std::move(config)), mFuncArgs(std::move(argBundle))
 {
 	mFuncString = "return " + funcString;
 
@@ -71,7 +71,7 @@ LuaArgBundle CoTask::DoExec(lua_State* pL)
 		lua_settop(pL, 0);
 
 	}
-	else result = DoResume(pL, argC);
+	else result = DoResume(pL, argC, 1);
 
 	return  result;
 }
@@ -81,10 +81,12 @@ LuaArgBundle CoTask::DoExec(lua_State* pL)
 ///		passing any arguments already on the stack.
 /// If this is not the same state previously passed to Exec, behaviour is undefined.
 /// </summary>
+/// <param name = "funcCall">1 or 0. 1 Indicates that the function running on this coroutine is on the stack after the arguments</param>
 /// <param name="pL">Lua state</param>
-LuaArgBundle CoTask::DoResume(lua_State* pL, int argC)
+LuaArgBundle CoTask::DoResume(lua_State* pL, int argC, int funcCall)
 {
-	int prevTop = lua_gettop(pL) - argC - 1; // Top of stack sans function and its arguments. TODO test pushing more than argC before calling this
+
+	int prevTop = lua_gettop(pL) - argC - funcCall;
 
 	int execResult = lua_resume(pL, argC);	
 	
@@ -103,8 +105,8 @@ LuaArgBundle CoTask::DoResume(lua_State* pL, int argC)
 	}
 	else
 	{
-		int resC = lua_gettop(pL) - prevTop;
-		results = LuaArgBundle(pL, resC);
+		int resC = lua_gettop(pL);// -prevTop;
+		results = LuaArgBundle(pL, resC, GetMaxTableDepth());
 	}
 		
 	lua_settop(pL, 0);

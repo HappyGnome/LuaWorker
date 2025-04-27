@@ -56,7 +56,7 @@ namespace LuaWorker
 		/// Constructor
 		/// </summary>
 		/// <param name="execString">Lua string to run when this task executes</param>
-		explicit TaskDoString(std::string execString);
+		explicit TaskDoString(std::string execString, TaskConfig&& config);
 	};
 };
 #endif

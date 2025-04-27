@@ -59,6 +59,33 @@ std::shared_ptr<Worker> WorkerLuaInterface::l_PopWorker(lua_State* pL, int& outK
 	}
 }
 
+/// <summary>
+/// Read selected options form a config table at position `idx` on the stack
+/// If no table is found at that position, the default config is used
+/// </summary>
+/// <param name="pL"></param>
+/// <param name="idx"></param>
+/// <returns></returns>
+TaskConfig ReadTaskConfigTable(lua_State* pL, int idx)
+{
+	TaskConfig result;
+
+	// Get Opts
+	if (lua_istable(pL, idx))
+	{
+		lua_getfield(pL, idx, "maxTableDepth");
+
+		if (lua_isnumber(pL, -1))
+		{
+			result.MaxTableDepth = (int)lua_tointeger(pL, -1);
+		}
+
+		lua_pop(pL, 1);
+	}
+
+	return result;
+}
+
 //-------------------------------
 // Static Lua-callable methods 
 // (Library level)
@@ -145,11 +172,21 @@ int WorkerLuaInterface::l_Worker_DoString(lua_State* pL)
 
 	if (pWorker != nullptr)
 	{
-		if (lua_isstring(pL, -1))
-		{
-			std::string str = lua_tostring(pL, -1);
+		TaskConfig tc;
+		int argIdx = 1;
 
-			std::shared_ptr<OneShotTask> newItem(new TaskDoString(str));
+		if (lua_istable(pL, argIdx))
+		{
+			tc = ReadTaskConfigTable(pL, argIdx);
+			argIdx++;
+
+		}
+
+		if (lua_isstring(pL, argIdx))
+		{
+			std::string str = lua_tostring(pL, argIdx);
+
+			std::shared_ptr<OneShotTask> newItem(new TaskDoString(str, std::move(tc)));
 			pWorker->AddTask(newItem);
 
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -165,11 +202,22 @@ int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 
 	if (pWorker != nullptr)
 	{
-		if (lua_isstring(pL, -1))
-		{
-			std::string str = lua_tostring(pL, -1);
 
-			std::shared_ptr<OneShotTask> newItem(new TaskDoFile(str));
+		TaskConfig tc;
+		int argIdx = 1;
+
+		if (lua_istable(pL, argIdx))
+		{
+			tc = ReadTaskConfigTable(pL, argIdx);
+			argIdx++;
+
+		}
+
+		if (lua_isstring(pL, argIdx))
+		{
+			std::string str = lua_tostring(pL, argIdx);
+
+			std::shared_ptr<OneShotTask> newItem(new TaskDoFile(str, std::move(tc)));
 			pWorker->AddTask(newItem);
 			
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -189,7 +237,7 @@ int WorkerLuaInterface::l_Worker_DoSleep(lua_State* pL)
 		{
 			unsigned int millis = std::max(0,(int)lua_tointeger(pL, -1));
 
-			std::shared_ptr<OneShotTask> newItem(new TaskDoSleep(millis));
+			std::shared_ptr<OneShotTask> newItem(new TaskDoSleep(millis, TaskConfig()));
 			pWorker->AddTask(newItem);
 
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -207,6 +255,14 @@ int WorkerLuaInterface::l_Worker_DoCoRoutine(lua_State* pL)
 	if (pWorker != nullptr)
 	{		
 		int N = lua_gettop(pL) - 1;
+		
+		TaskConfig tc;
+
+		if (lua_istable(pL, -N))
+		{
+			tc = ReadTaskConfigTable(pL, -N);
+			N--;
+		}
 
 		if (!lua_isstring(pL, -N)) return 0;
 
@@ -214,9 +270,9 @@ int WorkerLuaInterface::l_Worker_DoCoRoutine(lua_State* pL)
 
 		std::unique_ptr<LuaArgBundle> argBundle = nullptr;
 		
-		if (N > 1) argBundle.reset(new LuaArgBundle(pL, N - 1));
+		if (N > 1) argBundle.reset(new LuaArgBundle(pL, N - 1, tc.MaxTableDepth));
 
-		std::shared_ptr<CoTask> newItem(new CoTask(funcStr, std::move(argBundle)));
+		std::shared_ptr<CoTask> newItem(new CoTask(funcStr, std::move(argBundle), std::move(tc)));
 		pWorker->AddTask(newItem);
 
 		return TaskLuaInterface::l_PushTask(pL, newItem);

@@ -138,7 +138,7 @@ TaskStatus Task::GetStatus()
 
 
 //------
-Task::Task() : mStatus(TaskStatus::NotStarted), mUnreadResult(false) {}
+Task::Task( TaskConfig&& config) : mStatus(TaskStatus::NotStarted), mUnreadResult(false), mConfig(config) {}
 
 
 
@@ -174,3 +174,10 @@ void Task::Cancel()
 	}
 	mResultStatusCv.notify_all();
 }
+
+//------
+int Task::GetMaxTableDepth() 
+{
+	return mConfig.MaxTableDepth;
+}
+

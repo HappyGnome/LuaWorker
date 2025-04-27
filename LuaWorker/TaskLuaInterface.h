@@ -123,6 +123,17 @@ namespace LuaWorker
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
 		static int l_Task_Finalized(lua_State* pL);
+
+
+		/// <summary>
+		/// Configure options for this task.
+		/// 
+		/// Lua syntax:
+		///		task:SetOpts({MaxTableDepth = 5})
+		/// </summary>
+		/// <param name="pL"></param>
+		/// <returns></returns>
+		static int l_Task_SetOpts(lua_State* pL);
 	};
 };
 #endif

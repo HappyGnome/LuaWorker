@@ -28,6 +28,7 @@
 
 #include "Cancelable.h"
 #include "LuaArgBundle.h"
+#include "TaskCOnfig.h"
 
 extern "C" {
 #include "lua.h"
@@ -67,6 +68,8 @@ namespace LuaWorker
 		std::condition_variable mResultStatusCv;
 
 		bool mUnreadResult;
+
+		TaskConfig mConfig;
 
 	protected:
 
@@ -111,12 +114,12 @@ namespace LuaWorker
 		/// <summary>
 		/// Default constructor
 		/// </summary>
-		Task();
+		Task(TaskConfig&& config);
 
 		/// <summary>
 		/// Push result of this task onto the given lua stack and return the number of items pushed
 		/// </summary>
-		/// <returns>Task result</returns>
+		/// <returns>The number of items added to the stack</returns>
 		int GetResult(lua_State *pL);
 
 		/// <summary>
@@ -150,6 +153,12 @@ namespace LuaWorker
 		/// <returns>Error message</returns>
 		std::string GetError();
 
+		/// <summary>
+		/// Get the MaxTableDepth option for this task. This controls the number of levels of nesting in tables that can be passed to or returned from this Task.
+		/// E.g. if it's 0, no tables can be returned. If 1, then tables in result values will not contain tables
+		/// </summary>
+		/// <returns></returns>
+		int GetMaxTableDepth();
 	};
 }
 #endif

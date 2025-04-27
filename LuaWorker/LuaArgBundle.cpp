@@ -100,8 +100,14 @@ int LuaArgSetTable::Unpack(lua_State* pL) const
 //---------------
 // LuaArgBundle
 
-void LuaArgBundle::BundleTable(lua_State* pL)
+void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 {
+	if (maxTableDepth <= 0)
+	{
+		mArgs.push_back(std::make_unique<LuaArgNil>()); 
+		return;
+	}
+
 	int tableDepth = 1;
 	bool skipKey = true; // Key is nil (start of new table), or otherwise does not correspond to a key-value pair when this bundle is unpacked
 
@@ -165,24 +171,32 @@ void LuaArgBundle::BundleTable(lua_State* pL)
 
 		mArgs.push_back(std::make_unique<LuaArgSetTable>());
 
-		switch (lua_type(pL,-1)) // value type
+		switch (lua_type(pL, -1)) // value type
 		{
 		case LUA_TNUMBER:
-			stepToAddValue.reset(new LuaArgNum(lua_tonumber(pL,-1))); 
+			stepToAddValue.reset(new LuaArgNum(lua_tonumber(pL, -1)));
 			break;
 		case LUA_TBOOLEAN:
-			stepToAddValue.reset(new LuaArgBool(lua_toboolean(pL,-1))); 
+			stepToAddValue.reset(new LuaArgBool(lua_toboolean(pL, -1)));
 			break;
 		case LUA_TSTRING:
 			str = lua_tolstring(pL, -1, &len);
-			stepToAddValue.reset(new LuaArgStr(str,len)); 
+			stepToAddValue.reset(new LuaArgStr(str, len));
 			break;
 
 		case LUA_TTABLE:
-			lua_pushnil(pL);// to get first key of new table
-			tableDepth++;
-			skipKey = true;
-			continue;
+			if (tableDepth >= maxTableDepth)
+			{
+				stepToAddValue.reset(new LuaArgNil());
+				break;
+			}
+			else
+			{
+				lua_pushnil(pL);// to get first key of new table
+				tableDepth++;
+				skipKey = true;
+				continue;
+			}
 		default: 
 			stepToAddValue.reset(new LuaArgNil()); 
 			break;
@@ -198,9 +212,8 @@ void LuaArgBundle::BundleTable(lua_State* pL)
 /// </summary>
 LuaArgBundle::LuaArgBundle(){}
 
-LuaArgBundle::LuaArgBundle(lua_State* pL, int height)
+LuaArgBundle::LuaArgBundle(lua_State* pL, int height, int maxTableDepth)
 {
-	// TODO add table recursion limit
 	int heightDelta = 0;
 
 	std::unique_ptr<LuaArgUnpackStep> stepToAddValue;
@@ -226,10 +239,9 @@ LuaArgBundle::LuaArgBundle(lua_State* pL, int height)
 			break;
 
 		case LUA_TTABLE:
-			BundleTable(pL); // Pop table and append instructions for building a copy to mArgs
+			BundleTable(pL, maxTableDepth); // Pop table and append instructions for building a copy to mArgs
 			heightDelta++;
 			continue;
-
 		default: 
 			stepToAddValue.reset(new LuaArgNil()); 
 			break;

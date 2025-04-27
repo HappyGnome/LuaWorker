@@ -26,7 +26,7 @@ extern "C" {
 
 using namespace LuaWorker;
 
-TaskDoString::TaskDoString(std::string execString) : mExecString(execString) {}
+TaskDoString::TaskDoString(std::string execString, TaskConfig&& config) :OneShotTask(std::move(config)), mExecString(execString) {}
 
 LuaArgBundle TaskDoString::DoExec(lua_State* pL)
 {
@@ -49,7 +49,7 @@ LuaArgBundle TaskDoString::DoExec(lua_State* pL)
 		resC = lua_gettop(pL) - prevTop;
 	}
 
-	LuaArgBundle result(pL, resC);
+	LuaArgBundle result(pL, resC, GetMaxTableDepth());
 
 	lua_settop(pL, 0);
 

@@ -1,6 +1,6 @@
 /*****************************************************************************\
 *
-*  Copyright 2023 HappyGnome
+*  Copyright 2025 HappyGnome
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -16,18 +16,20 @@
 *
 \*****************************************************************************/
 
-#include "OneShotTask.h"
+#ifndef _TASK_CONFIG_H_
+#define _TASK_CONFIG_H_
+#pragma once
 
-using namespace LuaWorker;
+#include "LuaArgBundle.h"
 
-
-//------
-void OneShotTask::Exec(lua_State* pL)
+namespace LuaWorker
 {
-	if (pL == nullptr || !TrySetRunning()) return;
 
-	SetResult(this->DoExec(pL), lua_status(pL) == LUA_YIELD);
+	struct TaskConfig
+	{
+		int MaxTableDepth = LuaArgBundle::DefaultMaxTableDepth;
+	};
 
-}
-//------
-OneShotTask::OneShotTask(TaskConfig&& config) :Task(std::move(config)) {}
+};
+
+#endif

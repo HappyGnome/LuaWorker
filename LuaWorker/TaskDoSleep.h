@@ -56,7 +56,7 @@ namespace LuaWorker
 		/// Constructor
 		/// </summary>
 		/// <param name="sleepForMs">Time to sleep for</param>
-		explicit TaskDoSleep(unsigned int sleepForMs);
+		explicit TaskDoSleep(unsigned int sleepForMs, TaskConfig&& config);
 	};
 };
 #endif

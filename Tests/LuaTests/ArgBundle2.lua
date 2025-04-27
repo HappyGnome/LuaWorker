@@ -20,11 +20,10 @@
 initStr = [[
 
 
-Echo = function(n,...)
+Echo = function(t)
 
 	local s = ""
-	for k = 1,n do
-		local v = arg[k]
+	for k,v in pairs(t) do
 		if v~= nil then
 			if type(v) == 'boolean' then
 				if v then
@@ -38,7 +37,14 @@ Echo = function(n,...)
 	end	
 
 	return s
-end]]
+end
+
+Reflect = function(...)
+
+	arg["n"] = nil
+	return arg
+end
+]]
 
 w = LuaWorker.Create()
 w:Start()
@@ -53,7 +59,7 @@ end
 
 Step2 = function()
 
-	T1 = w:DoCoroutine("Echo",2,"a",1000)
+	T1 = w:DoCoroutine("Echo",{"a",1000})
 
 	res = T1:Await(100)
 	
@@ -68,7 +74,7 @@ end
 
 Step3 = function()
 
-	T1 = w:DoCoroutine("Echo",2,"",1000)
+	T1 = w:DoCoroutine("Echo",{"",1000})
 
 	res = T1:Await(100)
 	
@@ -83,7 +89,7 @@ end
 
 Step4 = function()
 
-	T1 = w:DoCoroutine("Echo",4,10,"",nil,1000)
+	T1 = w:DoCoroutine("Echo",{10,"",nil,1000})
 
 	res = T1:Await(100)
 	
@@ -98,7 +104,7 @@ end
 
 Step5 = function()
 
-	T1 = w:DoCoroutine("Echo",4,10,"\0Hello\0",nil,1000)
+	T1 = w:DoCoroutine("Echo",{10,"\0Hello\0",nil,1000})
 
 	res = T1:Await(100)
 	
@@ -118,7 +124,7 @@ end
 
 Step6 = function()
 
-	T1 = w:DoCoroutine("Echo",4,true,"\n",nil,1000.645)
+	T1 = w:DoCoroutine("Echo",{true,"\n",nil,1000.645})
 
 	res = T1:Await(100)
 	
@@ -133,7 +139,7 @@ end
 
 Step7 = function()
 
-	T1 = w:DoCoroutine("Echo",0)
+	T1 = w:DoCoroutine("Echo",{})
 
 	res = T1:Await(100)
 	
@@ -147,7 +153,7 @@ Step7 = function()
 end 
 Step8 = function()
 
-	T1 = w:DoCoroutine("Echo",1,false)
+	T1 = w:DoCoroutine("Echo",{false})
 
 	res = T1:Await(100)
 	
@@ -157,6 +163,42 @@ Step8 = function()
 		return true
 	else
 		error(res)
+	end
+end 
+
+Step9 = function()
+
+	local toSend = {"1",99, {"Hello"}, nil, true, false}
+	
+	T1 = w:DoCoroutine("Reflect",unpack(toSend))
+
+	res = T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+
+	local ok, str = DeepMatch(toSend,res)
+	if  ok then
+		return true
+	else
+		error("Mismatch at " .. str .. " :: " .. obj2str(res))
+	end
+end 
+
+Step10 = function()
+
+	local toSend = {{"Hello"},{1}, nil, true, {false}}
+	
+	T1 = w:DoCoroutine("Reflect",unpack(toSend))
+
+	res = T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+	
+	local ok, str = DeepMatch(toSend,res)
+	if  ok then
+		return true
+	else
+		error("Mismatch at " .. str .. " :: " .. obj2str(res))
 	end
 end 
 

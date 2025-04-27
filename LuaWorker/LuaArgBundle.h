@@ -174,9 +174,12 @@ namespace LuaWorker
 		/// After execution, the table is popped.
 		/// </summary>
 		/// <param name="pL"></param>
-		void BundleTable(lua_State* pL);
+		/// <param name = "maxTableDepth">maximum levels of the table heirarchy to allow. E.g. if maxDepth == 0, tables are packed as nils. If it's 1, tables witih are top level table are ignored, and so on.</param>
+		void BundleTable(lua_State* pL, int maxTableDepth);
 
 	public:
+
+		static constexpr int DefaultMaxTableDepth = 10;
 
 		/// <summary>
 		/// Initialise the bundle by taking the top `height` items from the lua stack
@@ -184,7 +187,8 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="pL"></param>
 		/// <param name="height"></param>
-		explicit LuaArgBundle(lua_State* pL, int height);
+		/// <param name = "maxTableDepth">maximum levels of the table heirarchy to allow. E.g. if maxDepth == 0, tables are packed as nils. If it's 1, tables witih are top level table are ignored, and so on.</param>
+		explicit LuaArgBundle(lua_State* pL, int height, int maxTableDepth );
 
 		/// <summary>
 		/// Initialize an empty arg bundle
