@@ -63,7 +63,8 @@ InLuaWorker.Sleep(1000)
 InLuaWorker.YieldFor( millis , result1, ...)
 ```
 Yield this coroutine and resume after at least the specified delay. Set a result in the task that launched the coroutine.
-Calling this outside of a task created with DoCoroutine is an error.
+Calling this outside of a task created with DoCoroutine is an error. This is useful to create a task that resumes with an approximate frequency on the worker thread.
+E.g. to poll an external service, so that the latest data from the service is available in the main thread by awaiting the yielding task.
 
 **Arguments** : 
 \#  |Type		| Description				
