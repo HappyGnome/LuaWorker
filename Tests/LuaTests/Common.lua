@@ -35,7 +35,7 @@ end
 
 DeepMatch = function(t,s,maxDepth)
 	if type(maxDepth) ~= 'number' then maxDepth = 10 end
-	if maxDepth <= 0  then return false end
+	if maxDepth <= 0  then return true, "" end
 
 	if type(t) ~= type(s) then return false, type(s) end
 

@@ -291,6 +291,7 @@
     </CopyFileToFolders>
     <None Include="LuaTests\ArgBundle1.lua" />
     <None Include="LuaTests\ArgBundle2.lua" />
+    <None Include="LuaTests\ArgBundle3.lua" />
     <None Include="LuaTests\ErrorInCoroutine.lua" />
     <None Include="LuaTests\TaskDoFile_FileTask.lua">
       <FileType>Document</FileType>
