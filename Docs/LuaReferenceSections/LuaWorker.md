@@ -53,7 +53,7 @@ Queue a task for this worker. The task executes the lua file at the specified pa
 task = worker:DoFile("myfile.lua")
 ```
 **Options**
-* maxTableDepth: As for [DoCoroutine](###DoCoroutine)
+* maxTableDepth: As for [DoCoroutine](#DoCoroutine)
 
 ### DoSleep
 ```
@@ -101,7 +101,7 @@ Queue a task for this worker. The task executes lua code from a string.
 task = worker:DoString("os.execute('timeout 5')")
 ```
 **Options**
-* maxTableDepth: As for [DoCoroutine](###DoCoroutine)
+* maxTableDepth: As for [DoCoroutine](#DoCoroutine)
 
 ### PopLogLine
 ```
