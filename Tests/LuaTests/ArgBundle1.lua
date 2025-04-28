@@ -23,6 +23,9 @@ initStr = [[
 Echo = function(n,...)
 
 	local s = ""
+
+	if n == nil then return "NIL" end
+
 	for k = 1,n do
 		local v = arg[k]
 		if v~= nil then
@@ -154,6 +157,22 @@ Step8 = function()
 	RaiseFirstWorkerError(w)
 	
 	if res == "1false" then
+		return true
+	else
+		error(res)
+	end
+end 
+
+-- Empty arg bundle
+Step9 = function()
+
+	T1 = w:DoCoroutine("Echo")
+
+	res = T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+	
+	if res == "NIL" then
 		return true
 	else
 		error(res)

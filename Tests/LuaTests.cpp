@@ -245,6 +245,7 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step6()", 200ms), L"Step6");
 			Assert::IsTrue(lua.DoTestString("return Step7()", 200ms), L"Step7");
 			Assert::IsTrue(lua.DoTestString("return Step8()", 200ms), L"Step8");
+			Assert::IsTrue(lua.DoTestString("return Step9()", 200ms), L"Step9");
 		}
 
 		// Arg bundles with simple tables
@@ -269,6 +270,7 @@ namespace Tests
 			Assert::IsFalse(lua.DoTestString("return Step11()", 200ms), L"Step11");
 			Assert::IsTrue(lua.DoTestString("return Step12()", 200ms), L"Step12");
 			Assert::IsFalse(lua.DoTestString("return Step13()", 200ms), L"Step13");
+			Assert::IsTrue(lua.DoTestString("return Step14()", 200ms), L"Step14");
 		}
 
 		// Arg bundles of nested tables

@@ -259,3 +259,22 @@ Step13 = function() -- Input truncation test
 		error("Res " .. res .. " Must not match " .. #toSend)
 	end
 end 
+
+-- Empty table
+Step14 = function() -- Input truncation test
+
+	local toSend = {{}}
+	
+	T1 = w:DoCoroutine("Reflect",unpack(toSend))
+
+	res = T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+	
+	local ok, str = DeepMatch(toSend,res)
+	if  ok then
+		return true
+	else
+		error("Mismatch at " .. str .. " :: " .. obj2str(res))
+	end
+end 
