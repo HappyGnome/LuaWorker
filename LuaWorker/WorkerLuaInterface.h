@@ -177,6 +177,8 @@ namespace LuaWorker
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
 		static int l_Worker_DoCoRoutine(lua_State* pL);
+		// TODO: Add DoFunction for lighter weight option when yielding not needed
+		// TODO: Allow normal yielding
 
 		/// <summary>
 		/// Start worker thread

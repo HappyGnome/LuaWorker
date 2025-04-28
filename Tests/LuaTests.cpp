@@ -19,6 +19,7 @@
 #include "LuaTestState.h"
 #include "CppUnitTest.h"
 #include<thread>
+#include<iostream>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -321,9 +322,6 @@ namespace Tests
 			//Assert::IsTrue(lua.DoTestString("return Step8()", 200ms), L"Step8");
 		}
 
-
-
-		// TODO Performance/stress testing. Look for possible optimizations.
 		
 	};
 }

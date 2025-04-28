@@ -191,6 +191,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AutoKeyDeckTests.cpp" />
+    <ClCompile Include="Benchmarks.cpp" />
     <ClCompile Include="LuaTestState.cpp" />
     <ClCompile Include="LuaTests.cpp" />
     <ClCompile Include="SortedDeckTests.cpp" />
@@ -292,6 +293,7 @@
     <None Include="LuaTests\ArgBundle1.lua" />
     <None Include="LuaTests\ArgBundle2.lua" />
     <None Include="LuaTests\ArgBundle3.lua" />
+    <None Include="LuaTests\Benchmark1.lua" />
     <None Include="LuaTests\ErrorInCoroutine.lua" />
     <CopyFileToFolders Include="LuaTests\TaskAwait0.lua">
       <FileType>Document</FileType>

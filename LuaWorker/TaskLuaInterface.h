@@ -99,7 +99,7 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
-		static int l_Task_Await(lua_State* pL); // TODO allow 0ms wait
+		static int l_Task_Await(lua_State* pL);
 
 		/// <summary>
 		/// Pop Task handle from the top of the lua stack
