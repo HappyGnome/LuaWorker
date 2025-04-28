@@ -1,10 +1,11 @@
 # LuaWorker
 
+
 ## Methods
 
 ### DoCoroutine
 ```
-worker:DoCoroutine( function,args... )
+worker:DoCoroutine([opts], function, args... )
 ```
 
 Queue a task for this worker. The task starts a coroutine, which can yield to be resumed after a delay
@@ -12,8 +13,9 @@ Queue a task for this worker. The task starts a coroutine, which can yield to be
 **Arguments** :
 \#  |Type		| Description
 ----|-----------|-----------
-1	| String	| When executed in the worker thread, results in a lua function
-2+  | String	| When executed in the worker thread, each results in an argument for the function
+1   | Table		| (Optional) table of options for the created task.
+2	| String	| When executed in the worker thread, results in a lua function. Any variables returned or yielded must be primitive   
+3+  | Primitive	| Arguments for the function 
 
 **Returns** :
 \#  |Type					| Description
@@ -22,12 +24,15 @@ Queue a task for this worker. The task starts a coroutine, which can yield to be
 
 **Examples**
 ```
-task = worker:DoCoroutine("YieldingFunc","'a'","1000")
+task1 = worker:DoCoroutine("YieldingFunc1","a","1000")
+task2 = worker:DoCoroutine({maxTableDepth = 100},"YieldingFunc2",{"a"},7)
 ```
+**Options**
+* maxTableDepth: (integer) override the maximum number of nested tables in function parameters and results. Default is 10.
 
 ### DoFile
 ```
-worker:DoFile( path )
+worker:DoFile([opts], path )
 ```
 
 Queue a task for this worker. The task executes the lua file at the specified path.
@@ -35,7 +40,8 @@ Queue a task for this worker. The task executes the lua file at the specified pa
 **Arguments** :
 \#  |Type		| Description
 ----|-----------|-----------
-1	| String	| Path of lua file to execute in the worker thread's lua environment
+1   | Table		| (Optional) table of options for the created task.
+2	| String	| Path of lua file to execute in the worker thread's lua environment
 
 **Returns** :
 \#  |Type					| Description
@@ -46,6 +52,8 @@ Queue a task for this worker. The task executes the lua file at the specified pa
 ```
 task = worker:DoFile("myfile.lua")
 ```
+**Options**
+* maxTableDepth: As for [DoCoroutine](###DoCoroutine)
 
 ### DoSleep
 ```
@@ -72,7 +80,7 @@ task = worker:DoSleep(1000)
 
 ### DoString
 ```
-worker:DoString( luaString )
+worker:DoString([opts], luaString)
 ```
 
 Queue a task for this worker. The task executes lua code from a string.
@@ -80,7 +88,8 @@ Queue a task for this worker. The task executes lua code from a string.
 **Arguments** :
 \#  |Type		| Description
 ----|-----------|-----------
-1	| String	| Lua to execute in the worker thread's lua environment
+1   | Table		| (Optional) table of options for the created task.
+2	| String	| Lua to execute in the worker thread's lua environment
 
 **Returns** :
 \#  |Type					| Description
@@ -91,6 +100,8 @@ Queue a task for this worker. The task executes lua code from a string.
 ```
 task = worker:DoString("os.execute('timeout 5')")
 ```
+**Options**
+* maxTableDepth: As for [DoCoroutine](###DoCoroutine)
 
 ### PopLogLine
 ```

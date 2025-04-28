@@ -19,9 +19,7 @@ Wait for a limited time for this task to reach a final status, or to yield (coro
 If the task is complete:
 \#  |Type		| Description
 ----|-----------|-----------
-1	| String	| Return value of the task
-
-otherwise nothing (e.g. on timeout, cancellation or error).
+0+	| Primitive	| Return values of the task, otherwise nothing (e.g. on timeout, cancellation or error).
 
 **Examples**
 ```

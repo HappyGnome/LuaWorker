@@ -210,6 +210,8 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
 			std::this_thread::sleep_for(5.1s);
 			Assert::IsTrue(lua.DoTestString("return Step4()", 200ms), L"Step4");
+			Assert::IsTrue(lua.DoTestString("return Step5()", 200ms), L"Step5");
+			Assert::IsTrue(lua.DoTestString("return Step6()", 200ms), L"Step6");
 		}
 
 		TEST_METHOD(ErrorInCoroutine)
@@ -271,6 +273,8 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step12()", 200ms), L"Step12");
 			Assert::IsFalse(lua.DoTestString("return Step13()", 200ms), L"Step13");
 			Assert::IsTrue(lua.DoTestString("return Step14()", 200ms), L"Step14");
+			Assert::IsTrue(lua.DoTestString("return Step15()", 200ms), L"Step15");
+			Assert::IsTrue(lua.DoTestString("return Step16()", 200ms), L"Step16");
 		}
 
 		// Arg bundles of nested tables
@@ -286,7 +290,7 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step2()", 200ms), L"Step2");
 			Assert::IsTrue(lua.DoTestString("return Step3()", 200ms), L"Step3");
 			Assert::IsFalse(lua.DoTestString("return Step4()", 1200ms), L"Step4");
-			//Assert::IsTrue(lua.DoTestString("return Step5()", 200ms), L"Step5");
+			Assert::IsTrue(lua.DoTestString("return Step5()", 200ms), L"Step5");
 			//Assert::IsTrue(lua.DoTestString("return Step6()", 200ms), L"Step6");
 			//Assert::IsTrue(lua.DoTestString("return Step7()", 200ms), L"Step7");
 			//Assert::IsTrue(lua.DoTestString("return Step8()", 200ms), L"Step8");

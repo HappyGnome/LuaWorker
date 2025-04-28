@@ -278,3 +278,45 @@ Step14 = function() -- Input truncation test
 		error("Mismatch at " .. str .. " :: " .. obj2str(res))
 	end
 end 
+
+-- Table key types
+Step15 = function() -- Input truncation test
+
+	local toSend = {{hey="foo", [9] ="baz"}}
+	local boo = true
+	toSend[1][boo] = "bar"
+	
+	T1 = w:DoCoroutine("Reflect",unpack(toSend))
+
+	res = T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+	
+	local ok, str = DeepMatch(toSend,res)
+	if  ok then
+		return true
+	else
+		error("Mismatch at " .. str .. " :: " .. obj2str(res))
+	end
+end
+
+-- Empty params
+Step16 = function() 
+
+	local toSend = {}
+	
+	T1 = w:DoCoroutine("Reflect")
+
+	res = T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+	
+	local ok, str = DeepMatch(toSend,res)
+	if  ok then
+		return true
+	else
+		error("Mismatch at " .. str .. " :: " .. obj2str(res))
+	end
+end 
+
+

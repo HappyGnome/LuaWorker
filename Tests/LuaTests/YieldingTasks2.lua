@@ -1,6 +1,6 @@
 --[[*****************************************************************************
 * 
-*  Copyright 2023 HappyGnome
+*  Copyright 2025 HappyGnome
 *  
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -24,7 +24,17 @@ YieldingFunc = function(ch, delay)
 		InLuaWorker.YieldFor(delay,gStr)
 	end
 	return gStr
-end]]
+end
+
+YieldingFuncNoResult = function()
+	InLuaWorker.YieldFor(1000)
+end
+
+YieldingFuncMultipleResults = function()
+	InLuaWorker.YieldFor(1000,1,2,3,{4})
+end
+
+]]
 
 w = LuaWorker.Create()
 w:Start()
@@ -62,5 +72,31 @@ Step4 = function()
 		return true
 	else
 		error(res)
+	end
+end 
+
+Step5 = function()
+	T = w:DoCoroutine("YieldingFuncNoResult")
+	res = T:Await(200) 
+
+	RaiseFirstWorkerError(w)
+	if res == nil then 
+		return true
+	else
+		error(obj2str(res))
+	end
+end 
+
+Step6 = function()
+	T = w:DoCoroutine("YieldingFuncMultipleResults")
+
+	local res = {}
+	res[1],res[2],res[3],res[4] = T:Await(200) 
+
+	RaiseFirstWorkerError(w)
+	if DeepMatch(res,{1,2,3,{4}}) then 
+		return true
+	else
+		error(obj2str(res))
 	end
 end 

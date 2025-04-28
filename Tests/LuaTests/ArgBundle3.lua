@@ -42,7 +42,7 @@ end
 Reflect = function(...)
 
 	arg["n"] = nil
-	return arg
+	return arg, "AnotherResult"
 end
 
 ArgC = function(...)
@@ -123,3 +123,21 @@ Step4 = function()
 	end
 end 
 
+-- Nested tables non-tree, diferent depth
+Step5 = function()
+
+	local toSend = {toSend}
+	toSend[1] = toSend
+	
+	T1 = w:DoCoroutine({maxTableDepth = 9}, "Reflect",unpack(toSend))
+
+	_, res= T1:Await(100)
+	
+	RaiseFirstWorkerError(w)
+
+	if res == "AnotherResult" then
+		return true
+	else
+		error("Second result was: " .. res)
+	end
+end 
