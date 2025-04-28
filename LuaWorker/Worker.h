@@ -101,7 +101,7 @@ namespace LuaWorker
 		void ThreadMainLoop(InnerLuaState& lua);
 
 		/// <summary>
-		/// Resume tasks/wait for new tasks. Returns the next new task unless main loop should quit
+		/// Resume tasks on schedule and wait for new tasks. Returns the next new task unless main loop should quit
 		/// </summary>
 		std::unique_ptr<TaskExecPack> RunCurrentTasks(InnerLuaState& lua);
 

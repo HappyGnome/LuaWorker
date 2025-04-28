@@ -129,5 +129,8 @@
     <None Include="LuaTests\ArgBundle3.lua">
       <Filter>LuaTests</Filter>
     </None>
+    <None Include="LuaTests\WorkerVersion.lua">
+      <Filter>LuaTests</Filter>
+    </None>
   </ItemGroup>
 </Project>

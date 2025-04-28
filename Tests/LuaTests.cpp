@@ -42,6 +42,16 @@ namespace Tests
 			Assert::IsTrue(lua.DoTestString("return Step4()"), L"Step4");
 		}
 
+		TEST_METHOD(WorkerVersion)
+		{
+			LuaTestState lua;
+
+			lua.DoTestFile("Common.lua");
+			lua.DoTestFile("WorkerVersion.lua");
+
+			Assert::IsTrue(lua.DoTestString("return Step1()"), L"Step1");
+		}
+
 		TEST_METHOD(TaskSleep)
 		{
 			LuaTestState lua;
@@ -298,6 +308,7 @@ namespace Tests
 
 
 
+		// TODO Performance/stress testing. Look for possible optimizations.
 		
 	};
 }

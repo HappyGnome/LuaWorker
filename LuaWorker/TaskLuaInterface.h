@@ -99,7 +99,7 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
-		static int l_Task_Await(lua_State* pL);
+		static int l_Task_Await(lua_State* pL); // TODO allow 0ms wait
 
 		/// <summary>
 		/// Pop Task handle from the top of the lua stack
@@ -124,16 +124,6 @@ namespace LuaWorker
 		/// <returns>Number of items pushed to the stack</returns>
 		static int l_Task_Finalized(lua_State* pL);
 
-
-		/// <summary>
-		/// Configure options for this task.
-		/// 
-		/// Lua syntax:
-		///		task:SetOpts({MaxTableDepth = 5})
-		/// </summary>
-		/// <param name="pL"></param>
-		/// <returns></returns>
-		static int l_Task_SetOpts(lua_State* pL);
 	};
 };
 #endif
