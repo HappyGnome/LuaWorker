@@ -12,7 +12,7 @@ Wait for a limited time for this task to reach a final status, or to yield (coro
 **Arguments** :
 \#  |Type		| Description
 ----|-----------|-----------
-1	| Integer	| Maximum milliseconds to wait for the task to reach a final status.
+1	| Integer	| (Optional) Maximum milliseconds to wait for the task to reach a final status. If 0, immediately returns the latest unread results, or nil if there are none. Default 0.
 
 **Returns** :
 

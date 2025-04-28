@@ -127,7 +127,7 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="waitForMillis">Max time to wait</param>
 		/// <returns>True if tasks is complete, or newly suspended</returns>
-		bool WaitForResult(unsigned int waitForMillis);
+		bool WaitForResult(long waitForMillis);
 
 		/// <summary>
 		/// Get execution status of this Task

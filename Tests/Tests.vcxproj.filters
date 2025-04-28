@@ -95,6 +95,9 @@
     <CopyFileToFolders Include="LuaTests\YieldingTasks1.lua">
       <Filter>LuaTests</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="LuaTests\TaskAwait0.lua">
+      <Filter>LuaTests</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaTestState.h">

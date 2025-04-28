@@ -109,9 +109,15 @@ int Task::GetResult(lua_State *pL)
 }
 
 //------
-bool Task::WaitForResult(unsigned int waitForMillis)
+bool Task::WaitForResult(long waitForMillis)
 {
-	if (waitForMillis <= 0) waitForMillis = 1;
+	if (waitForMillis <= 0)
+	{
+		std::unique_lock<std::mutex> lock(mResultStatusMtx);
+
+		return (mStatus == TaskStatus::Complete || mUnreadResult);
+
+	}
 
 	system_clock::time_point sleepTill = system_clock::now() + (waitForMillis * 1ms);
 
@@ -119,8 +125,14 @@ bool Task::WaitForResult(unsigned int waitForMillis)
 	{
 		std::unique_lock<std::mutex> lock(mResultStatusMtx);
 
-		if (mStatus == TaskStatus::Error) return false;
-		if (IsFinal(mStatus) || mUnreadResult) return true;
+		if (mStatus == TaskStatus::Complete || mUnreadResult)
+		{
+			return true;
+		}
+		else if (IsFinal(mStatus))
+		{
+			return false;
+		}
 
 		mResultStatusCv.wait_until(lock, sleepTill);
 
