@@ -44,7 +44,7 @@ namespace Benchmarks
 			lua.DoTestFile("Benchmark1.lua");
 
 			std::this_thread::sleep_for(0.5s);
-			if (not lua.DoTestString("return Step1()")) {
+			if (!lua.DoTestString("return Step1()")) {
 				std::cout << "Step1 failed"<<std::endl;
 				return;
 			}
@@ -63,7 +63,15 @@ namespace Benchmarks
 
 			memDataOK = memDataOK && GetProcessMemoryInfo(thisProc, &memCounters2, sizeof(memCounters2));
 
+			if (!lua.DoTestString("return Step3()"))
+			{
+				std::cout << "Step3.1 failed"<<std::endl;
+			}
 			lua.RunGcNow();
+			if (!lua.DoTestString("return Step3()"))
+			{
+				std::cout << "Step3.2 failed"<<std::endl;
+			}
 
 			memDataOK = memDataOK && GetProcessMemoryInfo(thisProc, &memCounters3, sizeof(memCounters3));
 

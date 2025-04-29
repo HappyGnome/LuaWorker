@@ -352,3 +352,29 @@ int WorkerLuaInterface::l_Worker_PopLogLine(lua_State* pL)
 
 	return 0;
 }
+
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+int WorkerLuaInterface::l_Reset_Benchmark_Counters(lua_State* pL)
+{
+	Task::CountDeleted = 0;
+	Task::CountPushed = 0;
+	Task::PeakTaskCount = 0;
+	return 0;
+}
+
+int WorkerLuaInterface::l_Get_Benchmark_Counters(lua_State* pL)
+{
+	lua_createtable(pL,0,0);
+	lua_pushinteger(pL,Task::CountDeleted);
+	lua_setfield(pL, -2, "TaskDeleteCount");
+
+	lua_pushinteger(pL,Task::CountPushed);
+	lua_setfield(pL, -2, "TaskCreateCount");
+
+	lua_pushinteger(pL,Task::PeakTaskCount);
+	lua_setfield(pL, -2, "PeakTaskCount");
+	return 1;
+}
+
+#endif
+

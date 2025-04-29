@@ -55,6 +55,7 @@ std::shared_ptr<Task> TaskLuaInterface::l_PopTask(lua_State* pL, int &outKey)
 
 int TaskLuaInterface::l_PushTask(lua_State* pL, std::shared_ptr<Task> pTask)
 {
+
 	int key = sTasks.push(pTask);
 
 	lua_createtable(pL, 0, 5);
@@ -87,6 +88,7 @@ int TaskLuaInterface::l_PushTask(lua_State* pL, std::shared_ptr<Task> pTask)
 //-------------------------------
 // Public Static Lua-callable methods
 //-------------------------------
+
 int TaskLuaInterface::l_Task_Delete(lua_State* pL)
 {
 	int key;

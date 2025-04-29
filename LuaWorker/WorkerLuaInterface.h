@@ -220,6 +220,25 @@ namespace LuaWorker
 		/// <param name="pL">Lua state</param>
 		/// <returns>Number of items pushed to the stack</returns>
 		static int l_Worker_PopLogLine(lua_State* pL);
+
+
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		/// <summary>
+		/// Reset diagnostic counters embedded for benchmarking/profiling
+		/// </summary>
+		/// <param name="pL"></param>
+		/// <returns></returns>
+		static int l_Reset_Benchmark_Counters(lua_State* pL);
+
+		/// <summary>
+		/// Fetch a table of benchmarking counters
+		/// </summary>
+		/// <param name="pL"></param>
+		/// <returns></returns>
+		static int l_Get_Benchmark_Counters(lua_State* pL);
+
+#endif
+
 	};
 }
 #endif

@@ -150,8 +150,24 @@ TaskStatus Task::GetStatus()
 
 
 //------
-Task::Task( TaskConfig&& config) : mStatus(TaskStatus::NotStarted), mUnreadResult(false), mConfig(config) {}
+Task::Task( TaskConfig&& config) : mStatus(TaskStatus::NotStarted), mUnreadResult(false), mConfig(config) 
+{
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+	CountPushed++;
+	if (CountPushed - CountDeleted > PeakTaskCount)
+	{
+		PeakTaskCount = CountPushed - CountDeleted;
+	}
+#endif
+}
 
+//------
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+Task::~Task()
+{
+	CountDeleted++;
+}
+#endif
 
 
 //------
@@ -192,4 +208,14 @@ int Task::GetMaxTableDepth()
 {
 	return mConfig.MaxTableDepth;
 }
+
+//------------------------------
+// Diagnostic statics
+//------------------------------
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		std::atomic<int> Task::CountPushed = 0;
+		std::atomic<int> Task::CountDeleted = 0;
+		std::atomic<int> Task::PeakTaskCount = 0;
+#endif
+
 

@@ -97,6 +97,16 @@ namespace LuaWorker
 
 	public:
 
+		//------------------------------
+		// Diagnostic statics
+		//------------------------------
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		static std::atomic<int> CountPushed;
+		static std::atomic<int> CountDeleted;
+		static std::atomic<int> PeakTaskCount ;
+#endif
+
+
 		//-------------------------------
 		// Public static methods
 		//-------------------------------
@@ -115,6 +125,11 @@ namespace LuaWorker
 		/// Default constructor
 		/// </summary>
 		Task(TaskConfig&& config);
+
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		~Task();
+#endif
+
 
 		/// <summary>
 		/// Push result of this task onto the given lua stack and return the number of items pushed

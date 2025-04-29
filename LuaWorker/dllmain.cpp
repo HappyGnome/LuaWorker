@@ -34,6 +34,13 @@ extern "C"  int luaopen_LuaWorker(lua_State* pL) {
           {"Create", WorkerLuaInterface::l_Worker_Create},
           {"Version", WorkerLuaInterface::l_LuaWorker_Version},
 
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+        {"Benchmark_Counters_Reset", WorkerLuaInterface::l_Reset_Benchmark_Counters},
+        {"Benchmark_Counters_Get", WorkerLuaInterface::l_Get_Benchmark_Counters},
+
+#endif
+
+
           {nullptr, nullptr}  /* end */
     };
     luaL_register(pL, "LuaWorker", Worker_Index);

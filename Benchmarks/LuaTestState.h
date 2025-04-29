@@ -37,7 +37,7 @@ namespace Benchmarks
 	private:
 		lua_State* mLua;
 
-		bool GetTestResult();
+		bool GetTestResult(std::string &details);
 
 	public:
 

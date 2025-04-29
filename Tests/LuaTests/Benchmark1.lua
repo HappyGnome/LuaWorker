@@ -30,8 +30,19 @@ Step1 = function()
 
 	RaiseFirstWorkerError(w)
 	
+	if type(LuaWorker.Benchmark_Counters_Get) == 'function' then 
+		LuaWorker.Benchmark_Counters_Reset()
+	end
+
 	return w:Status() == LuaWorker.WorkerStatus.Processing
 end 
+
+Step3 = function()
+
+	if type(LuaWorker.Benchmark_Counters_Get) ~= 'function' then return true end
+	return obj2str(LuaWorker.Benchmark_Counters_Get()), true
+
+end
 
 Step2NoData = function()
 
@@ -43,13 +54,14 @@ Step2NoData = function()
 		w:DoCoroutine("Echo")
 		w:DoCoroutine("Echo")
 		lastTask = w:DoCoroutine("Echo")
+		lastTask:Await(100)
 	end
 
 	local done = lastTask:Await(60000)
 
 	RaiseFirstWorkerError(w)
 
-	return done ~= nil
+	return (done ~= nil)
 end 
 
 Step2Int = function()
@@ -62,6 +74,7 @@ Step2Int = function()
 		w:DoCoroutine("Echo",2)
 		w:DoCoroutine("Echo",3)
 		lastTask = w:DoCoroutine("Echo",4)
+		lastTask:Await(100)
 	end
 
 	local done = lastTask:Await(60000)
@@ -81,6 +94,7 @@ Step2String = function()
 		w:DoCoroutine("Echo","Here is a string 1234567890124124124 Some random stu f:f 90u1jnwuehrp2983y4ph34lc2u3h5p29n83yc5[qc283y4c2 34h;2u5h232[034y 2q;3hr ;2uh234nuc3[9u'2oh4/']]]")
 		w:DoCoroutine("Echo","Here is a string 1234567890124124124 Some random stu f:f 90u1jnwuehrp2983y4ph34lc2u3h5p29n83yc5[qc283y4c2 34h;2u5h232[034y 2q;3hr ;2uh234nuc3[9u'2oh4/']]]")
 		lastTask = w:DoCoroutine("Echo","Here is a string 1234567890124124124 Some random stu f:f 90u1jnwuehrp2983y4ph34lc2u3h5p29n83yc5[qc283y4c2 34h;2u5h232[034y 2q;3hr ;2uh234nuc3[9u'2oh4/']]]")
+		lastTask:Await(100)
 	end
 
 	local done = lastTask:Await(60000)
@@ -100,6 +114,7 @@ Step2Bool = function()
 		w:DoCoroutine("Echo",false)
 		w:DoCoroutine("Echo",true)
 		lastTask = w:DoCoroutine("Echo",false)
+		lastTask:Await(100)
 	end
 
 	local done = lastTask:Await(60000)
@@ -119,6 +134,7 @@ Step2Table1 = function()
 		w:DoCoroutine("Echo",{true})
 		w:DoCoroutine("Echo",{"Hi"})
 		lastTask = w:DoCoroutine("Echo",{})
+		lastTask:Await(100)
 	end
 
 	local done = lastTask:Await(60000)
@@ -138,6 +154,7 @@ Step2Table2 = function()
 		w:DoCoroutine("Echo",{true, {{"124124"}}})
 		w:DoCoroutine("Echo",{"Hi"}, {{"124124"}})
 		lastTask = w:DoCoroutine("Echo",{{{"124124"}}})
+		lastTask:Await(100)
 	end
 
 	local done = lastTask:Await(60000)

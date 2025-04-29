@@ -38,11 +38,20 @@ namespace Benchmarks
 	//--------------------------
 	// Private
 	//--------------------------
-	bool LuaTestState::GetTestResult()
+
+	bool LuaTestState::GetTestResult(std::string &details)
 	{
 		if (mLua == nullptr) return false;
 
 		if (!lua_isboolean(mLua, -1)) return false;
+		if (lua_isstring(mLua, -2))
+		{
+			details = lua_tostring(mLua, -2);
+		}
+		else
+		{
+			details = "";
+		}
 
 		bool ret = lua_toboolean(mLua, -1);
 
@@ -50,6 +59,7 @@ namespace Benchmarks
 
 		return ret;
 	}
+
 
 
 	//--------------------------
@@ -93,7 +103,15 @@ namespace Benchmarks
 			return false;
 		}
 
-		return LuaTestState::GetTestResult();
+		std::string details;
+		bool ok = LuaTestState::GetTestResult(details);
+
+		if (details != "") 
+		{
+			std::cout << details<< std::endl;
+		}
+
+		return ok;
 	}
 
 	bool LuaTestState::DoTestString(const char* luaString)
@@ -108,7 +126,15 @@ namespace Benchmarks
 			return false;
 		}
 
-		return LuaTestState::GetTestResult();
+		std::string details;
+		bool ok = LuaTestState::GetTestResult(details);
+
+		if (details != "") 
+		{
+			std::cout << details << std::endl;
+		}
+
+		return ok;
 	}
 
 	void LuaTestState::RunGcNow()
