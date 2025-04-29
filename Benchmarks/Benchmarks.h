@@ -1,6 +1,7 @@
+
 /*****************************************************************************\
 *
-*  Copyright 2023 HappyGnome
+*  Copyright 2025 HappyGnome
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -16,39 +17,31 @@
 *
 \*****************************************************************************/
 
-#ifndef _LUA_TEST_STATE_H_
-#define _LUA_TEST_STATE_H_
+#ifndef _BENCHMARKS_H_
+#define _BENCHMARKS_H_
 #pragma once
 
-#include<chrono>
-
-extern "C" {
-#include "lua.h"
-	//#include "lauxlib.h"
-	//#include "lualib.h"
-}
-
-using namespace std::chrono_literals;
-
-namespace Tests 
+namespace Benchmarks
 {
-	class LuaTestState
+	class Benchmarks
 	{
 	private:
-		lua_State* mLua;
-
-		bool GetTestResult();
+		void DoBenchmark1(const char* stepTestString);
+		
 
 	public:
+		
+		void BenchmarkCoroutineNoData( );
 
-		LuaTestState();
-		~LuaTestState();
+		void BenchmarkCoroutineInt( );
+		
+		void BenchmarkCoroutineString( );
 
-		bool DoTestFile(const char* filepath);
-		bool DoTestFile(const char* filepath, std::chrono::duration<float> maxTime, std::chrono::duration<float> minTime = 0ms);
-		bool DoTestString(const char* luaString);
-		bool DoTestString(const char* luaString, std::chrono::duration<float> maxTime, std::chrono::duration<float> minTime = 0ms);
-		void RunGcNow();
+		void BenchmarkCoroutineBool( );
+
+		void BenchmarkCoroutineTable1( );
+
+		void BenchmarkCoroutineTable2( );
 	};
 }
 

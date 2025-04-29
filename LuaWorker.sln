@@ -33,6 +33,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LuaReferenceSections", "Lua
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoKeyDeck", "AutoKeyDeck\AutoKeyDeck.vcxproj", "{9107DD88-B029-4DC5-BFF7-7D931F16615B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Benchmarks", "Benchmarks\Benchmarks.vcxproj", "{CCAC61F3-4612-4481-BC5C-9A45E34B3E2E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1521E6B5-481F-4E06-ACB1-0020C4320430} = {1521E6B5-481F-4E06-ACB1-0020C4320430}
+		{86299A01-96F7-49E5-AE0A-7A7AA8DCF727} = {86299A01-96F7-49E5-AE0A-7A7AA8DCF727}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -73,6 +79,14 @@ Global
 		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Release|x64.Build.0 = Release|x64
 		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Release|x86.ActiveCfg = Release|Win32
 		{9107DD88-B029-4DC5-BFF7-7D931F16615B}.Release|x86.Build.0 = Release|Win32
+		{CCAC61F3-4612-4481-BC5C-9A45E34B3E2E}.Debug|x64.ActiveCfg = Debug|x64
+		{CCAC61F3-4612-4481-BC5C-9A45E34B3E2E}.Debug|x64.Build.0 = Debug|x64
+		{CCAC61F3-4612-4481-BC5C-9A45E34B3E2E}.Debug|x86.ActiveCfg = Debug|Win32
+		{CCAC61F3-4612-4481-BC5C-9A45E34B3E2E}.Debug|x86.Build.0 = Debug|Win32
+		{CCAC61F3-4612-4481-BC5C-9A45E34B3E2E}.Release|x64.ActiveCfg = Release|x64
+		{CCAC61F3-4612-4481-BC5C-9A45E34B3E2E}.Release|x64.Build.0 = Release|x64
+		{CCAC61F3-4612-4481-BC5C-9A45E34B3E2E}.Release|x86.ActiveCfg = Release|Win32
+		{CCAC61F3-4612-4481-BC5C-9A45E34B3E2E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

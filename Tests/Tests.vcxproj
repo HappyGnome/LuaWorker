@@ -191,7 +191,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AutoKeyDeckTests.cpp" />
-    <ClCompile Include="Benchmarks.cpp" />
     <ClCompile Include="LuaTestState.cpp" />
     <ClCompile Include="LuaTests.cpp" />
     <ClCompile Include="SortedDeckTests.cpp" />

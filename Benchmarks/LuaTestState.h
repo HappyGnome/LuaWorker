@@ -1,6 +1,6 @@
 /*****************************************************************************\
 *
-*  Copyright 2023 HappyGnome
+*  Copyright 2025 HappyGnome
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ extern "C" {
 
 using namespace std::chrono_literals;
 
-namespace Tests 
+namespace Benchmarks 
 {
 	class LuaTestState
 	{
@@ -45,9 +45,7 @@ namespace Tests
 		~LuaTestState();
 
 		bool DoTestFile(const char* filepath);
-		bool DoTestFile(const char* filepath, std::chrono::duration<float> maxTime, std::chrono::duration<float> minTime = 0ms);
 		bool DoTestString(const char* luaString);
-		bool DoTestString(const char* luaString, std::chrono::duration<float> maxTime, std::chrono::duration<float> minTime = 0ms);
 		void RunGcNow();
 	};
 }

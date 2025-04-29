@@ -153,3 +153,9 @@ bool LuaTestState::DoTestString(const char* luaString, std::chrono::duration<flo
 	else return true;
 }
 
+void LuaTestState::RunGcNow()
+{
+	if (mLua == nullptr) return;
+
+	lua_gc(mLua,LUA_GCCOLLECT,0);
+}
