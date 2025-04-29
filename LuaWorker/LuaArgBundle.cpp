@@ -100,6 +100,15 @@ int LuaArgSetTable::Unpack(lua_State* pL) const
 //---------------
 // LuaArgBundle
 
+/// <summary>
+/// Helper struct for bundling tables, to track table and sub-table sizes
+/// </summary>
+struct TableSizeCounter
+{
+	int nArr = 0;
+	int nRec = 0;
+};
+
 void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 {
 	if (maxTableDepth <= 0)
@@ -107,6 +116,10 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 		mArgs.push_back(std::make_unique<LuaArgNil>()); 
 		return;
 	}
+
+	std::vector<TableSizeCounter> parentSizes(LuaArgBundle::DefaultMaxTableDepth);
+
+	parentSizes[1].nArr = (int)lua_objlen(pL, -1); //table depth is an index into this. Initially 1.
 
 	int tableDepth = 1;
 	bool skipKey = true; // Key is nil (start of new table), or otherwise does not correspond to a key-value pair when this bundle is unpacked
@@ -118,7 +131,6 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 	
 	size_t len;
 	const char* str;
-
 
 	// Each iteration starts with stack <Top>|Key|Table
 	while (tableDepth > 0)
@@ -149,10 +161,13 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 
 		if (lua_next(pL, -2) == 0)
 		{
+			TableSizeCounter tsc = parentSizes[tableDepth];
+			mArgs.push_back(std::make_unique<LuaArgStartTable>(tsc.nArr, std::max(0,tsc.nRec - tsc.nArr)));//TODO: Test
+
 			tableDepth--;
 
-			mArgs.push_back(std::make_unique<LuaArgStartTable>()); // TODO: Can we get narr and nrec here?
 			lua_pop(pL, 1);// pop table, now it's read
+
 			continue;
 		}
 		//key-value pair now at top of stack
@@ -170,6 +185,7 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 		}
 
 		mArgs.push_back(std::make_unique<LuaArgSetTable>());
+		parentSizes[tableDepth].nRec++;
 
 		switch (lua_type(pL, -1)) // value type
 		{
@@ -192,8 +208,12 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 			}
 			else
 			{
-				lua_pushnil(pL);// to get first key of new table
 				tableDepth++;
+				if (parentSizes.size() <= tableDepth) parentSizes.emplace_back();
+				parentSizes[tableDepth].nRec = 0;
+				parentSizes[tableDepth].nArr = (int)lua_objlen(pL, -1);
+
+				lua_pushnil(pL);// to get first key of new table
 				skipKey = true;
 				continue;
 			}
