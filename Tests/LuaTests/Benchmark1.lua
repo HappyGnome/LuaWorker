@@ -18,7 +18,7 @@
 
 initStr = [[
 Echo = function(...)
-	return arg
+	return  arg
 end
 ]]
 

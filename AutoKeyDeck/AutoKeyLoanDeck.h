@@ -86,7 +86,7 @@ namespace AutoKeyDeck
 		/// </summary>
 		AutoKeyLoanDeck() : 
 			T_Base(),
-			mAutoKey(new AutoKey<T_Tag>())
+			mAutoKey(std::make_shared<AutoKey<T_Tag>>())
 		{}
 
 		// Hide Make functions - give these more concrete implementations below

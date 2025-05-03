@@ -57,7 +57,7 @@ namespace AutoKeyDeck
 		/// Default constructor
 		/// </summary>
 		LoanDeck() :
-			mDeck(new T_Deck())
+			mDeck(std::make_shared<T_Deck>())
 		{}
 
 		/// <summary>

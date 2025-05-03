@@ -27,6 +27,10 @@
 #include<memory>
 #include<cassert>
 
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+#include <atomic>
+#endif
+
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
@@ -48,6 +52,11 @@ namespace LuaWorker
 		/// <param name="pL"></param>
 		/// <returns>The change in the stack height caused by this operation</returns>
 		virtual int Unpack(lua_State* pL) const = 0;
+
+		/// <summary>
+		/// Allow subclasses to define a destructor
+		/// </summary>
+		virtual ~LuaArgUnpackStep(){}
 	};
 
 	/// <summary>
@@ -115,6 +124,15 @@ namespace LuaWorker
 		 size_t mLen;
 	public:
 		
+		//------------------------------
+		// Diagnostic statics
+		//------------------------------
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		static std::atomic<int> CountPushed;
+		static std::atomic<int> CountDeleted;
+		static std::atomic<int> PeakStrArgCount ;
+#endif
+
 		/// <summary>
 		/// Makes a copy of a raw string value. The string may contain nulls throughout. 
 		/// </summary>
@@ -181,6 +199,15 @@ namespace LuaWorker
 
 		static constexpr int DefaultMaxTableDepth = 10;
 
+		//------------------------------
+		// Diagnostic statics
+		//------------------------------
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		static std::atomic<int> CountPushed;
+		static std::atomic<int> CountDeleted;
+		static std::atomic<int> PeakCount ;
+#endif
+
 		/// <summary>
 		/// Initialise the bundle by taking the top `height` items from the lua stack
 		/// Pops height items from the stack
@@ -195,7 +222,15 @@ namespace LuaWorker
 		/// </summary>
 		LuaArgBundle();
 
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		~LuaArgBundle();
 
+		LuaArgBundle(const LuaArgBundle&) = delete;
+		LuaArgBundle& operator=(const LuaArgBundle&) = delete;
+
+		LuaArgBundle(LuaArgBundle&&) = default;
+		LuaArgBundle& operator=(LuaArgBundle&&) = default;
+#endif
 
 		/// <summary>
 		/// Reconstruct stored data onto the stack in the given lua state

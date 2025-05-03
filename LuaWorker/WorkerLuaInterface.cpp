@@ -101,7 +101,7 @@ int WorkerLuaInterface::l_Worker_Create(lua_State* pL)
 
 	LogSection log(std::make_shared<LogStack>(logSize), "Worker " + std::to_string(sNextWorkerId++));
 
-	std::shared_ptr<Worker> newWorker(new Worker(std::move(log)));
+	std::shared_ptr<Worker> newWorker = std::make_shared<Worker>(std::move(log));
 
 	lua_Integer key = sWorkers.push(newWorker);
 
@@ -184,7 +184,7 @@ int WorkerLuaInterface::l_Worker_DoString(lua_State* pL)
 		{
 			std::string str = lua_tostring(pL, -1);
 
-			std::shared_ptr<OneShotTask> newItem(new TaskDoString(str, std::move(tc)));
+			std::shared_ptr<OneShotTask> newItem = std::make_shared<TaskDoString>(str, std::move(tc));
 			pWorker->AddTask(newItem);
 
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -213,7 +213,7 @@ int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 		{
 			std::string str = lua_tostring(pL,  -1);
 
-			std::shared_ptr<OneShotTask> newItem(new TaskDoFile(str, std::move(tc)));
+			std::shared_ptr<OneShotTask> newItem = std::make_shared<TaskDoFile>(str, std::move(tc));
 			pWorker->AddTask(newItem);
 			
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -233,7 +233,7 @@ int WorkerLuaInterface::l_Worker_DoSleep(lua_State* pL)
 		{
 			unsigned int millis = std::max(0,(int)lua_tointeger(pL, -1));
 
-			std::shared_ptr<OneShotTask> newItem(new TaskDoSleep(millis, TaskConfig()));
+			std::shared_ptr<OneShotTask> newItem = std::make_shared<TaskDoSleep>(millis, TaskConfig());
 			pWorker->AddTask(newItem);
 
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -266,9 +266,9 @@ int WorkerLuaInterface::l_Worker_DoCoRoutine(lua_State* pL)
 
 		std::unique_ptr<LuaArgBundle> argBundle = nullptr;
 		
-		if (N > 1) argBundle.reset(new LuaArgBundle(pL, N - 1, tc.MaxTableDepth));
+		if (N > 1) argBundle = std::make_unique<LuaArgBundle>(pL, N - 1, tc.MaxTableDepth);
 
-		std::shared_ptr<CoTask> newItem(new CoTask(funcStr, std::move(argBundle), std::move(tc)));
+		std::shared_ptr<CoTask> newItem = std::make_shared<CoTask>(funcStr, std::move(argBundle), std::move(tc));
 		pWorker->AddTask(newItem);
 
 		return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -359,6 +359,12 @@ int WorkerLuaInterface::l_Reset_Benchmark_Counters(lua_State* pL)
 	Task::CountDeleted = 0;
 	Task::CountPushed = 0;
 	Task::PeakTaskCount = 0;
+	LuaArgStr::CountDeleted = 0;
+	LuaArgStr::CountPushed = 0;
+	LuaArgStr::PeakStrArgCount = 0;
+	LuaArgBundle::CountDeleted = 0;
+	LuaArgBundle::CountPushed = 0;
+	LuaArgBundle::PeakCount = 0;
 	return 0;
 }
 
@@ -373,6 +379,24 @@ int WorkerLuaInterface::l_Get_Benchmark_Counters(lua_State* pL)
 
 	lua_pushinteger(pL,Task::PeakTaskCount);
 	lua_setfield(pL, -2, "PeakTaskCount");
+	
+	lua_pushinteger(pL,LuaArgStr::CountDeleted);
+	lua_setfield(pL, -2, "LuaArgStrDeleteCount");
+
+	lua_pushinteger(pL,LuaArgStr::CountPushed);
+	lua_setfield(pL, -2, "LuaArgStrCreateCount");
+
+	lua_pushinteger(pL,LuaArgStr::PeakStrArgCount);
+	lua_setfield(pL, -2, "PeakLuaArgStrCount");
+	
+	lua_pushinteger(pL,LuaArgBundle::CountDeleted);
+	lua_setfield(pL, -2, "LuaArgBundleDeleteCount");
+
+	lua_pushinteger(pL,LuaArgBundle::CountPushed);
+	lua_setfield(pL, -2, "LuaArgBundleCreateCount");
+
+	lua_pushinteger(pL,LuaArgBundle::PeakCount);
+	lua_setfield(pL, -2, "PeakLuaArgBundleCount");
 	return 1;
 }
 

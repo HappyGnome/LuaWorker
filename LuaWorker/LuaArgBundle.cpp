@@ -53,6 +53,14 @@ LuaArgStr::LuaArgStr(const char* val, size_t len) :mLen(len)
 {
 	mValue = new char[len+1];
 	memcpy_s(mValue, len+1, val,len+1);
+
+	//------------------------------
+	// Diagnostic statics
+	//------------------------------
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+	LuaArgStr::CountPushed++;
+	if (LuaArgStr::CountPushed > LuaArgStr::PeakStrArgCount + LuaArgStr::CountDeleted) LuaArgStr::PeakStrArgCount = LuaArgStr::CountPushed - LuaArgStr::CountDeleted;
+#endif
 }
 
 LuaArgStr::~LuaArgStr() 
@@ -60,6 +68,13 @@ LuaArgStr::~LuaArgStr()
 	if (mValue != nullptr)
 	{
 		delete[] mValue;
+
+		//------------------------------
+		// Diagnostic statics
+		//------------------------------
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		LuaArgStr::CountDeleted++;
+#endif
 	}
 }
 
@@ -75,6 +90,15 @@ int LuaArgStr::Unpack(lua_State* pL) const
 	}
 	return 1;
 }
+
+//------------------------------
+// Diagnostic statics
+//------------------------------
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		std::atomic<int> LuaArgStr::CountPushed = 0;
+		std::atomic<int> LuaArgStr::CountDeleted = 0;
+		std::atomic<int> LuaArgStr::PeakStrArgCount = 0;
+#endif
 
 // LuaArgStartTable
 
@@ -124,9 +148,6 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 	int tableDepth = 1;
 	bool skipKey = true; // Key is nil (start of new table), or otherwise does not correspond to a key-value pair when this bundle is unpacked
 
-	std::unique_ptr<LuaArgUnpackStep> stepToAddValue;
-	std::unique_ptr<LuaArgUnpackStep> stepToAddKey;
-
 	lua_pushnil(pL); // Get first key-value pair on lua_next
 	
 	size_t len;
@@ -135,19 +156,22 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 	// Each iteration starts with stack <Top>|Key|Table
 	while (tableDepth > 0)
 	{
+		std::unique_ptr<LuaArgUnpackStep> stepToAddValue = nullptr;
+		std::unique_ptr<LuaArgUnpackStep> stepToAddKey = nullptr;
+
 		if (!skipKey)
 		{
 			switch (lua_type(pL, -1))
 			{
 			case LUA_TNUMBER:
-				stepToAddKey.reset(new LuaArgNum(lua_tonumber(pL, -1)));
+				stepToAddKey = std::make_unique<LuaArgNum>(lua_tonumber(pL, -1));
 				break;
 			case LUA_TBOOLEAN:
-				stepToAddKey.reset(new LuaArgBool(lua_toboolean(pL, -1)));
+				stepToAddKey = std::make_unique<LuaArgBool>(lua_toboolean(pL, -1));
 				break;
 			case LUA_TSTRING:
 				str = lua_tolstring(pL, -1, &len);
-				stepToAddKey.reset(new LuaArgStr(str, len));
+				stepToAddKey = std::make_unique<LuaArgStr>(str, len);
 				break;
 			default:
 				assert(false); // skipKey should have been set, and instructions to create the corresponding value not added if this key is invalid. 
@@ -190,20 +214,20 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 		switch (lua_type(pL, -1)) // value type
 		{
 		case LUA_TNUMBER:
-			stepToAddValue.reset(new LuaArgNum(lua_tonumber(pL, -1)));
+			stepToAddValue = std::make_unique<LuaArgNum>(lua_tonumber(pL, -1));
 			break;
 		case LUA_TBOOLEAN:
-			stepToAddValue.reset(new LuaArgBool(lua_toboolean(pL, -1)));
+			stepToAddValue = std::make_unique<LuaArgBool>(lua_toboolean(pL, -1));
 			break;
 		case LUA_TSTRING:
 			str = lua_tolstring(pL, -1, &len);
-			stepToAddValue.reset(new LuaArgStr(str, len));
+			stepToAddValue = std::make_unique<LuaArgStr>(str, len);
 			break;
 
 		case LUA_TTABLE:
 			if (tableDepth >= maxTableDepth)
 			{
-				stepToAddValue.reset(new LuaArgNil());
+				stepToAddValue = std::make_unique<LuaArgNil>();
 				break;
 			}
 			else
@@ -218,7 +242,7 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 				continue;
 			}
 		default: 
-			stepToAddValue.reset(new LuaArgNil()); 
+			stepToAddValue = std::make_unique<LuaArgNil>(); 
 			break;
 		}
 
@@ -230,32 +254,47 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 /// <summary>
 /// Default constructor
 /// </summary>
-LuaArgBundle::LuaArgBundle(){}
+LuaArgBundle::LuaArgBundle()
+{
 
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+	LuaArgBundle::CountPushed++;
+	if (LuaArgBundle::CountPushed > LuaArgBundle::PeakCount + LuaArgBundle::CountDeleted) LuaArgBundle::PeakCount = LuaArgBundle::CountPushed - LuaArgBundle::CountDeleted;
+#endif
+}
+
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+LuaArgBundle::~LuaArgBundle() 
+{
+	LuaArgBundle::CountDeleted++;
+}
+#endif
+	
 LuaArgBundle::LuaArgBundle(lua_State* pL, int height, int maxTableDepth)
 {
 	int heightDelta = 0;
-
-	std::unique_ptr<LuaArgUnpackStep> stepToAddValue;
 	
 	size_t len;
 	const char* str;
 	
 	while (heightDelta < height)
 	{
+
+		std::unique_ptr<LuaArgUnpackStep> stepToAddValue = nullptr;
+
 		int luaType = lua_type(pL, -1);
 
 		switch (luaType)
 		{
 		case LUA_TNUMBER:
-			stepToAddValue.reset(new LuaArgNum(lua_tonumber(pL,-1))); 
+			stepToAddValue = std::make_unique<LuaArgNum>(lua_tonumber(pL,-1)); 
 			break;
 		case LUA_TBOOLEAN:
-			stepToAddValue.reset(new LuaArgBool(lua_toboolean(pL,-1))); 
+			stepToAddValue = std::make_unique<LuaArgBool>(lua_toboolean(pL,-1)); 
 			break;
 		case LUA_TSTRING:
 			str = lua_tolstring(pL, -1, &len);
-			stepToAddValue.reset(new LuaArgStr(str,len)); 
+			stepToAddValue = std::make_unique<LuaArgStr>(str,len); 
 			break;
 
 		case LUA_TTABLE:
@@ -263,7 +302,7 @@ LuaArgBundle::LuaArgBundle(lua_State* pL, int height, int maxTableDepth)
 			heightDelta++;
 			continue;
 		default: 
-			stepToAddValue.reset(new LuaArgNil()); 
+			stepToAddValue = std::make_unique<LuaArgNil>(); 
 			break;
 		}
 
@@ -272,6 +311,11 @@ LuaArgBundle::LuaArgBundle(lua_State* pL, int height, int maxTableDepth)
 
 		mArgs.push_back(std::move(stepToAddValue));
 	}
+
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+	LuaArgBundle::CountPushed++;
+	if (LuaArgBundle::CountPushed > LuaArgBundle::PeakCount + LuaArgBundle::CountDeleted) LuaArgBundle::PeakCount = LuaArgBundle::CountPushed - LuaArgBundle::CountDeleted;
+#endif
 }
 
 int LuaArgBundle::Unpack(lua_State* pL)
@@ -284,3 +328,12 @@ int LuaArgBundle::Unpack(lua_State* pL)
 	}
 	return height;
 }
+
+//------------------------------
+// Diagnostic statics
+//------------------------------
+#ifdef _BENCHMARK_OBJ_COUNTERS_
+		std::atomic<int> LuaArgBundle::CountPushed = 0;
+		std::atomic<int> LuaArgBundle::CountDeleted = 0;
+		std::atomic<int> LuaArgBundle::PeakCount = 0;
+#endif
