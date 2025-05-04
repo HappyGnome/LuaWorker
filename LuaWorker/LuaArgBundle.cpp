@@ -20,106 +20,124 @@
 
 using namespace LuaWorker;
 
-//LuaArgNum
-
-LuaArgNum::LuaArgNum(lua_Number val) : mValue(val) {}
-
-int LuaArgNum::Unpack(lua_State* pL) const
+LuaArgUnpackStep::LArgData::LArgData()
 {
-	lua_pushnumber(pL, mValue);
-	return 1;
+	String.String = nullptr;
 }
 
-// LuaArgBool
+LuaArgUnpackStep::LuaArgUnpackStep() : mType(Nil), mData() {}
 
-LuaArgBool::LuaArgBool(int val) : mValue(val) {}
-
-int LuaArgBool::Unpack(lua_State* pL) const
+LuaArgUnpackStep::LuaArgUnpackStep(LuaArgUnpackStep&& other) noexcept
 {
-	lua_pushboolean(pL, mValue);
-	return 1;
+	*this = std::move(other);
+}
+LuaArgUnpackStep& LuaArgUnpackStep::operator=(LuaArgUnpackStep&& other) noexcept
+{
+	mData = std::move(other.mData);
+	mType = other.mType;
+	other.mType = Nil;
+
+	return *this;
 }
 
-// LuaArgNil	
-int LuaArgNil::Unpack(lua_State* pL) const
+LuaArgUnpackStep::~LuaArgUnpackStep() 
 {
-	lua_pushnil(pL);
-	return 1;
-}
-
-// LuaArgStr
-
-LuaArgStr::LuaArgStr(const char* val, size_t len) :mLen(len)
-{
-	mValue = new char[len+1];
-	memcpy_s(mValue, len+1, val,len+1);
-
-	//------------------------------
-	// Diagnostic statics
-	//------------------------------
-#ifdef _BENCHMARK_OBJ_COUNTERS_
-	LuaArgStr::CountPushed++;
-	if (LuaArgStr::CountPushed > LuaArgStr::PeakStrArgCount + LuaArgStr::CountDeleted) LuaArgStr::PeakStrArgCount = LuaArgStr::CountPushed - LuaArgStr::CountDeleted;
-#endif
-}
-
-LuaArgStr::~LuaArgStr() 
-{
-	if (mValue != nullptr)
+	if (mType == String /* && mData.String.String != nullptr*/)
 	{
-		delete[] mValue;
-
-		//------------------------------
-		// Diagnostic statics
-		//------------------------------
-#ifdef _BENCHMARK_OBJ_COUNTERS_
-		LuaArgStr::CountDeleted++;
-#endif
+		delete[] mData.String.String;
 	}
+	
 }
 
-int LuaArgStr::Unpack(lua_State* pL) const
+int LuaArgUnpackStep::Unpack(lua_State* pL) const
 {
-	if (mValue != nullptr)
+	switch (mType)
 	{
-		lua_pushlstring(pL, mValue, mLen);
-	}
-	else
-	{
+	case Number:
+		lua_pushnumber(pL, mData.Number);
+		return 1;
+	case Bool:
+		lua_pushboolean(pL, mData.Bool);
+		return 1;
+	case Nil:
 		lua_pushnil(pL);
+		return 1;
+	case String:
+		lua_pushlstring(pL, mData.String.String, mData.String.Len);
+		return 1;
+	case TableSet:
+		lua_rawset(pL, -3);
+		return -2;
+	case TableStart:
+		lua_createtable(pL, mData.TableInfo.NArr, mData.TableInfo.NRec);
+		return 1;
+	default:
+		return 0;
 	}
-	return 1;
 }
 
-//------------------------------
-// Diagnostic statics
-//------------------------------
-#ifdef _BENCHMARK_OBJ_COUNTERS_
-		std::atomic<int> LuaArgStr::CountPushed = 0;
-		std::atomic<int> LuaArgStr::CountDeleted = 0;
-		std::atomic<int> LuaArgStr::PeakStrArgCount = 0;
-#endif
-
-// LuaArgStartTable
-
-LuaArgStartTable::LuaArgStartTable(int narr, int nrec) :mNArr(narr), mNRec(nrec) {}
-
-LuaArgStartTable::LuaArgStartTable() :mNArr(0), mNRec(0) {}
-
-int LuaArgStartTable::Unpack(lua_State* pL) const
+LuaArgUnpackStep LuaArgUnpackStep::PushNumber(lua_Number value)
 {
-	lua_createtable(pL, mNArr, mNRec);
-	return 1;
+	LuaArgUnpackStep result;
+
+	result.mType = LuaArgStepType::Number;
+	result.mData.Number = value;
+
+	return result;
 }
 
-// LuaArgSetTable
-
-int LuaArgSetTable::Unpack(lua_State* pL) const
+LuaArgUnpackStep LuaArgUnpackStep::PushNil()
 {
-	lua_rawset(pL,-3);
-	return -2;
+	LuaArgUnpackStep result;
+
+	result.mType = LuaArgStepType::Nil;
+
+	return result;
 }
 
+LuaArgUnpackStep LuaArgUnpackStep::PushBool(int value)
+{
+	LuaArgUnpackStep result;
+
+	result.mType = LuaArgStepType::Bool;
+	result.mData.Bool = value;
+
+	return result;
+}
+
+LuaArgUnpackStep LuaArgUnpackStep::PushString(const char* value, size_t len)
+{
+	LuaArgUnpackStep result;
+
+	result.mType = LuaArgStepType::String;
+
+	result.mData.String.String = new char[len+1];
+	memcpy_s(result.mData.String.String, len+1, value,len+1);
+
+	result.mData.String.Len = len;
+
+	return result;
+}
+
+LuaArgUnpackStep LuaArgUnpackStep::SetTable()
+{
+	LuaArgUnpackStep result;
+
+	result.mType = LuaArgStepType::TableSet;
+
+	return result;
+}
+
+LuaArgUnpackStep LuaArgUnpackStep::StartTable(int nArr, int nRec)
+{
+	LuaArgUnpackStep result;
+
+	result.mType = LuaArgStepType::TableStart;
+	result.mData.TableInfo.NArr = nArr;
+	result.mData.TableInfo.NRec = nRec;
+
+	return result;
+}
 
 //---------------
 // LuaArgBundle
@@ -137,7 +155,7 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 {
 	if (maxTableDepth <= 0)
 	{
-		mArgs.push_back(std::make_unique<LuaArgNil>()); 
+		mArgs.push_back(LuaArgUnpackStep::PushNil()); 
 		return;
 	}
 
@@ -156,29 +174,23 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 	// Each iteration starts with stack <Top>|Key|Table
 	while (tableDepth > 0)
 	{
-		std::unique_ptr<LuaArgUnpackStep> stepToAddValue = nullptr;
-		std::unique_ptr<LuaArgUnpackStep> stepToAddKey = nullptr;
-
 		if (!skipKey)
 		{
 			switch (lua_type(pL, -1))
 			{
 			case LUA_TNUMBER:
-				stepToAddKey = std::make_unique<LuaArgNum>(lua_tonumber(pL, -1));
+				mArgs.push_back(LuaArgUnpackStep::PushNumber(lua_tonumber(pL, -1)));
 				break;
 			case LUA_TBOOLEAN:
-				stepToAddKey = std::make_unique<LuaArgBool>(lua_toboolean(pL, -1));
+				mArgs.push_back(LuaArgUnpackStep::PushBool(lua_toboolean(pL, -1)));
 				break;
 			case LUA_TSTRING:
 				str = lua_tolstring(pL, -1, &len);
-				stepToAddKey = std::make_unique<LuaArgStr>(str, len);
+				mArgs.push_back(LuaArgUnpackStep::PushString(str, len));
 				break;
 			default:
 				assert(false); // skipKey should have been set, and instructions to create the corresponding value not added if this key is invalid. 
-				stepToAddKey = nullptr; // Prevent C26800 in the std::move below
 			}
-			
-			mArgs.push_back(std::move(stepToAddKey));
 		}
 
 		skipKey = false;
@@ -186,7 +198,7 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 		if (lua_next(pL, -2) == 0)
 		{
 			TableSizeCounter tsc = parentSizes[tableDepth];
-			mArgs.push_back(std::make_unique<LuaArgStartTable>(tsc.nArr, std::max(0,tsc.nRec - tsc.nArr)));//TODO: Test
+			mArgs.push_back(LuaArgUnpackStep::StartTable(tsc.nArr, std::max(0,tsc.nRec - tsc.nArr)));
 
 			tableDepth--;
 
@@ -208,26 +220,26 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 			continue;
 		}
 
-		mArgs.push_back(std::make_unique<LuaArgSetTable>());
+		mArgs.push_back(LuaArgUnpackStep::SetTable());
 		parentSizes[tableDepth].nRec++;
 
 		switch (lua_type(pL, -1)) // value type
 		{
 		case LUA_TNUMBER:
-			stepToAddValue = std::make_unique<LuaArgNum>(lua_tonumber(pL, -1));
+			mArgs.push_back(LuaArgUnpackStep::PushNumber(lua_tonumber(pL, -1)));
 			break;
 		case LUA_TBOOLEAN:
-			stepToAddValue = std::make_unique<LuaArgBool>(lua_toboolean(pL, -1));
+			mArgs.push_back(LuaArgUnpackStep::PushBool(lua_toboolean(pL, -1)));
 			break;
 		case LUA_TSTRING:
 			str = lua_tolstring(pL, -1, &len);
-			stepToAddValue = std::make_unique<LuaArgStr>(str, len);
+			mArgs.push_back(LuaArgUnpackStep::PushString(str,len));
 			break;
 
 		case LUA_TTABLE:
 			if (tableDepth >= maxTableDepth)
 			{
-				stepToAddValue = std::make_unique<LuaArgNil>();
+				mArgs.push_back(LuaArgUnpackStep::PushNil());
 				break;
 			}
 			else
@@ -242,11 +254,10 @@ void LuaArgBundle::BundleTable(lua_State* pL, int maxTableDepth)
 				continue;
 			}
 		default: 
-			stepToAddValue = std::make_unique<LuaArgNil>(); 
+			mArgs.push_back(LuaArgUnpackStep::PushNil());
 			break;
 		}
 
-		mArgs.push_back(std::move(stepToAddValue));
 		lua_pop(pL, 1); // Pop the value
 	}
 }
@@ -280,21 +291,19 @@ LuaArgBundle::LuaArgBundle(lua_State* pL, int height, int maxTableDepth)
 	while (heightDelta < height)
 	{
 
-		std::unique_ptr<LuaArgUnpackStep> stepToAddValue = nullptr;
-
 		int luaType = lua_type(pL, -1);
 
 		switch (luaType)
 		{
 		case LUA_TNUMBER:
-			stepToAddValue = std::make_unique<LuaArgNum>(lua_tonumber(pL,-1)); 
+			mArgs.push_back(LuaArgUnpackStep::PushNumber(lua_tonumber(pL, -1)));
 			break;
 		case LUA_TBOOLEAN:
-			stepToAddValue = std::make_unique<LuaArgBool>(lua_toboolean(pL,-1)); 
+			mArgs.push_back(LuaArgUnpackStep::PushBool(lua_toboolean(pL, -1)));
 			break;
 		case LUA_TSTRING:
 			str = lua_tolstring(pL, -1, &len);
-			stepToAddValue = std::make_unique<LuaArgStr>(str,len); 
+			mArgs.push_back(LuaArgUnpackStep::PushString(str,len));
 			break;
 
 		case LUA_TTABLE:
@@ -302,14 +311,13 @@ LuaArgBundle::LuaArgBundle(lua_State* pL, int height, int maxTableDepth)
 			heightDelta++;
 			continue;
 		default: 
-			stepToAddValue = std::make_unique<LuaArgNil>(); 
+			mArgs.push_back(LuaArgUnpackStep::PushNil());
 			break;
 		}
 
 		heightDelta++;
 		lua_pop(pL,1);
 
-		mArgs.push_back(std::move(stepToAddValue));
 	}
 
 #ifdef _BENCHMARK_OBJ_COUNTERS_
@@ -324,7 +332,7 @@ int LuaArgBundle::Unpack(lua_State* pL)
 
 	for (auto it = mArgs.crbegin(); it != mArgs.crend(); ++it)
 	{
-		height += it->get()->Unpack(pL);
+		height += it->Unpack(pL);
 	}
 	return height;
 }

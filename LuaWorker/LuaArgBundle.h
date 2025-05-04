@@ -40,136 +40,124 @@ extern "C" {
 
 namespace LuaWorker
 {
+	enum LuaArgStepType
+	{
+		Nil,
+		Number,
+		Bool,
+		String,
+		TableStart,
+		TableSet
+	};
+
 	/// <summary>
 	/// Base class for stack reconstruction steps
 	/// </summary>
 	class LuaArgUnpackStep
 	{
+	private:
+		LuaArgStepType mType;
+
+		struct LString
+		{
+			LString() : String(nullptr), Len(0) {}
+			LString(const LString&) = delete;
+			LString(LString&&) = default;
+
+			LString& operator= (const LString&) = delete;
+			LString& operator= (LString&&) = default;
+
+			char* String;
+			size_t Len;
+		};
+		
+		struct LTableDef
+		{
+			int NArr, NRec;
+		};
+
+		union LArgData
+		{
+			LArgData();
+			LArgData(const LArgData&) = delete;
+			LArgData& operator=(const LArgData&) = delete;
+
+			LArgData(LArgData&&) = default;
+			LArgData& operator=(LArgData&&) = default;
+
+			lua_Number Number;
+			int Bool;
+			struct LString String;
+			struct LTableDef TableInfo;
+		} mData;
+
 	public:
+
+		/// <summary>
+		/// Default constructor
+		/// </summary>
+		LuaArgUnpackStep();
+
+		LuaArgUnpackStep(const LuaArgUnpackStep&) = delete;
+		LuaArgUnpackStep& operator=(const LuaArgUnpackStep&) = delete;
+
+		LuaArgUnpackStep(LuaArgUnpackStep&&) noexcept;
+		LuaArgUnpackStep& operator=(LuaArgUnpackStep&&) noexcept;
+
+
+		/// <summary>
+		/// Construct step to push a number
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		static LuaArgUnpackStep PushNumber(lua_Number value);
+
+		/// <summary>
+		/// Construct step that pushes nil
+		/// </summary>
+		/// <returns></returns>
+		static LuaArgUnpackStep PushNil();
+
+		/// <summary>
+		/// Construct step that pushes a boolean
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		static LuaArgUnpackStep PushBool(int value);
+
+		/// <summary>
+		/// Construct a step that pushes a string
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="len"></param>
+		/// <returns></returns>
+		static LuaArgUnpackStep PushString(const char* value, size_t len);
+
+		/// <summary>
+		/// Construct a step that sets a table value
+		/// </summary>
+		/// <returns></returns>
+		static LuaArgUnpackStep SetTable();
+
+		/// <summary>
+		/// Construct a step that starts a table (with pre-allocation)
+		/// </summary>
+		/// <param name="nArr"></param>
+		/// <param name="nRec"></param>
+		/// <returns></returns>
+		static LuaArgUnpackStep StartTable(int nArr, int nRec);
+
 		/// <summary>
 		/// Unpack this arg onto the stack of a given lua state 
 		/// </summary>
 		/// <param name="pL"></param>
 		/// <returns>The change in the stack height caused by this operation</returns>
-		virtual int Unpack(lua_State* pL) const = 0;
+		int Unpack(lua_State* pL) const;
 
 		/// <summary>
-		/// Allow subclasses to define a destructor
+		/// Destructor
 		/// </summary>
-		virtual ~LuaArgUnpackStep(){}
-	};
-
-	/// <summary>
-	/// Stack reconstruction step that pushes a number onto the lua stack
-	/// </summary>
-	class LuaArgNum : public LuaArgUnpackStep
-	{
-	private:
-		lua_Number mValue;
-	public:
-		
-		LuaArgNum(lua_Number val);
-
-		int Unpack(lua_State* pL) const;
-	};
-
-	/// <summary>
-	/// Stack reconstruction step that pushes a bool onto the lua stack
-	/// </summary>
-	class LuaArgBool : public LuaArgUnpackStep
-	{
-	private:
-		int mValue;
-	public:
-		
-		LuaArgBool(int val);
-
-		int Unpack(lua_State* pL) const;
-	};
-
-	///// <summary>
-	///// Stack reconstruction step that pops values from the stack
-	///// </summary>
-	//class LuaArgPop : public LuaArgUnpackStep
-	//{
-	//public:
-	//	
-	//	LuaArgPop() {}
-
-	//	int Unpack(lua_State* pL) const
-	//	{
-	//		lua_pop(pL, 1);
-	//		return -1;
-	//	}
-	//};
-
-
-	/// <summary>
-	/// Stack reconstruction step that pushes a nil onto the lua stack
-	/// </summary>
-	class LuaArgNil : public LuaArgUnpackStep
-	{
-	public:
-		
-		int Unpack(lua_State* pL) const;
-	};
-
-	/// <summary>
-	/// Stack reconstruction step that pushes a lua string onto the lua stack
-	/// </summary>
-	class LuaArgStr : public LuaArgUnpackStep
-	{
-	private:
-		 char* mValue;
-		 size_t mLen;
-	public:
-		
-		//------------------------------
-		// Diagnostic statics
-		//------------------------------
-#ifdef _BENCHMARK_OBJ_COUNTERS_
-		static std::atomic<int> CountPushed;
-		static std::atomic<int> CountDeleted;
-		static std::atomic<int> PeakStrArgCount ;
-#endif
-
-		/// <summary>
-		/// Makes a copy of a raw string value. The string may contain nulls throughout. 
-		/// </summary>
-		/// <param name="val"></param>
-		/// <param name="len">Length of the string (excluding null terminator)</param>
-		LuaArgStr(const char* val, size_t len);
-
-		~LuaArgStr();
-		
-		int Unpack(lua_State* pL) const;
-	};
-
-	/// <summary>
-	/// Stack reconstruction step that creates a new table
-	/// </summary>
-	class LuaArgStartTable : public LuaArgUnpackStep
-	{	
-	private:
-		int mNArr, mNRec;
-	public:
-		LuaArgStartTable(int narr, int nrec);
-
-		/// <summary>
-		/// Non-pre-allocating constructor
-		/// </summary>
-		LuaArgStartTable();
-
-		int Unpack(lua_State* pL) const;
-	};
-
-	/// <summary>
-	/// Stack reconstruction step that sets a table at stack pos -3 with key and value at -2, -1, respectively
-	/// </summary>
-	class LuaArgSetTable: public LuaArgUnpackStep
-	{	
-	public:
-		int Unpack(lua_State* pL) const;
+		~LuaArgUnpackStep();
 	};
 
 
@@ -184,7 +172,7 @@ namespace LuaWorker
 	class LuaArgBundle 
 	{
 	private:
-		std::vector<std::unique_ptr<LuaArgUnpackStep>> mArgs;
+		std::vector<LuaArgUnpackStep> mArgs;
 
 		/// <summary>
 		/// Assumes top of the stack is a table

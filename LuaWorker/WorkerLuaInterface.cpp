@@ -359,9 +359,9 @@ int WorkerLuaInterface::l_Reset_Benchmark_Counters(lua_State* pL)
 	Task::CountDeleted = 0;
 	Task::CountPushed = 0;
 	Task::PeakTaskCount = 0;
-	LuaArgStr::CountDeleted = 0;
-	LuaArgStr::CountPushed = 0;
-	LuaArgStr::PeakStrArgCount = 0;
+	//LuaArgStr::CountDeleted = 0;
+	//LuaArgStr::CountPushed = 0;
+	//LuaArgStr::PeakStrArgCount = 0;
 	LuaArgBundle::CountDeleted = 0;
 	LuaArgBundle::CountPushed = 0;
 	LuaArgBundle::PeakCount = 0;
@@ -380,14 +380,14 @@ int WorkerLuaInterface::l_Get_Benchmark_Counters(lua_State* pL)
 	lua_pushinteger(pL,Task::PeakTaskCount);
 	lua_setfield(pL, -2, "PeakTaskCount");
 	
-	lua_pushinteger(pL,LuaArgStr::CountDeleted);
-	lua_setfield(pL, -2, "LuaArgStrDeleteCount");
+	//lua_pushinteger(pL,LuaArgStr::CountDeleted);
+	//lua_setfield(pL, -2, "LuaArgStrDeleteCount");
 
-	lua_pushinteger(pL,LuaArgStr::CountPushed);
-	lua_setfield(pL, -2, "LuaArgStrCreateCount");
+	//lua_pushinteger(pL,LuaArgStr::CountPushed);
+	//lua_setfield(pL, -2, "LuaArgStrCreateCount");
 
-	lua_pushinteger(pL,LuaArgStr::PeakStrArgCount);
-	lua_setfield(pL, -2, "PeakLuaArgStrCount");
+	//lua_pushinteger(pL,LuaArgStr::PeakStrArgCount);
+	//lua_setfield(pL, -2, "PeakLuaArgStrCount");
 	
 	lua_pushinteger(pL,LuaArgBundle::CountDeleted);
 	lua_setfield(pL, -2, "LuaArgBundleDeleteCount");
