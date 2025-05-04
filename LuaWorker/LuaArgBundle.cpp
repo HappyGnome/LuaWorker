@@ -20,11 +20,6 @@
 
 using namespace LuaWorker;
 
-LuaArgUnpackStep::LArgData::LArgData()
-{
-	String.String = nullptr;
-}
-
 LuaArgUnpackStep::LuaArgUnpackStep() : mType(Nil), mData() {}
 
 LuaArgUnpackStep::LuaArgUnpackStep(LuaArgUnpackStep&& other) noexcept

@@ -60,13 +60,6 @@ namespace LuaWorker
 
 		struct LString
 		{
-			LString() : String(nullptr), Len(0) {}
-			LString(const LString&) = delete;
-			LString(LString&&) = default;
-
-			LString& operator= (const LString&) = delete;
-			LString& operator= (LString&&) = default;
-
 			char* String;
 			size_t Len;
 		};
@@ -78,13 +71,6 @@ namespace LuaWorker
 
 		union LArgData
 		{
-			LArgData();
-			LArgData(const LArgData&) = delete;
-			LArgData& operator=(const LArgData&) = delete;
-
-			LArgData(LArgData&&) = default;
-			LArgData& operator=(LArgData&&) = default;
-
 			lua_Number Number;
 			int Bool;
 			struct LString String;
