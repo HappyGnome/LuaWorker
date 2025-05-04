@@ -123,4 +123,16 @@ namespace Benchmarks
 			std::cout << "BenchmarkCoroutineTable2" << std::endl;
 			DoBenchmark1("return Step2Table2()");		
 		}
+
+		void Benchmarks::BenchmarkCoroutineTable2OneWay( )
+		{
+			std::cout << "BenchmarkCoroutineTable2OneWay" << std::endl;
+			DoBenchmark1("return Step2Table2OneWay()");		
+		}
+
+		void Benchmarks::BenchmarkCoroutineStringOneWay( )
+		{
+			std::cout << "BenchmarkCoroutineStringOneWay" << std::endl;
+			DoBenchmark1("return Step2StringOneWay()");		
+		}
 }

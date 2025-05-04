@@ -164,3 +164,41 @@ Step2Table2 = function()
 	return done ~= nil
 end 
 
+Step2StringOneWay = function()
+
+	local RepCount = 250000
+	local lastTask = nil
+
+	for i = 1,RepCount do
+		w:DoCoroutine("Echo","Here is a string 1234567890124124124 Some random stu f:f 90u1jnwuehrp2983y4ph34lc2u3h5p29n83yc5[qc283y4c2 34h;2u5h232[034y 2q;3hr ;2uh234nuc3[9u'2oh4/']]]")
+		w:DoCoroutine("Echo","Here is a string 1234567890124124124 Some random stu f:f 90u1jnwuehrp2983y4ph34lc2u3h5p29n83yc5[qc283y4c2 34h;2u5h232[034y 2q;3hr ;2uh234nuc3[9u'2oh4/']]]")
+		w:DoCoroutine("Echo","Here is a string 1234567890124124124 Some random stu f:f 90u1jnwuehrp2983y4ph34lc2u3h5p29n83yc5[qc283y4c2 34h;2u5h232[034y 2q;3hr ;2uh234nuc3[9u'2oh4/']]]")
+		lastTask = w:DoCoroutine("Echo","Here is a string 1234567890124124124 Some random stu f:f 90u1jnwuehrp2983y4ph34lc2u3h5p29n83yc5[qc283y4c2 34h;2u5h232[034y 2q;3hr ;2uh234nuc3[9u'2oh4/']]]")
+	end
+
+	local done = lastTask:Await(60000)
+
+	RaiseFirstWorkerError(w)
+
+	return done ~= nil
+end 
+
+Step2Table2OneWay = function()
+
+	local RepCount = 250000
+	local lastTask = nil
+
+	for i = 1,RepCount do
+		w:DoCoroutine("Echo",{1, {{"124124"}}})
+		w:DoCoroutine("Echo",{true, {{"124124"}}})
+		w:DoCoroutine("Echo",{"Hi"}, {{"124124"}})
+		lastTask = w:DoCoroutine("Echo",{{{"124124"}}})
+	end
+
+	local done = lastTask:Await(60000)
+
+	RaiseFirstWorkerError(w)
+
+	return done ~= nil
+end 
+

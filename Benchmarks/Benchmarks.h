@@ -42,6 +42,11 @@ namespace Benchmarks
 		void BenchmarkCoroutineTable1( );
 
 		void BenchmarkCoroutineTable2( );
+
+		void BenchmarkCoroutineTable2OneWay();
+
+		void BenchmarkCoroutineStringOneWay();
+
 	};
 }
 

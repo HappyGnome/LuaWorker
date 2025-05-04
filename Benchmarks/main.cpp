@@ -26,6 +26,9 @@ int main()
 	Benchmarks::Benchmarks b;
 
 
+	b.BenchmarkCoroutineTable2OneWay();
+	b.BenchmarkCoroutineStringOneWay();
+
 	b.BenchmarkCoroutineBool();
 	b.BenchmarkCoroutineInt();
 	b.BenchmarkCoroutineNoData();
