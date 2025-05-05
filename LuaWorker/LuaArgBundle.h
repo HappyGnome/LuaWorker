@@ -26,6 +26,8 @@
 #include<vector>
 #include<memory>
 #include<cassert>
+#include<string>
+#include<variant>
 
 #ifdef _BENCHMARK_OBJ_COUNTERS_
 #include <atomic>
@@ -58,38 +60,19 @@ namespace LuaWorker
 	private:
 		LuaArgStepType mType;
 
-		struct LString
-		{
-			char* String;
-			size_t Len;
-		};
-		
-		struct LTableDef
+		struct LTableSpec
 		{
 			int NArr, NRec;
 		};
 
-		union LArgData
-		{
-			lua_Number Number;
-			int Bool;
-			struct LString String;
-			struct LTableDef TableInfo;
-		} mData;
+		std::variant<	
+			lua_Number,
+			int,
+			std::string,
+			LTableSpec>
+		 mData;
 
 	public:
-
-		/// <summary>
-		/// Default constructor
-		/// </summary>
-		LuaArgUnpackStep();
-
-		LuaArgUnpackStep(const LuaArgUnpackStep&) = delete;
-		LuaArgUnpackStep& operator=(const LuaArgUnpackStep&) = delete;
-
-		LuaArgUnpackStep(LuaArgUnpackStep&&) noexcept;
-		LuaArgUnpackStep& operator=(LuaArgUnpackStep&&) noexcept;
-
 
 		/// <summary>
 		/// Construct step to push a number
@@ -139,11 +122,6 @@ namespace LuaWorker
 		/// <param name="pL"></param>
 		/// <returns>The change in the stack height caused by this operation</returns>
 		int Unpack(lua_State* pL) const;
-
-		/// <summary>
-		/// Destructor
-		/// </summary>
-		~LuaArgUnpackStep();
 	};
 
 

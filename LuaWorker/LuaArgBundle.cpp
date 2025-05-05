@@ -20,52 +20,34 @@
 
 using namespace LuaWorker;
 
-LuaArgUnpackStep::LuaArgUnpackStep() : mType(Nil), mData() {}
-
-LuaArgUnpackStep::LuaArgUnpackStep(LuaArgUnpackStep&& other) noexcept
-{
-	*this = std::move(other);
-}
-LuaArgUnpackStep& LuaArgUnpackStep::operator=(LuaArgUnpackStep&& other) noexcept
-{
-	mData = std::move(other.mData);
-	mType = other.mType;
-	other.mType = Nil;
-
-	return *this;
-}
-
-LuaArgUnpackStep::~LuaArgUnpackStep() 
-{
-	if (mType == String /* && mData.String.String != nullptr*/)
-	{
-		delete[] mData.String.String;
-	}
-	
-}
-
 int LuaArgUnpackStep::Unpack(lua_State* pL) const
 {
 	switch (mType)
 	{
 	case Number:
-		lua_pushnumber(pL, mData.Number);
+		lua_pushnumber(pL, std::get<lua_Number>(mData));
 		return 1;
 	case Bool:
-		lua_pushboolean(pL, mData.Bool);
+		lua_pushboolean(pL, std::get<int>(mData));
 		return 1;
 	case Nil:
 		lua_pushnil(pL);
 		return 1;
 	case String:
-		lua_pushlstring(pL, mData.String.String, mData.String.Len);
-		return 1;
+		{
+			const std::string& s = std::get<std::string>(mData);
+			lua_pushlstring(pL, s.data(), s.size());
+			return 1;
+		}
 	case TableSet:
 		lua_rawset(pL, -3);
 		return -2;
 	case TableStart:
-		lua_createtable(pL, mData.TableInfo.NArr, mData.TableInfo.NRec);
-		return 1;
+		{
+			const LTableSpec& t = std::get<LTableSpec>(mData);
+			lua_createtable(pL, t.NArr, t.NRec);
+			return 1;
+		}
 	default:
 		return 0;
 	}
@@ -76,7 +58,7 @@ LuaArgUnpackStep LuaArgUnpackStep::PushNumber(lua_Number value)
 	LuaArgUnpackStep result;
 
 	result.mType = LuaArgStepType::Number;
-	result.mData.Number = value;
+	result.mData = value;
 
 	return result;
 }
@@ -95,7 +77,7 @@ LuaArgUnpackStep LuaArgUnpackStep::PushBool(int value)
 	LuaArgUnpackStep result;
 
 	result.mType = LuaArgStepType::Bool;
-	result.mData.Bool = value;
+	result.mData = value;
 
 	return result;
 }
@@ -103,13 +85,9 @@ LuaArgUnpackStep LuaArgUnpackStep::PushBool(int value)
 LuaArgUnpackStep LuaArgUnpackStep::PushString(const char* value, size_t len)
 {
 	LuaArgUnpackStep result;
-
+	
 	result.mType = LuaArgStepType::String;
-
-	result.mData.String.String = new char[len+1];
-	memcpy_s(result.mData.String.String, len+1, value,len+1);
-
-	result.mData.String.Len = len;
+	result.mData = std::string(value, len);
 
 	return result;
 }
@@ -128,8 +106,7 @@ LuaArgUnpackStep LuaArgUnpackStep::StartTable(int nArr, int nRec)
 	LuaArgUnpackStep result;
 
 	result.mType = LuaArgStepType::TableStart;
-	result.mData.TableInfo.NArr = nArr;
-	result.mData.TableInfo.NRec = nRec;
+	result.mData = LTableSpec{ nArr, nRec };
 
 	return result;
 }
