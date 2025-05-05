@@ -30,6 +30,7 @@
 //#include "OneShotTaskExecPack.h"
 //#include "CoTaskExecPack.h"
 #include "TaskPackAcceptor.h"
+#include "Task.h"
 
 extern "C" {
 #include "lua.h"
@@ -43,11 +44,11 @@ namespace LuaWorker
 	/// <summary>
 	/// Manages lua state in worker thread
 	/// </summary>
-	class InnerLuaState : public Cancelable, public TaskPackAcceptor
+	class InnerLuaState : public Cancelable //, public TaskPackAcceptor
 	{
 	private:
 
-		typedef AutoKeyDeck::AutoKeyLoanDeck<std::unique_ptr<CoTaskExecPack>,std::chrono::system_clock::time_point,int> T_SuspendedTaskDeck;
+		typedef AutoKeyDeck::AutoKeyLoanDeck<std::shared_ptr<Task>,std::chrono::system_clock::time_point,int> T_SuspendedTaskDeck;
 		typedef T_SuspendedTaskDeck::CardType T_SuspendedTaskCard;
 
 		/// <summary>
@@ -95,7 +96,7 @@ namespace LuaWorker
 		/// <param name="task">Task to push</param>
 		/// <param name="resumeAt">Target resume time for this task</param>
 		/// </summary>
-		bool HandleSuspendedTask(std::unique_ptr<CoTaskExecPack>&& task, std::chrono::system_clock::time_point resumeAt);
+		bool HandleSuspendedTask(std::shared_ptr<Task> task, std::chrono::system_clock::time_point resumeAt);
 
 		lua_State* GetTaskThread(int taskHandle);
 
@@ -160,20 +161,11 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="task">Task to execute</param>
 		/// <param name="resumeToken">Resume token output</param>
-		void ExecTask(std::unique_ptr <OneShotTaskExecPack>&& task);
+		void ExecTask(std::shared_ptr <Task> task);
 
 		/// <summary>
-		/// Exec task in lua state. 
-		/// Call in worker thread only.
+		/// Resume newxt resumable task		
 		/// </summary>
-		/// <param name="task">Task to execute</param>
-		/// <param name="resumeToken">Resume token output</param>
-		void ExecTask(std::unique_ptr <CoTaskExecPack>&& task);
-
-		/// <summary>
-		/// Resume task from a token
-		/// </summary>
-		/// <param name="resumeToken">Handle to task to return</param>
 		void ResumeTask();
 
 		/// <summary>

@@ -45,7 +45,7 @@ const char* InnerLuaState::cInLuaWorkerTableName = "InLuaWorker";
 // Private
 //----------------------
 
-bool InnerLuaState::HandleSuspendedTask(std::unique_ptr<CoTaskExecPack>&& task, std::chrono::system_clock::time_point resumeAt)
+bool InnerLuaState::HandleSuspendedTask(std::shared_ptr<Task> task, std::chrono::system_clock::time_point resumeAt)
 {
 	if (mLua == nullptr) return false;
 
@@ -62,7 +62,7 @@ bool InnerLuaState::HandleSuspendedTask(std::unique_ptr<CoTaskExecPack>&& task, 
 		return false;
 	}
 
-	T_SuspendedTaskCard card  = mResumableTasks.MakeCard(std::move(task),resumeAt);
+	T_SuspendedTaskCard card  = mResumableTasks.MakeCard(task,resumeAt);
 
 	lua_pushinteger(mLua, card.GetTag());
 
@@ -343,23 +343,8 @@ void InnerLuaState::Close()
 }
 
 //------
-void InnerLuaState::ExecTask(std::unique_ptr<OneShotTaskExecPack>&& task)
-{
-	if(mCancel) throw LuaCancellationException();
 
-	if (mLua != nullptr && task != nullptr)
-	{
-		int prevTop = lua_gettop(mLua);
-
-		mCurrentTaskCanYield = false; // Block yields via InLuaWorker
-
-		task->Exec(mLua);
-
-		lua_settop(mLua, prevTop);
-	}
-}
-
-void InnerLuaState::ExecTask(std::unique_ptr < CoTaskExecPack>&& task)
+void InnerLuaState::ExecTask(std::shared_ptr<Task> task)
 {
 	if (mCancel) throw LuaCancellationException();
 
@@ -367,16 +352,27 @@ void InnerLuaState::ExecTask(std::unique_ptr < CoTaskExecPack>&& task)
 	{
 		int prevTop = lua_gettop(mLua);
 
-		lua_State* taskThread = lua_newthread(mLua);
-
-		mCurrentTaskYielded = false;
-		mCurrentTaskCanYield = true;
-
-		task->Exec(taskThread);
-
-		if (mCurrentTaskYielded && lua_status(taskThread) == LUA_YIELD)
+		if (task->RunOnOwnLuaThread())
 		{
-			HandleSuspendedTask(std::move(task), mResumeCurrentTaskAt);
+
+			lua_State* taskThread = lua_newthread(mLua);
+
+			mCurrentTaskYielded = false;
+			mCurrentTaskCanYield = true;
+
+			task->Exec(taskThread);
+
+			if (mCurrentTaskYielded && lua_status(taskThread) == LUA_YIELD)
+			{
+				HandleSuspendedTask(std::move(task), mResumeCurrentTaskAt);
+			}
+		}
+		else
+		{
+
+			mCurrentTaskCanYield = false; // Block yields via InLuaWorker
+
+			task->Exec(mLua);
 		}
 
 		lua_settop(mLua, prevTop);

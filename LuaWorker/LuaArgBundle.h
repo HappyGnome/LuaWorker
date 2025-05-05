@@ -177,11 +177,11 @@ namespace LuaWorker
 #ifdef _BENCHMARK_OBJ_COUNTERS_
 		~LuaArgBundle();
 
-		LuaArgBundle(const LuaArgBundle&) = delete;
-		LuaArgBundle& operator=(const LuaArgBundle&) = delete;
+		//LuaArgBundle(const LuaArgBundle&) = delete;
+		//LuaArgBundle& operator=(const LuaArgBundle&) = delete;
 
-		LuaArgBundle(LuaArgBundle&&) = default;
-		LuaArgBundle& operator=(LuaArgBundle&&) = default;
+		//LuaArgBundle(LuaArgBundle&&) = default;
+		//LuaArgBundle& operator=(LuaArgBundle&&) = default;
 #endif
 
 		/// <summary>

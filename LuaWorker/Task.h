@@ -25,10 +25,12 @@
 //#include <thread>
 #include <mutex>
 #include <string>
+#include<variant>
 
 #include "Cancelable.h"
 #include "LuaArgBundle.h"
-#include "TaskCOnfig.h"
+#include "TaskConfig.h"
+#include "LuaArgBundle.h"
 
 extern "C" {
 #include "lua.h"
@@ -55,6 +57,20 @@ namespace LuaWorker
 	{
 	private:
 
+		enum TaskType 
+		{
+			DoSleep,
+			DoFile,
+			DoString,
+			Coroutine
+		};
+
+		struct CoroutineData 
+		{
+			std::string FuncString;
+			LuaArgBundle Args;
+		};
+
 		//-------------------------------
 		// Properties
 		//-------------------------------
@@ -70,6 +86,45 @@ namespace LuaWorker
 		bool mUnreadResult;
 
 		TaskConfig mConfig;
+
+		TaskType mType;
+
+		std::variant<std::string, unsigned int, CoroutineData> mExecData;
+
+		
+		//-------------------------------
+		// Private methods
+		//-------------------------------
+
+		///// <summary>
+		///// Explicit constructor with config
+		///// </summary>
+		//explicit Task(const TaskConfig& config);
+
+		/// <summary>
+		/// Explicit constructor with config, hweere exec data is a string
+		/// </summary>
+		explicit Task(const std::string& data, const TaskConfig& config);
+
+		/// <summary>
+		/// Explicit constructor with config, where exec data is uint
+		/// </summary>
+		explicit Task(unsigned int data, const TaskConfig& config);
+
+		/// <summary>
+		/// Explicit constructor with config, where exec data is uint
+		/// </summary>
+		explicit Task(const std::string& funcString, const LuaArgBundle& args, const TaskConfig& config);
+
+		LuaArgBundle DoExecFile(lua_State* pL);
+
+		LuaArgBundle DoExecSleep(lua_State* pL);
+
+		LuaArgBundle DoExecString(lua_State* pL);
+
+		LuaArgBundle DoExecCoroutine(lua_State* pL);
+
+		LuaArgBundle DoResumeCoroutine(lua_State* pL, int argC, int funcCall);
 
 	protected:
 
@@ -117,19 +172,49 @@ namespace LuaWorker
 		/// <returns>True if status is final</returns>
 		static bool IsFinal(TaskStatus status);
 
+		/// <summary>
+		/// Construct instance to execute a lua file
+		/// </summary>
+		/// <param name="filePath">Filepath to run when this task executes</param>
+		static std::shared_ptr<Task> NewDoFile(const std::string& filePath, const TaskConfig& config);
+
+		/// <summary>
+		/// Construct instance to execute a lua string
+		/// </summary>
+		static std::shared_ptr<Task> NewDoString(const std::string& luaString, const TaskConfig& config);
+
+		/// <summary>
+		/// Construct instance that sleeps the worker thread
+		/// </summary>
+		/// <param name="sleepForMs"></param>
+		/// <param name="config"></param>
+		/// <returns></returns>
+		static std::shared_ptr<Task> NewDoSleep(unsigned int sleepForMs, const TaskConfig& config);
+
+		/// <summary>
+		/// Construct instance that launches a coroutine
+		/// </summary>
+		/// <param name="funcString"></param>
+		/// <param name="args"></param>
+		/// <param name="config"></param>
+		/// <returns></returns>
+		static std::shared_ptr<Task> NewDoCoroutine(const std::string& funcString, const LuaArgBundle& args, const TaskConfig& config);
+
 		//-------------------------------
 		// Public methods
 		//-------------------------------
 
-		/// <summary>
-		/// Default constructor
-		/// </summary>
-		Task(TaskConfig&& config);
-
 #ifdef _BENCHMARK_OBJ_COUNTERS_
-		~Task();
+		~Task()
 #endif
 
+		Task() = default;
+
+		Task(Task&&) noexcept = delete;
+		Task& operator= (Task&&) = delete;
+
+		Task(const Task&) = delete;
+		Task& operator= (const Task&) = delete;
 
 		/// <summary>
 		/// Push result of this task onto the given lua stack and return the number of items pushed
@@ -174,6 +259,26 @@ namespace LuaWorker
 		/// </summary>
 		/// <returns></returns>
 		int GetMaxTableDepth();
+
+		/// <summary>
+		/// Execute this task on a given lua state
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		void Exec(lua_State* pL);
+
+		/// <summary>
+		/// Resume execution of this task on the given lua state.
+		/// Is this is not the same state previously passed to Exec, behaviour is undefined.
+		/// </summary>
+		/// <param name="pL">Lua state</param>
+		void Resume(lua_State* pL);
+
+		/// <summary>
+		/// Returns true if this task should be run like a coroutine on its own lua thread
+		/// </summary>
+		/// <returns></returns>
+		bool RunOnOwnLuaThread() const;
+
 	};
 }
 #endif

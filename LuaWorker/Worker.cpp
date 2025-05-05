@@ -22,10 +22,11 @@
 #include "LogSection.h"
 #include "InnerLuaState.h"
 #include "Worker.h"
-#include "OneShotTaskExecPack.h"
-#include "CoTaskExecPack.h"
-#include "OneShotTask.h"
-#include "CoTask.h"
+#include "Task.h"
+//#include "OneShotTaskExecPack.h"
+//#include "CoTaskExecPack.h"
+//#include "OneShotTask.h"
+//#include "CoTask.h"
 
 using namespace LuaWorker;
 
@@ -96,7 +97,7 @@ bool Worker::ThreadMainCloseLua(InnerLuaState& lua)
 	return false;
 }
 
-std::unique_ptr<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
+std::shared_ptr<Task> Worker::RunCurrentTasks(InnerLuaState& lua)
 {
 	while (!mCancel)
 	{
@@ -108,7 +109,7 @@ std::unique_ptr<TaskExecPack> Worker::RunCurrentTasks(InnerLuaState& lua)
 			{
 				if (!mTaskQueue.empty())
 				{
-					std::unique_ptr<TaskExecPack> newTaskOut(std::move(mTaskQueue.front()));
+					std::shared_ptr<Task> newTaskOut(mTaskQueue.front());
 					mTaskQueue.pop_front();
 					return newTaskOut;
 				}
@@ -146,7 +147,7 @@ void Worker::ThreadMainLoop(InnerLuaState& lua)
 	{
 		while (!mCancel)
 		{
-			std::unique_ptr<TaskExecPack> currentTask (RunCurrentTasks(lua));
+			std::shared_ptr<Task> currentTask = RunCurrentTasks(lua);
 			
 			if (currentTask == nullptr) break;
 
@@ -159,7 +160,7 @@ void Worker::ThreadMainLoop(InnerLuaState& lua)
 				break;
 			}
 
-			TaskExecPack::VisitLuaState(std::move(currentTask), &lua);
+			lua.ExecTask(currentTask);
 		}
 	}
 	catch (const std::exception& ex)
@@ -256,10 +257,8 @@ WorkerStatus Worker::Stop()
 }
 
 //------
-WorkerStatus Worker::AddTask(std::shared_ptr<OneShotTask> task)
+WorkerStatus Worker::AddTask(std::shared_ptr<Task> task)
 {	
-	std::unique_ptr<OneShotTaskExecPack> pack = std::make_unique<OneShotTaskExecPack>(task, LogSection(mLog));
-
 	{
 		std::unique_lock<std::mutex> lock(mTasksMtx);
 
@@ -269,28 +268,7 @@ WorkerStatus Worker::AddTask(std::shared_ptr<OneShotTask> task)
 			return mCurrentStatus;
 		}
 
-		mTaskQueue.push_back(std::move(pack));
-	}
-	mTaskCancelCv.notify_all();
-
-	return mCurrentStatus;
-}
-
-//------
-WorkerStatus Worker::AddTask(std::shared_ptr<CoTask> task)
-{
-	std::unique_ptr<CoTaskExecPack> pack = std::make_unique<CoTaskExecPack>(task, LogSection(mLog));
-
-	{
-		std::unique_lock<std::mutex> lock(mTasksMtx);
-
-		if (mCancel)
-		{
-			task->Cancel();
-			return mCurrentStatus;
-		}
-
-		mTaskQueue.push_back(std::move(pack));
+		mTaskQueue.push_back(task); 	
 	}
 	mTaskCancelCv.notify_all();
 

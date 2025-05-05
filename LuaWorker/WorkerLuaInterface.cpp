@@ -17,11 +17,12 @@
 \*****************************************************************************/
 
 #include "WorkerLuaInterface.h"
-#include "TaskDoFile.h"
-#include "TaskDoString.h"
-#include "TaskDoSleep.h"
-#include "OneShotTask.h"
-#include "CoTask.h"
+#include "Task.h"
+//#include "TaskDoFile.h"
+//#include "TaskDoString.h"
+//#include "TaskDoSleep.h"
+//#include "OneShotTask.h"
+//#include "CoTask.h"
 
 using namespace LuaWorker;
 using namespace AutoKeyDeck;
@@ -184,7 +185,7 @@ int WorkerLuaInterface::l_Worker_DoString(lua_State* pL)
 		{
 			std::string str = lua_tostring(pL, -1);
 
-			std::shared_ptr<OneShotTask> newItem = std::make_shared<TaskDoString>(str, std::move(tc));
+			std::shared_ptr<Task> newItem = Task::NewDoString(str, tc);
 			pWorker->AddTask(newItem);
 
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -213,7 +214,7 @@ int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 		{
 			std::string str = lua_tostring(pL,  -1);
 
-			std::shared_ptr<OneShotTask> newItem = std::make_shared<TaskDoFile>(str, std::move(tc));
+			std::shared_ptr<Task> newItem = Task::NewDoFile(str, tc);
 			pWorker->AddTask(newItem);
 			
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -233,7 +234,7 @@ int WorkerLuaInterface::l_Worker_DoSleep(lua_State* pL)
 		{
 			unsigned int millis = std::max(0,(int)lua_tointeger(pL, -1));
 
-			std::shared_ptr<OneShotTask> newItem = std::make_shared<TaskDoSleep>(millis, TaskConfig());
+			std::shared_ptr<Task> newItem = Task::NewDoSleep(millis, TaskConfig());
 			pWorker->AddTask(newItem);
 
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -264,11 +265,11 @@ int WorkerLuaInterface::l_Worker_DoCoRoutine(lua_State* pL)
 
 		std::string funcStr = lua_tostring(pL, -N);		
 
-		std::unique_ptr<LuaArgBundle> argBundle = nullptr;
+		LuaArgBundle argBundle;
 		
-		if (N > 1) argBundle = std::make_unique<LuaArgBundle>(pL, N - 1, tc.MaxTableDepth);
+		if (N > 1) argBundle = LuaArgBundle(pL, N - 1, tc.MaxTableDepth);
 
-		std::shared_ptr<CoTask> newItem = std::make_shared<CoTask>(funcStr, std::move(argBundle), std::move(tc));
+		std::shared_ptr<Task> newItem = Task::NewDoCoroutine(funcStr, std::move(argBundle), tc);
 		pWorker->AddTask(newItem);
 
 		return TaskLuaInterface::l_PushTask(pL, newItem);

@@ -30,8 +30,9 @@
 #include "LogSection.h"
 #include "InnerLuaState.h"
 #include "Cancelable.h"
-#include "CoTask.h"
-#include "OneShotTask.h"
+#include "Task.h"
+//#include "CoTask.h"
+//#include "OneShotTask.h"
 
 extern "C" {
 //#include "lua.h"
@@ -60,7 +61,7 @@ namespace LuaWorker
 
 		std::thread mThread;
 
-		std::deque<std::unique_ptr<TaskExecPack>> mTaskQueue;
+		std::list<std::shared_ptr<Task>> mTaskQueue;
 		std::mutex mTasksMtx;
 
 		std::condition_variable mTaskCancelCv;
@@ -103,7 +104,7 @@ namespace LuaWorker
 		/// <summary>
 		/// Resume tasks on schedule and wait for new tasks. Returns the next new task unless main loop should quit
 		/// </summary>
-		std::unique_ptr<TaskExecPack> RunCurrentTasks(InnerLuaState& lua);
+		std::shared_ptr<Task> RunCurrentTasks(InnerLuaState& lua);
 
 		/// <summary>
 		/// Cancel worker thread execution
@@ -155,14 +156,7 @@ namespace LuaWorker
 		/// </summary>
 		/// <param name="task">Task to queue</param>
 		/// <returns>Current worker status</returns>
-		WorkerStatus AddTask(std::shared_ptr<OneShotTask> task);
-
-		/// <summary>
-		/// Queue coroutine task for worker thread
-		/// </summary>
-		/// <param name="task">Task to queue</param>
-		/// <returns>Current worker status</returns>
-		WorkerStatus AddTask(std::shared_ptr<CoTask> task);
+		WorkerStatus AddTask(std::shared_ptr<Task> task);
 
 		/// <summary>
 		/// Get log output for reading this worker's logs
