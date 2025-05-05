@@ -29,9 +29,9 @@ using namespace LuaWorker;
 //-------------------------------
 // Private methods
 //-------------------------------
-Task::Task(const std::string& data, const TaskConfig& config) : mConfig(config), mExecData(data){}
+Task::Task(const std::string& data, const TaskConfig& config) : mConfig(config), mExecData(data) {}
 
-Task::Task(unsigned int data, const TaskConfig& config): mConfig(config), mExecData(data) {}
+Task::Task(unsigned int data, const TaskConfig& config): mConfig(config), mExecData(data){}
 
 Task::Task(const std::string& funcString, const LuaArgBundle& args, const TaskConfig& config) : mConfig(config), mExecData(CoroutineData{funcString, args}) {}
 
@@ -412,7 +412,7 @@ void Task::Cancel()
 }
 
 //------
-int Task::GetMaxTableDepth() 
+int Task::GetMaxTableDepth() const
 {
 	return mConfig.MaxTableDepth;
 }
@@ -420,7 +420,6 @@ int Task::GetMaxTableDepth()
 void Task::Exec(lua_State* pL)
 {
 	if (pL == nullptr || !TrySetRunning()) return;
-
 
 	LuaArgBundle result;
 	bool yielded = false;

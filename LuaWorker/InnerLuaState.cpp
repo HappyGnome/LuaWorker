@@ -348,9 +348,12 @@ void InnerLuaState::ExecTask(std::shared_ptr<Task> task)
 {
 	if (mCancel) throw LuaCancellationException();
 
-	if (mLua != nullptr && task != nullptr)
+	if (mLua == nullptr || task == nullptr ) return;
+	
+	int prevTop = lua_gettop(mLua);
+
+	try
 	{
-		int prevTop = lua_gettop(mLua);
 
 		if (task->RunOnOwnLuaThread())
 		{
@@ -364,7 +367,7 @@ void InnerLuaState::ExecTask(std::shared_ptr<Task> task)
 
 			if (mCurrentTaskYielded && lua_status(taskThread) == LUA_YIELD)
 			{
-				HandleSuspendedTask(std::move(task), mResumeCurrentTaskAt);
+				HandleSuspendedTask(task, mResumeCurrentTaskAt);
 			}
 		}
 		else
@@ -375,8 +378,16 @@ void InnerLuaState::ExecTask(std::shared_ptr<Task> task)
 			task->Exec(mLua);
 		}
 
-		lua_settop(mLua, prevTop);
+		if (task->GetStatus() == TaskStatus::Error)
+			mLog.Push(LogLevel::Error, task->GetError());
 	}
+	catch (const std::exception& ex)
+	{
+		mLog.Push(ex);
+		task->SetError("Exception occurred during execution");
+	}
+
+	lua_settop(mLua, prevTop);
 }
 
 void InnerLuaState::ResumeTask()
@@ -393,7 +404,20 @@ void InnerLuaState::ResumeTask()
 
 	mCurrentTaskYielded = false;
 
-	card.value().GetValue()->Resume(taskThread);
+	std::shared_ptr<Task> task = card.value().GetValue();
+
+	try
+	{
+		task -> Resume(taskThread);
+
+		if (task->GetStatus() == TaskStatus::Error)
+				mLog.Push(LogLevel::Error, task->GetError());
+	}
+	catch (const std::exception& ex)
+	{
+		mLog.Push(ex);
+		task->SetError("Exception occurred during execution");
+	}
 
 	if (mCurrentTaskYielded)
 	{

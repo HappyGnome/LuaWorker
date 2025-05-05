@@ -30,7 +30,6 @@
 #include "Cancelable.h"
 #include "LuaArgBundle.h"
 #include "TaskConfig.h"
-#include "LuaArgBundle.h"
 
 extern "C" {
 #include "lua.h"
@@ -57,8 +56,9 @@ namespace LuaWorker
 	{
 	private:
 
-		enum TaskType 
+		enum class TaskType 
 		{
+			None,
 			DoSleep,
 			DoFile,
 			DoString,
@@ -75,7 +75,7 @@ namespace LuaWorker
 		// Properties
 		//-------------------------------
 
-		TaskStatus mStatus;
+		TaskStatus mStatus = TaskStatus::NotStarted;
 
 		LuaArgBundle mResult;
 		std::string mError;
@@ -83,11 +83,11 @@ namespace LuaWorker
 		std::mutex mResultStatusMtx;
 		std::condition_variable mResultStatusCv;
 
-		bool mUnreadResult;
+		bool mUnreadResult = false;
 
 		TaskConfig mConfig;
 
-		TaskType mType;
+		TaskType mType = TaskType::None;
 
 		std::variant<std::string, unsigned int, CoroutineData> mExecData;
 
@@ -208,13 +208,15 @@ namespace LuaWorker
 		~Task()
 #endif
 
-		Task() = default;
+		Task() = delete;
 
 		Task(Task&&) noexcept = delete;
 		Task& operator= (Task&&) = delete;
 
 		Task(const Task&) = delete;
 		Task& operator= (const Task&) = delete;
+
+		~Task() = default;
 
 		/// <summary>
 		/// Push result of this task onto the given lua stack and return the number of items pushed
@@ -258,7 +260,7 @@ namespace LuaWorker
 		/// E.g. if it's 0, no tables can be returned. If 1, then tables in result values will not contain tables
 		/// </summary>
 		/// <returns></returns>
-		int GetMaxTableDepth();
+		int GetMaxTableDepth() const;
 
 		/// <summary>
 		/// Execute this task on a given lua state

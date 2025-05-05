@@ -185,7 +185,7 @@ int WorkerLuaInterface::l_Worker_DoString(lua_State* pL)
 		{
 			std::string str = lua_tostring(pL, -1);
 
-			std::shared_ptr<Task> newItem = Task::NewDoString(str, tc);
+			std::shared_ptr<Task> newItem = Task::NewDoString(std::move(str), std::move(tc));
 			pWorker->AddTask(newItem);
 
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -214,7 +214,7 @@ int WorkerLuaInterface::l_Worker_DoFile(lua_State* pL)
 		{
 			std::string str = lua_tostring(pL,  -1);
 
-			std::shared_ptr<Task> newItem = Task::NewDoFile(str, tc);
+			std::shared_ptr<Task> newItem = Task::NewDoFile(std::move(str), std::move(tc));
 			pWorker->AddTask(newItem);
 			
 			return TaskLuaInterface::l_PushTask(pL, newItem);
@@ -269,7 +269,7 @@ int WorkerLuaInterface::l_Worker_DoCoRoutine(lua_State* pL)
 		
 		if (N > 1) argBundle = LuaArgBundle(pL, N - 1, tc.MaxTableDepth);
 
-		std::shared_ptr<Task> newItem = Task::NewDoCoroutine(funcStr, std::move(argBundle), tc);
+		std::shared_ptr<Task> newItem = Task::NewDoCoroutine(std::move(funcStr), std::move(argBundle), std::move(tc));
 		pWorker->AddTask(newItem);
 
 		return TaskLuaInterface::l_PushTask(pL, newItem);

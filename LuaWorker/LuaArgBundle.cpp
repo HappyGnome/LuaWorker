@@ -24,25 +24,25 @@ int LuaArgUnpackStep::Unpack(lua_State* pL) const
 {
 	switch (mType)
 	{
-	case Number:
+	case LuaArgStepType::Number:
 		lua_pushnumber(pL, std::get<lua_Number>(mData));
 		return 1;
-	case Bool:
+	case LuaArgStepType::Bool:
 		lua_pushboolean(pL, std::get<int>(mData));
 		return 1;
-	case Nil:
+	case LuaArgStepType::Nil:
 		lua_pushnil(pL);
 		return 1;
-	case String:
+	case LuaArgStepType::String:
 		{
 			const std::string& s = std::get<std::string>(mData);
 			lua_pushlstring(pL, s.data(), s.size());
 			return 1;
 		}
-	case TableSet:
+	case LuaArgStepType::TableSet:
 		lua_rawset(pL, -3);
 		return -2;
-	case TableStart:
+	case LuaArgStepType::TableStart:
 		{
 			const LTableSpec& t = std::get<LTableSpec>(mData);
 			lua_createtable(pL, t.NArr, t.NRec);

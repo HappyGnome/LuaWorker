@@ -42,7 +42,7 @@ extern "C" {
 
 namespace LuaWorker
 {
-	enum LuaArgStepType
+	enum class LuaArgStepType
 	{
 		Nil,
 		Number,
@@ -58,7 +58,7 @@ namespace LuaWorker
 	class LuaArgUnpackStep
 	{
 	private:
-		LuaArgStepType mType;
+		LuaArgStepType mType = LuaArgStepType::Nil;
 
 		struct LTableSpec
 		{
