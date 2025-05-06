@@ -447,7 +447,7 @@ void Task::Exec(lua_State* pL)
 
 void Task::Resume(lua_State* pL)
 {
-	assert(mType == Coroutine);
+	assert(mType == TaskType::Coroutine);
 
 	if (pL == nullptr || lua_status(pL) != LUA_YIELD || !TrySetRunning(TaskStatus::Suspended)) return;
 
